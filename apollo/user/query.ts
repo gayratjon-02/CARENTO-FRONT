@@ -199,6 +199,68 @@ export const GET_PROPERTIES = gql`
 	}
 `;
 
+export const GET_CARS = gql`
+	query GetCars($input: CarsInquiry!) {
+		getCars(input: $input) {
+			list {
+				_id
+				carTitle
+				carDescription
+				brandType
+				year
+				fuelType
+				transmission
+				seats
+				doors
+				mileage
+				engine
+				carType
+				carStatus
+				carLocation
+				carImages
+				pricePerDay
+				pricePerHour
+				carViews
+				deletedAt
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberType
+					memberStatus
+					memberAuthType
+					memberPhone
+					memberNick
+					memberFullName
+					memberImage
+					memberAddress
+					memberDesc
+					memberCars
+					memberArticles
+					memberFollowers
+					memberFollowings
+					memberPoints
+					memberLikes
+					memberViews
+					memberComments
+					memberRank
+					memberWarnings
+					memberBlocks
+					drivingLicenseNumber
+					drivingLicensePhoto
+					deletedAt
+					createdAt
+					updatedAt
+					accessToken
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
 export const GET_AGENT_PROPERTIES = gql`
 	query GetAgentProperties($input: AgentPropertiesInquiry!) {
 		getAgentProperties(input: $input) {

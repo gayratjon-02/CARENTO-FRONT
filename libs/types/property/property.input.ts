@@ -1,5 +1,6 @@
 import { PropertyLocation, PropertyStatus, PropertyType } from '../../enums/property.enum';
 import { Direction } from '../../enums/common.enum';
+import { BrandType, CarType, FuelType, CarLocation, Transmission } from '../../enum/car.enum';
 
 export interface PropertyInput {
 	propertyType: PropertyType;
@@ -37,6 +38,23 @@ export interface PropertiesInquiry {
 	sort?: string;
 	direction?: Direction;
 	search: PISearch;
+}
+
+export interface CarsInquiry {
+	page: number;
+	limit: number;
+	sort?: string;
+	direction?: Direction;
+	search: CSearch;
+}
+interface CSearch {
+	carLocation?: CarLocation[];
+	carType?: CarType[];
+	brandType?: BrandType[];
+	fuelType?: FuelType[];
+	transmission?: Transmission[];
+	seats?: number[];
+	year?: number[];
 }
 
 interface APISearch {

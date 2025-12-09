@@ -9,11 +9,12 @@ import { Property } from '../../types/property/property';
 import { PropertiesInquiry } from '../../types/property/property.input';
 import TrendPropertyCard from './TrendPropertyCard';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_PROPERTIES } from '../../../apollo/user/query';
+import { GET_CARS, GET_PROPERTIES } from '../../../apollo/user/query';
 import { T } from '../../types/common';
 import { LIKE_TARGET_PROPERTY } from '../../../apollo/user/mutation';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
+import { Car } from '../../types/property/cars';
 
 interface TrendPropertiesProps {
 	initialInput: PropertiesInquiry;
@@ -23,7 +24,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 	const { initialInput } = props;
 	const device = useDeviceDetect();
 	const [trendProperties, setTrendProperties] = useState<Property[]>([]);
-
+	const [cars, setCars] = useState<Car[]>([]);
 	/** APOLLO REQUESTS **/
 	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
 
@@ -40,6 +41,39 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 			setTrendProperties(data?.getProperties?.list);
 		},
 	});
+
+	// GETCARS
+
+	const {
+		loading: getCarsLoading,
+		data: getCarsData,
+		error: getCarsError,
+		refetch: getCarsRefetch,
+	} = useQuery(GET_CARS, {
+		fetchPolicy: 'cache-and-network',
+		variables: {
+			input: {
+				page: 1,
+				limit: 8,
+				search: {},
+			},
+		},
+		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			setCars(data?.getCars?.list);
+		},
+	});
+	if (getCarsLoading) {
+		console.log('Loading...');
+		return null;
+	}
+
+	if (getCarsError) {
+		console.error('Error =>', getCarsError);
+		return null;
+	}
+
+	console.log('RESULT =>', getCarsData);
 	/** HANDLERS **/
 	const likePropertyHandler = async (user: T, id: string) => {
 		try {
@@ -52,7 +86,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 			});
 
 			// execute getPropertiesRefetch
-			getPropertiesRefetch({input: initialInput})
+			getPropertiesRefetch({ input: initialInput });
 
 			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
@@ -69,10 +103,10 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 			<Stack className={'trend-properties'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
-						<span>Trend Properties</span>
+						<span>Most Searched Vehicles</span>
 					</Stack>
 					<Stack className={'card-box'}>
-						{trendProperties.length === 0 ? (
+						{getCarsData.length !== 0 ? (
 							<Box component={'div'} className={'empty-list'}>
 								Trends Empty
 							</Box>
@@ -84,10 +118,14 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 								spaceBetween={15}
 								modules={[Autoplay]}
 							>
-								{trendProperties.map((property: Property) => {
+								{getCarsData.map((car: Car) => {
 									return (
-										<SwiperSlide key={property._id} className={'trend-property-slide'}>
-											<TrendPropertyCard property={property} likePropertyHandler={likePropertyHandler}  />
+										<SwiperSlide key={car._id} className={'trend-property-slide'}>
+											<Stack key={car._id}>
+												{car.carTitle} sadsa Lorem, ipsum dolor sit amet consectetur adipisicing elit. Facere
+												voluptatibus in, aperiam non aliquid dolor illo ipsum perspiciatis reprehenderit? Officiis.
+											</Stack>
+											<TrendPropertyCard car={car} likePropertyHandler={likePropertyHandler} />
 										</SwiperSlide>
 									);
 								})}
@@ -103,7 +141,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
-							<span>Trend Properties</span>
+							<span>Most Searched Vehicles</span>
 							<p>Trend is based on likes</p>
 						</Box>
 						<Box component={'div'} className={'right'}>
@@ -133,10 +171,10 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 									el: '.swiper-trend-pagination',
 								}}
 							>
-								{trendProperties.map((property: Property) => {
+								{getCarsData.map((car: Car) => {
 									return (
-										<SwiperSlide key={property._id} className={'trend-property-slide'}>
-											<TrendPropertyCard property={property} likePropertyHandler={likePropertyHandler} />
+										<SwiperSlide key={car._id} className={'trend-property-slide'}>
+											<TrendPropertyCard car={car} likePropertyHandler={likePropertyHandler} />
 										</SwiperSlide>
 									);
 								})}
@@ -153,7 +191,7 @@ TrendProperties.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 8,
-		sort: 'propertyLikes',
+		sort: 'carLikes',
 		direction: 'DESC',
 		search: {},
 	},
