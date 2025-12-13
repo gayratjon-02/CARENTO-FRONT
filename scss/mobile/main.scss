@@ -32,16 +32,58 @@
 
   .car-brands {
     width: 100%;
-    padding: 26px 14px 40px;
-    background: #f7f9fc;
+    padding: 30px 14px 42px;
+    background: linear-gradient(135deg, #f8fbff 0%, #f6f7fb 50%, #f8fbff 100%);
     .container {
       width: 100%;
       flex-direction: column;
-      gap: 18px;
-      .info {
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+      .info-row {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 12px;
+        .info-left {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .info-right {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+      }
+      .info-left {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        .eyebrow-row {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          .spark-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.08);
+            &.muted {
+              opacity: 0.35;
+              box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.05);
+            }
+          }
+          .eyebrow {
+            color: #0f9f6e;
+            font-family: $font;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+          }
+        }
         h3 {
           margin: 0;
           color: #181a20;
@@ -49,6 +91,11 @@
           font-size: 24px;
           font-weight: 700;
           letter-spacing: -0.4px;
+          .gradient-text {
+            background: linear-gradient(120deg, #111827 0%, #0f9f6e 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
         }
         p {
           margin: 0;
@@ -58,18 +105,84 @@
           font-weight: 500;
           line-height: 20px;
         }
+        .accent-bar {
+          margin-top: 2px;
+          width: 96px;
+          height: 5px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0.8));
+        }
+        .meta {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          .pill {
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #e8faf1;
+            color: #0f9f6e;
+            font-family: $font;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+          }
+          .note {
+            color: #6b7280;
+            font-family: $font;
+            font-size: 12px;
+            font-weight: 600;
+          }
+        }
+        .stats {
+          margin-top: 4px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            .stat-number {
+              color: #111827;
+              font-family: $font;
+              font-size: 16px;
+              font-weight: 800;
+            }
+            .stat-label {
+              color: #6b7280;
+              font-family: $font;
+              font-size: 11px;
+              font-weight: 600;
+            }
+          }
+          .stat-divider {
+            width: 1px;
+            height: 28px;
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0), rgba(17, 24, 39, 0.16), rgba(17, 24, 39, 0));
+          }
+        }
       }
       .brand-grid {
         display: grid;
         grid-auto-flow: column;
-        grid-auto-columns: 140px;
-        gap: 12px;
+        grid-auto-columns: 132px;
+        gap: 10px;
         overflow-x: auto;
         padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          inset: 45% 0 auto 0;
+          height: 12px;
+          background: linear-gradient(90deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0), rgba(34, 197, 94, 0.12));
+          filter: blur(12px);
+          pointer-events: none;
+        }
       }
       .brand-card {
-        height: 110px;
+        height: 104px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -77,7 +190,16 @@
         border-radius: 16px;
         background: #fff;
         border: 1px solid #e6e7eb;
-        box-shadow: 0 10px 26px rgba(17, 24, 39, 0.08);
+        box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        position: relative;
+        overflow: hidden;
+        &:nth-child(2n) {
+          transform: translateY(4px);
+        }
+        &:nth-child(3n) {
+          transform: translateY(-3px);
+        }
         img {
           max-width: 72%;
           max-height: 52px;
@@ -89,6 +211,19 @@
           font-family: $font;
           font-size: 12px;
           font-weight: 600;
+        }
+        .ring {
+          position: absolute;
+          width: 80%;
+          height: 80%;
+          border-radius: 18px;
+          border: 1px solid rgba(34, 197, 94, 0.2);
+          box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.06), 0 12px 18px rgba(34, 197, 94, 0.12);
+          pointer-events: none;
+        }
+        &:active {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 34px rgba(17, 24, 39, 0.12);
         }
       }
     }

@@ -19,14 +19,20 @@ const CarBrands = () => {
 	return (
 		<Stack className={'car-brands'}>
 			<Stack className={'container'}>
-				<Stack className={'info'}>
-					<h3>Premium Brands</h3>
-					<p>Unveil the finest selection of high-end vehicles</p>
+				<Stack className={'info-row'}>
+					<Stack className={'info-left'}>
+						<h3>
+							<span className="gradient-text">Premium Brands</span>
+						</h3>
+						<p>Unveil the finest selection of high-end vehicles</p>
+						<div className="accent-bar" />
+					</Stack>
 				</Stack>
 
 				<Stack className={'brand-grid'}>
 					{BRANDS.map((brand) => (
 						<Stack key={brand.name} className={'brand-card'}>
+							<div className="ring"></div>
 							<img src={brand.logo} alt={`${brand.name} logo`} loading="lazy" />
 							<span className={'brand-name'}>{brand.name}</span>
 						</Stack>
