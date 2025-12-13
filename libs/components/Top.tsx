@@ -26,6 +26,9 @@ const Top = () => {
 	const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null);
 	const [lang, setLang] = useState<string | null>('en');
 	const drop = Boolean(anchorEl2);
+	const [anchorElCurrency, setAnchorElCurrency] = useState<null | HTMLElement>(null);
+	const [currency, setCurrency] = useState<string | null>('KRW');
+	const currencyDrop = Boolean(anchorElCurrency);
 	const [colorChange, setColorChange] = useState(false);
 	const [anchorEl, setAnchorEl] = React.useState<any | HTMLElement>(null);
 	let open = Boolean(anchorEl);
@@ -40,6 +43,12 @@ const Top = () => {
 			setLang('en');
 		} else {
 			setLang(localStorage.getItem('locale'));
+		}
+		if (localStorage.getItem('currency') === null) {
+			localStorage.setItem('currency', 'KRW');
+			setCurrency('KRW');
+		} else {
+			setCurrency(localStorage.getItem('currency'));
 		}
 	}, [router]);
 
@@ -69,13 +78,30 @@ const Top = () => {
 
 	const langChoice = useCallback(
 		async (e: any) => {
-			setLang(e.target.id);
-			localStorage.setItem('locale', e.target.id);
+			const selectedLang = e.target.id;
+			setLang(selectedLang);
+			localStorage.setItem('locale', selectedLang);
 			setAnchorEl2(null);
-			await router.push(router.asPath, router.asPath, { locale: e.target.id });
+			await i18n.changeLanguage(selectedLang);
+			await i18n.reloadResources(selectedLang, 'common');
+			await router.push(router.asPath, router.asPath, { locale: selectedLang });
 		},
-		[router],
+		[router, i18n],
 	);
+
+	const currencyClick = (e: any) => {
+		setAnchorElCurrency(e.currentTarget);
+	};
+
+	const currencyClose = () => {
+		setAnchorElCurrency(null);
+	};
+
+	const currencyChoice = useCallback((e: any) => {
+		setCurrency(e.target.id);
+		localStorage.setItem('currency', e.target.id);
+		setAnchorElCurrency(null);
+	}, []);
 
 	const changeNavbarColor = () => {
 		if (window.scrollY >= 50) {
@@ -162,7 +188,126 @@ const Top = () => {
 	} else {
 		return (
 			<Stack className={'navbar'}>
-				<Stack className={`navbar-main ${colorChange ? 'transparent' : ''} ${bgColor ? 'transparent' : ''}`}>
+				<Stack
+					direction={'column'}
+					className={`navbar-main ${colorChange ? 'transparent' : ''} ${bgColor ? 'transparent' : ''}`}
+				>
+					<Stack className="top-container">
+						<Stack className="call-info-box">
+							<Stack className="phone-number-box" flexDirection={'row'}>
+								<img src="img/icons/call.svg" alt="call image" />
+								<p className="phone-number">+82 10 8336 2002</p>
+							</Stack>
+							<Stack className="email-info-box" flexDirection={'row'}>
+								<img src="img/icons/email.svg" alt="email image" height={20} width={20} />
+								<p className="email">gayratjon2002uz@gmail.com</p>
+							</Stack>
+						</Stack>
+						<Stack className="carento-brand-box">
+							{t('CarentoBrandSlogan') || 'CARENTO — Your reliable car partner'}
+						</Stack>
+						<Stack className="lang-currency-box">
+							<div className={'lang-box'}>
+								{/* <img src="img/icons/language.svg" alt="lang image" height={20} width={20} /> */}
+								<Button
+									disableRipple
+									className="btn-lang"
+									onClick={langClick}
+									endIcon={<CaretDown size={14} color="#616161" weight="fill" />}
+								>
+									<Box component={'div'} className={'flag'}>
+										{lang !== null ? (
+											<img src={`/img/flag/lang${lang}.png`} alt={'flag'} />
+										) : (
+											<img src={`/img/flag/langen.png`} alt={'flag'} />
+										)}
+									</Box>
+								</Button>
+
+								<StyledMenu anchorEl={anchorEl2} open={drop} onClose={langClose} sx={{ position: 'absolute' }}>
+									<MenuItem disableRipple onClick={langChoice} id="en">
+										<img
+											className="img-flag"
+											src={'/img/flag/langen.png'}
+											onClick={langChoice}
+											id="en"
+											alt={'usaFlag'}
+										/>
+										{t('English')}
+									</MenuItem>
+									<MenuItem disableRipple onClick={langChoice} id="kr">
+										<img
+											className="img-flag"
+											src={'/img/flag/langkr.png'}
+											onClick={langChoice}
+											id="kr"
+											alt={'koreanFlag'}
+										/>
+										{t('Korean')}
+									</MenuItem>
+									<MenuItem disableRipple onClick={langChoice} id="ru">
+										<img
+											className="img-flag"
+											src={'/img/flag/langru.png'}
+											onClick={langChoice}
+											id="ru"
+											alt={'russiaFlag'}
+										/>
+										{t('Russian')}
+									</MenuItem>
+								</StyledMenu>
+							</div>
+							<div className={'currency-box'}>
+								<Button
+									disableRipple
+									className="btn-currency"
+									onClick={currencyClick}
+									endIcon={<CaretDown size={14} color="#616161" weight="fill" />}
+								>
+									<Box component={'div'} className={'currency-flag'}>
+										{currency === 'KRW' ? (
+											<img src={`/img/flag/langkr.png`} alt={'koreanFlag'} />
+										) : currency === 'USD' ? (
+											<img src={`/img/flag/langen.png`} alt={'usaFlag'} />
+										) : (
+											<img src={`/img/flag/langkr.png`} alt={'flag'} />
+										)}
+									</Box>
+									<Box component={'div'} className={'currency-text'}>
+										{currency !== null ? currency : 'KRW'}
+									</Box>
+								</Button>
+
+								<StyledMenu
+									anchorEl={anchorElCurrency}
+									open={currencyDrop}
+									onClose={currencyClose}
+									sx={{ position: 'absolute' }}
+								>
+									<MenuItem disableRipple onClick={currencyChoice} id="KRW">
+										<img
+											className="img-flag"
+											src={'/img/flag/langkr.png'}
+											onClick={currencyChoice}
+											id="KRW"
+											alt={'koreanFlag'}
+										/>
+										KRW - {t('Korean Won') || 'Korean Won'}
+									</MenuItem>
+									<MenuItem disableRipple onClick={currencyChoice} id="USD">
+										<img
+											className="img-flag"
+											src={'/img/flag/langen.png'}
+											onClick={currencyChoice}
+											id="USD"
+											alt={'usaFlag'}
+										/>
+										USD - {t('US Dollar') || 'US Dollar'}
+									</MenuItem>
+								</StyledMenu>
+							</div>
+						</Stack>
+					</Stack>
 					<Stack className={'container'}>
 						<Box component={'div'} className={'logo-box'}>
 							<Link href={'/'}>
@@ -231,53 +376,6 @@ const Top = () => {
 
 							<div className={'lan-box'}>
 								{user?._id && <NotificationsOutlinedIcon className={'notification-icon'} />}
-								<Button
-									disableRipple
-									className="btn-lang"
-									onClick={langClick}
-									endIcon={<CaretDown size={14} color="#616161" weight="fill" />}
-								>
-									<Box component={'div'} className={'flag'}>
-										{lang !== null ? (
-											<img src={`/img/flag/lang${lang}.png`} alt={'usaFlag'} />
-										) : (
-											<img src={`/img/flag/langen.png`} alt={'usaFlag'} />
-										)}
-									</Box>
-								</Button>
-
-								<StyledMenu anchorEl={anchorEl2} open={drop} onClose={langClose} sx={{ position: 'absolute' }}>
-									<MenuItem disableRipple onClick={langChoice} id="en">
-										<img
-											className="img-flag"
-											src={'/img/flag/langen.png'}
-											onClick={langChoice}
-											id="en"
-											alt={'usaFlag'}
-										/>
-										{t('English')}
-									</MenuItem>
-									<MenuItem disableRipple onClick={langChoice} id="kr">
-										<img
-											className="img-flag"
-											src={'/img/flag/langkr.png'}
-											onClick={langChoice}
-											id="uz"
-											alt={'koreanFlag'}
-										/>
-										{t('Korean')}
-									</MenuItem>
-									<MenuItem disableRipple onClick={langChoice} id="ru">
-										<img
-											className="img-flag"
-											src={'/img/flag/langru.png'}
-											onClick={langChoice}
-											id="ru"
-											alt={'russiaFlag'}
-										/>
-										{t('Russian')}
-									</MenuItem>
-								</StyledMenu>
 							</div>
 						</Box>
 					</Stack>
