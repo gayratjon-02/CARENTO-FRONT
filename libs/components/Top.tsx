@@ -37,6 +37,7 @@ const Top = () => {
 	const logoutOpen = Boolean(logoutAnchor);
 	const [isContainerVisible, setIsContainerVisible] = useState<boolean>(false);
 	const [notificationCount, setNotificationCount] = useState<number>(0); // Backend dan keladi
+	const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	/** LIFECYCLES **/
 	useEffect(() => {
@@ -53,6 +54,34 @@ const Top = () => {
 			setCurrency(localStorage.getItem('currency'));
 		}
 	}, [router]);
+
+	// Container ochilgandan keyin 5 soniyadan keyin avtomatik yopish
+	useEffect(() => {
+		if (isContainerVisible) {
+			// Eski timer'ni to'xtatish
+			if (autoCloseTimerRef.current) {
+				clearTimeout(autoCloseTimerRef.current);
+			}
+			
+			// 5 soniyalik yangi timer yaratish
+			autoCloseTimerRef.current = setTimeout(() => {
+				setIsContainerVisible(false);
+			}, 5000);
+		} else {
+			// Container yopilganda timer'ni to'xtatish
+			if (autoCloseTimerRef.current) {
+				clearTimeout(autoCloseTimerRef.current);
+				autoCloseTimerRef.current = null;
+			}
+		}
+
+		// Cleanup
+		return () => {
+			if (autoCloseTimerRef.current) {
+				clearTimeout(autoCloseTimerRef.current);
+			}
+		};
+	}, [isContainerVisible]);
 
 	useEffect(() => {
 		switch (router.pathname) {
@@ -103,7 +132,24 @@ const Top = () => {
 	};
 
 	const toggleContainer = () => {
-		setIsContainerVisible(!isContainerVisible);
+		const newState = !isContainerVisible;
+		setIsContainerVisible(newState);
+		
+		// Timer'ni reset qilish
+		if (autoCloseTimerRef.current) {
+			clearTimeout(autoCloseTimerRef.current);
+			autoCloseTimerRef.current = null;
+		}
+	};
+
+	// Container ichida harakat bo'lganda timer'ni reset qilish
+	const handleContainerInteraction = () => {
+		if (isContainerVisible && autoCloseTimerRef.current) {
+			clearTimeout(autoCloseTimerRef.current);
+			autoCloseTimerRef.current = setTimeout(() => {
+				setIsContainerVisible(false);
+			}, 5000);
+		}
 	};
 
 	const currencyChoice = useCallback((e: any) => {
@@ -372,7 +418,11 @@ const Top = () => {
 							</div>
 						</Stack>
 					</Stack>
-					<Stack className={`container ${isContainerVisible ? 'visible' : 'hidden'}`}>
+					<Stack 
+						className={`container ${isContainerVisible ? 'visible' : 'hidden'}`}
+						onMouseMove={handleContainerInteraction}
+						onClick={handleContainerInteraction}
+					>
 						<Box component={'div'} className={'logo-box'}>
 							<Link href={'/'} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
 								<img src="/img/icons/main-logotip.svg" alt="Carento Logo" />
