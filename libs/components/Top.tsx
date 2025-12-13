@@ -86,7 +86,8 @@ const Top = () => {
 			setAnchorEl2(null);
 			await i18n.changeLanguage(selectedLang);
 			await i18n.reloadResources(selectedLang, 'common');
-			await router.push(router.asPath, router.asPath, { locale: selectedLang });
+			// Shallow routing ni o'chirish - locale o'zgarganda sahifa qayta yuklanishi kerak
+			await router.push(router.asPath, router.asPath, { locale: selectedLang, shallow: false });
 		},
 		[router, i18n],
 	);
