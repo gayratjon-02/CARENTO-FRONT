@@ -63,17 +63,9 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 			setCars(data?.getCars?.list);
 		},
 	});
-	if (getCarsLoading) {
-		console.log('Loading...');
-		return null;
-	}
 
-	if (getCarsError) {
-		console.error('Error =>', getCarsError);
-		return null;
-	}
+	console.log('cars:', cars);
 
-	console.log('RESULT =>', getCarsData);
 	/** HANDLERS **/
 	const likePropertyHandler = async (user: T, id: string) => {
 		try {
@@ -103,7 +95,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 			<Stack className={'trend-properties'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
-						<span>Most Searched Vehicles</span>
+						<span>Most Searched Vehicles hn</span>
 					</Stack>
 					<Stack className={'card-box'}>
 						{getCarsData.length !== 0 ? (
@@ -153,7 +145,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 						</Box>
 					</Stack>
 					<Stack className={'card-box'}>
-						{trendProperties.length === 0 ? (
+						{cars.length === 0 ? (
 							<Box component={'div'} className={'empty-list'}>
 								Trends Empty
 							</Box>
@@ -171,7 +163,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 									el: '.swiper-trend-pagination',
 								}}
 							>
-								{getCarsData.map((car: Car) => {
+								{cars.map((car: Car) => {
 									return (
 										<SwiperSlide key={car._id} className={'trend-property-slide'}>
 											<TrendPropertyCard car={car} likePropertyHandler={likePropertyHandler} />

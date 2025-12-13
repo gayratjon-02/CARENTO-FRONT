@@ -37,6 +37,7 @@ const TrendPropertyCard = (props: TrendPropertyCardProps) => {
 					onClick={() => pushDetailHandler(car?._id)}
 				>
 					<div>${car.pricePerDay}</div>
+					<div>{car.carImages[0]} w</div>
 				</Box>
 				<Box component={'div'} className={'info'}>
 					<strong className={'title'} onClick={() => pushDetailHandler(car?._id)}>
