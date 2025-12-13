@@ -11,9 +11,9 @@ import { Property } from '../../types/property/property';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_PROPERTIES } from '../../../apollo/user/query';
 import { T } from '../../types/common';
-import { LIKE_TARGET_PROPERTY } from '../../../apollo/user/mutation';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
+import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
 
 interface TopPropertiesProps {
 	initialInput: PropertiesInquiry;
@@ -25,7 +25,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 	const [topProperties, setTopProperties] = useState<Property[]>([]);
 
 	/** APOLLO REQUESTS **/
-	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
+	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 
 	const {
 		loading: getPropertiesLoading,
@@ -49,7 +49,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 				if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
 	
 				// execute likeTargetProperty Mutation
-				await likeTargetProperty({
+				await likeTargetCar({
 					variables: { input: id },
 				});
 	
@@ -84,7 +84,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 							{topProperties.map((property: Property) => {
 								return (
 									<SwiperSlide className={'top-property-slide'} key={property?._id}>
-										<TopPropertyCard property={property} likePropertyHandler={likePropertyHandler} />
+										<TopPropertyCard property={property} likePropertyHandler={likeTargetCar} />
 									</SwiperSlide>
 								);
 							})}

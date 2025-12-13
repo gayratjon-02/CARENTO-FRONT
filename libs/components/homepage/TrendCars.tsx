@@ -5,44 +5,28 @@ import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper';
-import { Property } from '../../types/property/property';
-import { PropertiesInquiry } from '../../types/property/property.input';
+import { CarsInquiry, PropertiesInquiry } from '../../types/property/property.input';
 import TrendPropertyCard from './TrendPropertyCard';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_CARS, GET_PROPERTIES } from '../../../apollo/user/query';
+import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
-import { LIKE_TARGET_PROPERTY } from '../../../apollo/user/mutation';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
 import { Car } from '../../types/property/cars';
+import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
 
-interface TrendPropertiesProps {
-	initialInput: PropertiesInquiry;
+interface TrendCarsProps {
+	initialInput: CarsInquiry;
 }
 
-const TrendProperties = (props: TrendPropertiesProps) => {
+const TrendCars = (props: TrendCarsProps) => {
 	const { initialInput } = props;
 	const device = useDeviceDetect();
-	const [trendProperties, setTrendProperties] = useState<Property[]>([]);
 	const [cars, setCars] = useState<Car[]>([]);
-	/** APOLLO REQUESTS **/
-	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
-
-	const {
-		loading: getPropertiesLoading,
-		data: getPropertiesData,
-		error: getPropertiesError,
-		refetch: getPropertiesRefetch,
-	} = useQuery(GET_PROPERTIES, {
-		fetchPolicy: 'cache-and-network',
-		variables: { input: initialInput },
-		notifyOnNetworkStatusChange: true,
-		onCompleted: (data: T) => {
-			setTrendProperties(data?.getProperties?.list);
-		},
-	});
 
 	// GETCARS
+	/** APOLLO REQUESTS **/
+	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 
 	const {
 		loading: getCarsLoading,
@@ -64,38 +48,36 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 		},
 	});
 
-	console.log('cars:', cars);
-
 	/** HANDLERS **/
-	const likePropertyHandler = async (user: T, id: string) => {
+	const likeCarHandler = async (user: T, id: string) => {
 		try {
 			if (!id) return;
 			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
 
-			// execute likeTargetProperty Mutation
-			await likeTargetProperty({
+			// execute likeCarHandler Mutation
+			await likeTargetCar({
 				variables: { input: id },
 			});
 
 			// execute getPropertiesRefetch
-			getPropertiesRefetch({ input: initialInput });
+			getCarsRefetch({ input: initialInput });
 
 			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
-			console.log('ERROR: likePropertyHandler', err.message);
+			console.log('ERROR: likeCarHandler', err.message);
 			sweetMixinErrorAlert(err.message).then;
 		}
 	};
 
-	if (trendProperties) console.log('trendProperties:', trendProperties);
-	if (!trendProperties) return null;
+	if (TrendCars) console.log('TrendCars:', TrendCars);
+	if (!TrendCars) return null;
 
 	if (device === 'mobile') {
 		return (
 			<Stack className={'trend-properties'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
-						<span>Most Searched Vehicles hn</span>
+						<span>Most Searched Vehiclessd hwwn</span>
 					</Stack>
 					<Stack className={'card-box'}>
 						{getCarsData.length !== 0 ? (
@@ -117,7 +99,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 												{car.carTitle} sadsa Lorem, ipsum dolor sit amet consectetur adipisicing elit. Facere
 												voluptatibus in, aperiam non aliquid dolor illo ipsum perspiciatis reprehenderit? Officiis.
 											</Stack>
-											<TrendPropertyCard car={car} likePropertyHandler={likePropertyHandler} />
+											<TrendPropertyCard car={car} likePropertyHandler={likeCarHandler} />
 										</SwiperSlide>
 									);
 								})}
@@ -133,7 +115,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
-							<span>Most Searched Vehicles</span>
+							<span>Most Searched Vehiclesaaaa</span>
 							<p>Trend is based on likes</p>
 						</Box>
 						<Box component={'div'} className={'right'}>
@@ -166,7 +148,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 								{cars.map((car: Car) => {
 									return (
 										<SwiperSlide key={car._id} className={'trend-property-slide'}>
-											<TrendPropertyCard car={car} likePropertyHandler={likePropertyHandler} />
+											<TrendPropertyCard car={car} likePropertyHandler={likeCarHandler} />
 										</SwiperSlide>
 									);
 								})}
@@ -179,7 +161,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 	}
 };
 
-TrendProperties.defaultProps = {
+TrendCars.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 8,
@@ -189,4 +171,4 @@ TrendProperties.defaultProps = {
 	},
 };
 
-export default TrendProperties;
+export default TrendCars;

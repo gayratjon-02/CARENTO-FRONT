@@ -180,31 +180,31 @@ export const UPDATE_PROPERTY = gql`
 	}
 `;
 
-export const LIKE_TARGET_PROPERTY = gql`
-	mutation LikeTargetProperty($input: String!) {
-		likeTargetProperty(propertyId: $input) {
+export const LIKE_TARGET_CAR = gql`
+	mutation LikeTargetCar($input: String!) {
+		likeTargetCar(carId: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
-			memberId
-			soldAt
+			carTitle
+			carDescription
+			brandType
+			year
+			fuelType
+			transmission
+			seats
+			doors
+			mileage
+			engine
+			carType
+			carStatus
+			carLocation
+			carImages
+			pricePerDay
+			pricePerHour
+			carViews
 			deletedAt
-			constructedAt
 			createdAt
 			updatedAt
+			carLikes
 		}
 	}
 `;
