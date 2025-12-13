@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter, withRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { getJwtToken, logOut, updateUserInfo } from '../auth';
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, Badge } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import { alpha, styled } from '@mui/material/styles';
@@ -36,6 +36,7 @@ const Top = () => {
 	const [logoutAnchor, setLogoutAnchor] = React.useState<null | HTMLElement>(null);
 	const logoutOpen = Boolean(logoutAnchor);
 	const [isContainerVisible, setIsContainerVisible] = useState<boolean>(false);
+	const [notificationCount, setNotificationCount] = useState<number>(0); // Backend dan keladi
 
 	/** LIFECYCLES **/
 	useEffect(() => {
@@ -236,6 +237,37 @@ const Top = () => {
 							</Box>
 						</Stack>
 						<Stack className="lang-currency-box">
+							<div className={'notification-box'}>
+								<Badge 
+									badgeContent={notificationCount} 
+									color="error"
+									max={99}
+									sx={{
+										'& .MuiBadge-badge': {
+											right: 4,
+											top: 4,
+											fontSize: '10px',
+											fontWeight: 600,
+											minWidth: '18px',
+											height: '18px',
+											padding: '0 4px'
+										}
+									}}
+								>
+									<NotificationsOutlinedIcon 
+										className="notification-icon"
+										sx={{ 
+											color: '#fff', 
+											fontSize: '22px',
+											cursor: 'pointer',
+											transition: 'transform 0.3s ease',
+											'&:hover': {
+												transform: 'scale(1.1)'
+											}
+										}} 
+									/>
+								</Badge>
+							</div>
 							<div className={'lang-box'}>
 								{/* <img src="img/icons/language.svg" alt="lang image" height={20} width={20} /> */}
 								<Button
@@ -339,8 +371,9 @@ const Top = () => {
 					</Stack>
 					<Stack className={`container ${isContainerVisible ? 'visible' : 'hidden'}`}>
 						<Box component={'div'} className={'logo-box'}>
-							<Link href={'/'}>
-								<img src="/img/logo/main-logo.svg" alt="" />
+							<Link href={'/'} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+								<img src="/img/icons/main-logotip.svg" alt="Carento Logo" />
+								<span className="logo-text">Carento</span>
 							</Link>
 						</Box>
 						<Box component={'div'} className={'router-box'}>
@@ -397,7 +430,7 @@ const Top = () => {
 									<div className={'join-box'}>
 										<AccountCircleOutlinedIcon />
 										<span>
-											{t('Login')} / {t('Register')}
+											{t('Login')}
 										</span>
 									</div>
 								</Link>

@@ -199,7 +199,7 @@ body::-webkit-scrollbar {
 					.toggle-arrow {
 						position: absolute;
 						left: 50%;
-						top: calc(50% + 20px);
+						top: calc(50% + 30px);
 						transform: translateX(-50%);
 						cursor: pointer;
 						display: flex;
@@ -220,6 +220,26 @@ body::-webkit-scrollbar {
 						flex-direction: row;
 						align-items: center;
 						gap: 8px;
+
+						.notification-box {
+							padding: 5px 10px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							border-radius: 6px;
+							border: 1px solid rgba(255, 255, 255, 0.25);
+							background: rgba(255, 255, 255, 0.08);
+							backdrop-filter: blur(10px);
+							cursor: pointer;
+							transition: all 0.3s ease;
+							
+							&:hover {
+								border-color: rgba(241, 117, 66, 0.6);
+								background: rgba(241, 117, 66, 0.15);
+								transform: translateY(-1px);
+								box-shadow: 0 2px 8px rgba(241, 117, 66, 0.2);
+							}
+						}
 
 						.lang-box {
 							padding: 5px 10px;
@@ -338,9 +358,9 @@ body::-webkit-scrollbar {
 					margin: auto 0 auto;
 					width: 1300px;
 					padding: 20px 24px;
-					flex-direction: column;
+					flex-direction: row;
 					align-items: center;
-					justify-content: center;
+					justify-content: space-between;
 					gap: 20px;
 					border-radius: 60px 20px 60px 20px;
 					background: linear-gradient(135deg, rgba(24, 26, 32, 0.9) 0%, rgba(40, 42, 50, 0.85) 100%);
@@ -377,17 +397,37 @@ body::-webkit-scrollbar {
 						padding-bottom: 0;
 					}
 					.logo-box {
+						display: flex;
+						align-items: center;
+						justify-content: flex-start;
+						
 						img {
-							width: 150px;
+							width: 40px;
+							height: 40px;
 							cursor: pointer;
+							object-fit: contain;
+						}
+						
+						.logo-text {
+							color: #fff;
+							font-family: $font;
+							font-size: 24px;
+							font-style: normal;
+							font-weight: 700;
+							line-height: normal;
+							cursor: pointer;
+							text-transform: uppercase;
+							letter-spacing: 1px;
 						}
 					}
 					.router-box {
 						position: relative;
-						width: 617px;
 						display: flex;
 						flex-direction: row;
-						justify-content: space-between;
+						justify-content: center;
+						align-items: center;
+						gap: 32px;
+						flex: 1;
 						div {
 							position: relative;
 							color: #eeeeeeed;
@@ -426,25 +466,37 @@ body::-webkit-scrollbar {
 						flex-direction: row;
 						justify-content: flex-end;
 						.join-box {
-							width: 184px;
-							height: 47px;
+							width: auto;
+							height: auto;
+							padding: 5px 20px;
 							display: flex;
 							align-items: center;
 							justify-content: center;
-							border-radius: 60px;
-							border: 1px solid #ffffff;
+							gap: 8px;
+							border-radius: 8px;
+							border: 1px solid rgba(255, 255, 255, 0.2);
+							background: transparent;
 							cursor: pointer;
+							transition: all 0.3s ease;
+							
+							&:hover {
+								border-color: rgba(255, 255, 255, 0.4);
+								background: rgba(255, 255, 255, 0.05);
+							}
+							
 							svg {
 								color: #ffffff;
-								margin-right: 10px;
+								font-size: 20px;
 							}
+							
 							span {
 								font-family: $font;
 								font-size: 14px;
 								font-style: normal;
-								font-weight: 600;
+								font-weight: 500;
 								line-height: normal;
 								color: #ffffff;
+								white-space: nowrap;
 							}
 						}
 						.login-user {
