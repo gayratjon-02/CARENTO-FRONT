@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import { alpha, styled } from '@mui/material/styles';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { CaretDown } from 'phosphor-react';
+import { CaretDown, CaretUp } from 'phosphor-react';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import Link from 'next/link';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
@@ -35,6 +35,7 @@ const Top = () => {
 	const [bgColor, setBgColor] = useState<boolean>(false);
 	const [logoutAnchor, setLogoutAnchor] = React.useState<null | HTMLElement>(null);
 	const logoutOpen = Boolean(logoutAnchor);
+	const [isContainerVisible, setIsContainerVisible] = useState<boolean>(false);
 
 	/** LIFECYCLES **/
 	useEffect(() => {
@@ -95,6 +96,10 @@ const Top = () => {
 
 	const currencyClose = () => {
 		setAnchorElCurrency(null);
+	};
+
+	const toggleContainer = () => {
+		setIsContainerVisible(!isContainerVisible);
 	};
 
 	const currencyChoice = useCallback((e: any) => {
@@ -203,8 +208,32 @@ const Top = () => {
 								<p className="email">gayratjon2002uz@gmail.com</p>
 							</Stack>
 						</Stack>
+						<Stack style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
 						<Stack className="carento-brand-box">
-							{t('CarentoBrandSlogan') || 'CARENTO — Your reliable car partner'}
+								{t('CarentoBrandSlogan') || 'CARENTO — Your reliable car partner'}
+							</Stack>
+							<Box 
+								component="div" 
+								onClick={toggleContainer}
+								className="toggle-arrow"
+								sx={{ 
+									cursor: 'pointer', 
+									display: 'flex', 
+									alignItems: 'center',
+									justifyContent: 'center',
+									transition: 'transform 0.3s ease',
+									color: '#fff',
+									'&:hover': {
+										transform: 'scale(1.2)'
+									}
+								}}
+							>
+								{isContainerVisible ? (
+									<CaretUp size={16} color="#fff" weight="fill" />
+								) : (
+									<CaretDown size={16} color="#fff" weight="fill" />
+								)}
+							</Box>
 						</Stack>
 						<Stack className="lang-currency-box">
 							<div className={'lang-box'}>
@@ -308,7 +337,7 @@ const Top = () => {
 							</div>
 						</Stack>
 					</Stack>
-					<Stack className={'container'}>
+					<Stack className={`container ${isContainerVisible ? 'visible' : 'hidden'}`}>
 						<Box component={'div'} className={'logo-box'}>
 							<Link href={'/'}>
 								<img src="/img/logo/main-logo.svg" alt="" />

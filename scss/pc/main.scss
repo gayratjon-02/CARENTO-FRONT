@@ -71,7 +71,7 @@ body::-webkit-scrollbar {
 					align-items: center;
 					justify-content: space-between;
 					border-radius: 12px;
-					background: rgba(24, 26, 32, 0.75);
+					background: rgba(24, 26, 32, 0.299);
 					backdrop-filter: blur(20px);
 					border: 1px solid rgba(255, 255, 255, 0.1);
 					box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -187,11 +187,31 @@ body::-webkit-scrollbar {
 						backdrop-filter: blur(10px);
 						white-space: nowrap;
 						z-index: 1;
+						
 						&:hover {
 							border-color: rgba(241, 117, 66, 0.7);
 							background: linear-gradient(135deg, rgba(232, 84, 62, 0.25) 0%, rgba(236, 107, 87, 0.2) 100%);
 							box-shadow: 0 4px 12px rgba(241, 117, 66, 0.2);
 							transform: translate(-50%, -51%);
+						}
+					}
+					
+					.toggle-arrow {
+						position: absolute;
+						left: 50%;
+						top: calc(50% + 20px);
+						transform: translateX(-50%);
+						cursor: pointer;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						transition: transform 0.3s ease;
+						z-index: 2;
+						width: 16px;
+						height: 16px;
+						
+						&:hover {
+							transform: translateX(-50%) scale(1.2);
 						}
 					}
 
@@ -330,66 +350,44 @@ body::-webkit-scrollbar {
 						0 8px 32px rgba(0, 0, 0, 0.4),
 						0 0 40px rgba(232, 84, 62, 0.1),
 						inset 0 2px 10px rgba(255, 255, 255, 0.05);
-					transition: all 0.3s ease;
+					transition: all 0.5s ease-in-out;
 					overflow: hidden;
-
-					&::before {
-						content: '';
-						position: absolute;
-						top: -50%;
-						left: -50%;
-						width: 200%;
-						height: 200%;
-						background: radial-gradient(circle, rgba(232, 84, 62, 0.1) 0%, transparent 70%);
-						animation: carGlow 3s ease-in-out infinite;
+					max-height: 0;
+					opacity: 0;
+					transform: translateY(-20px);
+					margin-top: 0;
+					padding-top: 0;
+					padding-bottom: 0;
+					
+					&.visible {
+						max-height: 2000px;
+						opacity: 1;
+						transform: translateY(0);
+						margin-top: 20px;
+						padding-top: 20px;
+						padding-bottom: 20px;
 					}
-
-					&::after {
-						content: '';
-						position: absolute;
-						top: 0;
-						left: 0;
-						right: 0;
-						bottom: 0;
-						background: 
-							linear-gradient(90deg, transparent 0%, rgba(232, 84, 62, 0.1) 50%, transparent 100%),
-							linear-gradient(180deg, rgba(232, 84, 62, 0.15) 0%, transparent 30%, transparent 70%, rgba(232, 84, 62, 0.15) 100%);
-						pointer-events: none;
-						border-radius: inherit;
+					
+					&.hidden {
+						max-height: 0;
+						opacity: 0;
+						transform: translateY(-20px);
+						margin-top: 0;
+						padding-top: 0;
+						padding-bottom: 0;
 					}
-
 					.logo-box {
-						position: relative;
-						transition: transform 0.3s ease;
-						display: flex;
-						justify-content: center;
-						
 						img {
 							width: 150px;
 							cursor: pointer;
-							transition: all 0.3s ease;
-							filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.1));
-						}
-
-						&:hover {
-							transform: scale(1.05);
-							img {
-								filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
-							}
 						}
 					}
-
 					.router-box {
 						position: relative;
-						z-index: 2;
-						width: 100%;
+						width: 617px;
 						display: flex;
 						flex-direction: row;
-						align-items: center;
-						justify-content: center;
-						gap: 32px;
-						flex-wrap: wrap;
-						
+						justify-content: space-between;
 						div {
 							position: relative;
 							color: #eeeeeeed;
@@ -399,32 +397,6 @@ body::-webkit-scrollbar {
 							font-weight: 600;
 							line-height: normal;
 							cursor: pointer;
-							padding: 8px 12px;
-							border-radius: 8px;
-							transition: all 0.3s ease;
-							
-							&::before {
-								content: '';
-								position: absolute;
-								bottom: 0;
-								left: 50%;
-								width: 0;
-								height: 2px;
-								background: linear-gradient(90deg, #e8543e 0%, #ec6b57 100%);
-								transform: translateX(-50%);
-								transition: width 0.3s ease;
-							}
-
-							&:hover {
-								color: #ffffff;
-								background: rgba(255, 255, 255, 0.05);
-								transform: translateY(-2px);
-								
-								&::before {
-									width: calc(100% - 24px);
-								}
-							}
-
 							.community_menu {
 								position: absolute;
 								left: -177%;
@@ -448,49 +420,24 @@ body::-webkit-scrollbar {
 							}
 						}
 					}
-
 					.user-box {
-						position: relative;
-						z-index: 2;
-						width: 100%;
+						width: 270px;
 						display: flex;
 						flex-direction: row;
-						align-items: center;
-						justify-content: center;
-						gap: 16px;
-
+						justify-content: flex-end;
 						.join-box {
-							width: auto;
-							padding: 10px 24px;
-							height: auto;
+							width: 184px;
+							height: 47px;
 							display: flex;
 							align-items: center;
 							justify-content: center;
-							border-radius: 50px;
-							border: 1.5px solid rgba(255, 255, 255, 0.3);
-							background: linear-gradient(135deg, rgba(232, 84, 62, 0.2) 0%, rgba(236, 107, 87, 0.15) 100%);
-							backdrop-filter: blur(10px);
+							border-radius: 60px;
+							border: 1px solid #ffffff;
 							cursor: pointer;
-							transition: all 0.3s ease;
-							box-shadow: 0 2px 8px rgba(232, 84, 62, 0.2);
-
-							&:hover {
-								border-color: rgba(232, 84, 62, 0.6);
-								background: linear-gradient(135deg, rgba(232, 84, 62, 0.35) 0%, rgba(236, 107, 87, 0.25) 100%);
-								transform: translateY(-2px);
-								box-shadow: 0 4px 16px rgba(232, 84, 62, 0.3);
-							}
-
 							svg {
 								color: #ffffff;
-								margin-right: 8px;
-								transition: transform 0.3s ease;
+								margin-right: 10px;
 							}
-
-							&:hover svg {
-								transform: scale(1.1);
-							}
-
 							span {
 								font-family: $font;
 								font-size: 14px;
@@ -500,67 +447,30 @@ body::-webkit-scrollbar {
 								color: #ffffff;
 							}
 						}
-
 						.login-user {
-							position: relative;
-							cursor: pointer;
-							transition: all 0.3s ease;
-							border-radius: 50%;
-							padding: 2px;
-							border: 2px solid transparent;
-							
-							&:hover {
-								border-color: rgba(232, 84, 62, 0.6);
-								transform: scale(1.1);
-								box-shadow: 0 4px 12px rgba(232, 84, 62, 0.3);
-							}
-
 							img {
 								width: 42px;
 								height: 42px;
 								border-radius: 50%;
 								object-fit: cover;
-								display: block;
 							}
 						}
 					}
-
 					.lan-box {
-						margin-left: 0;
+						margin-left: 28px;
 						display: flex;
 						align-items: center;
-						gap: 12px;
-						
 						.notification-icon {
 							color: white;
-							cursor: pointer;
-							transition: all 0.3s ease;
-							padding: 8px;
-							border-radius: 50%;
-							
-							&:hover {
-								background: rgba(255, 255, 255, 0.1);
-								transform: scale(1.1);
-								color: rgba(232, 84, 62, 1);
-							}
 						}
-						
 						.btn-lang {
 							border-radius: 4px;
-							transition: all 0.3s ease;
-							
-							&:hover {
-								transform: scale(1.05);
-							}
-							
 							img {
 								width: 24px;
 								height: 17px;
 								border-radius: 2px;
-								transition: all 0.3s ease;
 							}
 						}
-						
 						.img-flag {
 							width: 24px;
 							height: 17px;
@@ -577,20 +487,10 @@ body::-webkit-scrollbar {
 		position: relative;
 		width: 100%;
 		height: 860px;
-		overflow: hidden;
-		
-		.header-video {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			z-index: 0;
-		}
+		background-image: url('/img/banner/header1.svg');
+		background-size: cover;
 		.container {
 			position: relative;
-			z-index: 2;
 			margin-top: 20px;
 			flex-direction: column;
 			align-items: center;
@@ -1466,15 +1366,4 @@ body::-webkit-scrollbar {
 	height: 17px;
 	border-radius: 2px;
 	margin-right: 8px;
-}
-
-@keyframes carGlow {
-	0%, 100% {
-		opacity: 0.5;
-		transform: translate(-50%, -50%) scale(1);
-	}
-	50% {
-		opacity: 0.8;
-		transform: translate(-50%, -50%) scale(1.1);
-	}
 }
