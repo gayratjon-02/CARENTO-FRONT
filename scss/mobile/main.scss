@@ -30,6 +30,70 @@
 
   }
 
+  .car-brands {
+    width: 100%;
+    padding: 26px 14px 40px;
+    background: #f7f9fc;
+    .container {
+      width: 100%;
+      flex-direction: column;
+      gap: 18px;
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        h3 {
+          margin: 0;
+          color: #181a20;
+          font-family: $font;
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: -0.4px;
+        }
+        p {
+          margin: 0;
+          color: #5f6067;
+          font-family: $font;
+          font-size: 13px;
+          font-weight: 500;
+          line-height: 20px;
+        }
+      }
+      .brand-grid {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 140px;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .brand-card {
+        height: 110px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid #e6e7eb;
+        box-shadow: 0 10px 26px rgba(17, 24, 39, 0.08);
+        img {
+          max-width: 72%;
+          max-height: 52px;
+          object-fit: contain;
+        }
+        .brand-name {
+          margin-top: 6px;
+          color: #6b7280;
+          font-family: $font;
+          font-size: 12px;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
   .trend-properties {
     padding: 32px 16px 56px;
     width: 100%;

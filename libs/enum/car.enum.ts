@@ -1,7 +1,7 @@
 export enum BrandType {
 	BMW = 'BMW',
 	MERCEDES = 'MERCEDES',
-	VOLKSWAGEN = 'VOLKSWAGEN', 
+	VOLKSWAGEN = 'VOLKSWAGEN',
 	JAGUAR = 'JAGUAR',
 	LEXUS = 'LEXUS',
 	AUDI = 'AUDI',
@@ -9,7 +9,8 @@ export enum BrandType {
 	KIA = 'KIA',
 	HYUNDAI = 'HYUNDAI',
 	TESLA = 'TESLA',
-	CHEVROLET = 'CHEVROLET'
+	CHEVROLET = 'CHEVROLET',
+	GENESIS = 'GENESIS',
 }
 
 export enum FuelType {
