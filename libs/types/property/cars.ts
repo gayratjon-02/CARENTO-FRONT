@@ -1,94 +1,37 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
-import type { ObjectId } from 'mongoose';
-import { BrandType, CarLocation, CarStatus, CarType, FuelType, Transmission } from '../../enums/car.enum';
-import { Member, TotalCounter } from '../member/member';
-import { MeLiked } from '../like/like';
+import { BrandType, CarLocation, CarStatus, CarType, FuelType, Transmission } from '../../enum/car.enum';
+import { Member } from '../member/member';
+import { MeLiked, TotalCounter } from './property';
 
-@ObjectType()
-export class Car {
-	@Field(() => String)
-	_id: ObjectId;
-
-	@Field(() => String)
+export interface Car {
+	_id: string;
 	carTitle: string;
-
-	memberId?: ObjectId;
-
-	@Field(() => String, { nullable: true })
+	memberId?: string;
 	carDescription?: string;
-
-	@Field(() => BrandType)
-	brandType: BrandType;
-
-	@Field(() => Int)
-	year: number;
-
-	@Field(() => FuelType, { nullable: true })
+	brandType?: BrandType;
+	year?: number;
 	fuelType?: FuelType;
-
-	@Field(() => Transmission, { nullable: true })
 	transmission?: Transmission;
-
-	@Field(() => Int)
-	seats: number;
-
-	@Field(() => Int)
-	doors: number;
-
-	@Field(() => Int)
-	mileage: number;
-
-	@Field(() => String, { nullable: true })
+	seats?: number;
+	doors?: number;
+	mileage?: number;
 	engine?: string;
-
-	@Field(() => CarType)
-	carType: CarType;
-
-	@Field(() => CarStatus)
-	carStatus: CarStatus;
-
-	@Field(() => CarLocation)
-	carLocation: CarLocation;
-
-	@Field(() => [String])
-	carImages: string[];
-
-	@Field(() => Number, { nullable: true })
+	carType?: CarType;
+	carStatus?: CarStatus;
+	carLocation?: CarLocation;
+	carImages?: string[];
 	pricePerDay?: number;
-
-	@Field(() => Number, { nullable: true })
 	pricePerHour?: number;
-
-
-	@Field(() => Number, { nullable: true })
 	carLikes?: number;
-
-	@Field(() => Int, { nullable: true })
 	carViews?: number;
-
-	@Field(() => Date, { nullable: true })
 	deletedAt?: Date;
-
-	@Field(() => Date)
-	createdAt: Date;
-
-	@Field(() => Date)
-	updatedAt: Date;
-
-	//** from aggregation **/
-
-	@Field(() => [MeLiked], { nullable: true })
+	createdAt?: Date;
+	updatedAt?: Date;
+	/** from aggregation **/
 	meLiked?: MeLiked[];
-
-	@Field(() => Member, { nullable: true })
 	memberData?: Member;
 }
 
-@ObjectType()
-export class CarsList {
-	@Field(() => [Car])
+export interface CarsList {
 	list: Car[];
-
-	@Field(() => [TotalCounter], { nullable: true })
 	metaCounter: TotalCounter[];
 }
