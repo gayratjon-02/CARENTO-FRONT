@@ -1,6 +1,8 @@
 import { Stack, Button } from '@mui/material';
+import { useRef, useState, useCallback } from 'react';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import { NextPage } from 'next';
 
 const CHECKPOINTS = [
@@ -13,15 +15,38 @@ const CHECKPOINTS = [
 ];
 
 const InfoRent: NextPage = () => {
+	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const [isPlaying, setIsPlaying] = useState(false);
+
+	const toggleVideo = useCallback(() => {
+		const video = videoRef.current;
+		if (!video) return;
+		if (video.paused) {
+			video.play();
+			setIsPlaying(true);
+		} else {
+			video.pause();
+			setIsPlaying(false);
+		}
+	}, []);
+
 	return (
 		<Stack className={'info-rent'}>
 			<Stack className={'container'}>
 				<Stack className={'visual'}>
 					<div className="visual-glow" />
 					<div className="visual-card">
-						<video className="info-video" src="/video/InfoRent.mp4" controls playsInline preload="metadata" />
-						<Button className="play-btn" variant="contained" color="success">
-							<PlayArrowRoundedIcon fontSize="large" />
+						<video
+							className="info-video"
+							src="/video/InfoRent.mp4"
+							playsInline
+							preload="metadata"
+							ref={videoRef}
+							onPause={() => setIsPlaying(false)}
+							onPlay={() => setIsPlaying(true)}
+						/>
+						<Button className="play-btn" variant="contained" color="success" onClick={toggleVideo}>
+							{isPlaying ? <PauseRoundedIcon fontSize="large" /> : <PlayArrowRoundedIcon fontSize="large" />}
 						</Button>
 					</div>
 				</Stack>
