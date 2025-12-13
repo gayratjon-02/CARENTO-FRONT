@@ -1161,154 +1161,213 @@ body::-webkit-scrollbar {
 		flex-direction: row;
 		background: #181a20;
 		.footer-container {
-			width: 1300px;
-			height: auto;
 			margin: 0 auto;
-			.main {
+			width: 100%;
+			max-width: 1280px;
+			display: flex;
+			flex-direction: column;
+			gap: 40px;
+
+			.footer-subscribe {
+				padding: 14px 20px;
+				border-radius: 10px;
+				background: #0f1112;
+				border: 1px solid #1f2224;
 				display: flex;
-				flex-direction: row;
+				align-items: center;
 				justify-content: space-between;
-				.left {
-					height: 360px;
+				gap: 24px;
+
+				.footer-subscribe-title {
+					color: #f7f7f7;
+					font-family: $font;
+					font-size: 18px;
+					font-weight: 600;
+					line-height: 26px;
+					max-width: 460px;
+				}
+
+				.footer-subscribe-input {
+					flex: 1;
+					display: flex;
+					gap: 12px;
+
+					.MuiTextField-root {
+						flex: 1;
+
+						.MuiOutlinedInput-root {
+							background: #0b0d0e;
+							border-radius: 10px;
+							color: #f1f1f1;
+
+							fieldset {
+								border-color: #222629;
+							}
+							&:hover fieldset {
+								border-color: #3a3f44;
+							}
+							.MuiInputAdornment-root {
+								color: #9ea3aa;
+							}
+						}
+					}
+
+					.footer-subscribe-btn {
+						min-width: 130px;
+						border-radius: 10px;
+						background: #4ade80;
+						color: #0e1011;
+						text-transform: none;
+						font-weight: 700;
+						&:hover {
+							background: #3ad46c;
+						}
+					}
+				}
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: 1.1fr 2fr;
+				gap: 32px;
+
+				.footer-brand {
+					padding-right: 20px;
 					display: flex;
 					flex-direction: column;
-					justify-content: space-between;
-					.footer-box {
+					gap: 16px;
+
+					.footer-logo {
 						display: flex;
-						flex-direction: column;
-						.logo {
-							width: 128px;
-							height: 52px;
-							cursor: pointer;
+						align-items: center;
+						gap: 10px;
+						img {
+							width: 40px;
+							height: 40px;
 						}
 						span {
-							color: #bebdbd;
+							color: #f7f7f7;
+							font-family: $font;
+							font-size: 22px;
+							font-weight: 700;
+						}
+					}
+
+					.footer-info {
+						display: flex;
+						flex-direction: column;
+						gap: 12px;
+
+						div {
+							display: flex;
+							align-items: flex-start;
+							gap: 10px;
+							color: #d1d5db;
 							font-family: $font;
 							font-size: 14px;
-							font-style: normal;
-							font-weight: 400;
-							text-transform: capitalize;
-						}
-						p {
-							color: #fff;
-							font-family: $font;
-							font-size: 15px;
-							font-style: normal;
-							font-weight: 600;
-							line-height: normal;
-							text-transform: capitalize;
-						}
-						.media-box {
-							margin-top: 12px;
-							color: #929495;
+							line-height: 22px;
+
 							svg {
-								font-size: 32px;
-								margin-right: 22px;
-								cursor: pointer;
+								color: #9ea3aa;
+								font-size: 20px;
+								margin-top: 2px;
+							}
+
+							p {
+								margin: 0;
+							}
+						}
+
+						.footer-hotline {
+							align-items: center;
+							gap: 12px;
+
+							span {
+								color: #9ea3aa;
+								font-size: 13px;
+							}
+							strong {
+								color: #4ade80;
+								font-size: 18px;
 							}
 						}
 					}
 				}
-				.right {
-					display: flex;
-					flex-direction: column;
-					.top {
+
+				.footer-links {
+					display: grid;
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+					gap: 24px;
+
+					.footer-link-group {
 						display: flex;
 						flex-direction: column;
+						gap: 12px;
+
 						strong {
-							color: #fff;
+							color: #f7f7f7;
 							font-family: $font;
 							font-size: 15px;
-							font-style: normal;
-							font-weight: 600;
-							line-height: normal;
-							text-transform: capitalize;
+							font-weight: 700;
 						}
-						div {
-							padding: 20px 30px;
-							margin-top: 20px;
-							width: 667px;
-							height: 70px;
-							display: flex;
-							flex-direction: row;
-							align-items: center;
-							box-sizing: border-box;
-							border-radius: 12px;
-							background: #212329;
-							input {
-								margin-right: 10px;
-								width: 85%;
-								border: none;
-								outline: none;
-								color: #fff;
-								font-family: $font;
-								font-size: 14px;
-								font-style: normal;
-								font-weight: 400;
-								line-height: 26px;
-								background: none;
-							}
-							span {
-								color: #fff;
-								font-family: $font;
-								font-size: 15px;
-								font-style: normal;
-								font-weight: 600;
-								line-height: normal;
-								cursor: pointer;
-							}
-						}
-					}
-					.bottom {
-						margin-top: 60px;
-						display: flex;
-						flex-direction: row;
-						justify-content: space-between;
-						div {
-							display: flex;
-							flex-direction: column;
-							strong {
-								margin-bottom: 3px;
-								color: #fff;
-								font-family: $font;
-								font-size: 15px;
-								font-style: normal;
-								font-weight: 600;
-								line-height: normal;
-								text-transform: capitalize;
-							}
-							span {
-								margin-top: 25px;
-								color: #bebdbd;
-								font-family: $font;
-								font-size: 14px;
-								font-style: normal;
-								font-weight: 400;
-								cursor: pointer;
-								&:hover {
-									color: #ffffff;
-									text-decoration-line: underline;
-								}
+
+						span {
+							color: #c7cbd1;
+							font-family: $font;
+							font-size: 13px;
+							cursor: pointer;
+							transition: color 0.2s;
+
+							&:hover {
+								color: #ffffff;
 							}
 						}
 					}
 				}
 			}
-			.second {
-				margin-top: 60px;
-				height: 45px;
-				border-top: 1px solid #212329;
+
+			.footer-bottom {
+				padding-top: 24px;
+				border-top: 1px solid #1f2224;
 				display: flex;
-				flex-direction: row;
+				align-items: center;
 				justify-content: space-between;
-				align-items: flex-end;
+				gap: 12px;
+
 				span {
-					color: #bebdbd;
+					color: #a3a7ad;
 					font-family: $font;
-					font-size: 14px;
-					font-style: normal;
-					font-weight: 400;
-					line-height: normal;
+					font-size: 13px;
+				}
+
+				.footer-socials {
+					display: flex;
+					align-items: center;
+					gap: 14px;
+
+					span {
+						color: #c7cbd1;
+						font-weight: 600;
+						font-size: 13px;
+					}
+
+					.social-icons {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+
+						svg {
+							color: #c7cbd1;
+							font-size: 20px;
+							cursor: pointer;
+							transition: transform 0.2s, color 0.2s;
+
+							&:hover {
+								color: #4ade80;
+								transform: translateY(-2px);
+							}
+						}
+					}
 				}
 			}
 		}

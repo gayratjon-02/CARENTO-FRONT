@@ -80,7 +80,9 @@ const Top = () => {
 
 	const langChoice = useCallback(
 		async (e: any) => {
-			const selectedLang = e.target.id;
+			const selectedLang = e.currentTarget?.id;
+			if (!selectedLang) return;
+			if (!['en', 'kr', 'ru'].includes(selectedLang)) return;
 			setLang(selectedLang);
 			localStorage.setItem('locale', selectedLang);
 			setAnchorEl2(null);

@@ -1,20 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, Box } from '@mui/material';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const HeroSection = () => {
+	const router = useRouter();
 	const { t, i18n } = useTranslation('common');
-	const [currentLang, setCurrentLang] = useState(i18n?.language || 'en');
+	const [currentLang, setCurrentLang] = useState(() => {
+		if (typeof window !== 'undefined') {
+			return router.locale || i18n?.language || 'en';
+		}
+		return router.locale || 'en';
+	});
 
-	// Til o'zgarsa real-time qayta render qilish
+	// Til o'zgarsa real-time qayta render qilish (faqat client-side)
 	useEffect(() => {
-		const handleLanguageChange = (lng: string) => setCurrentLang(lng || 'en');
-		i18n.on('languageChanged', handleLanguageChange);
+		if (typeof window === 'undefined' || !i18n) return;
+		
+		const handleLanguageChange = (lng: string) => {
+			setCurrentLang(lng || 'en');
+		};
+		
+		if (i18n && typeof i18n.on === 'function') {
+			i18n.on('languageChanged', handleLanguageChange);
+		}
+		
 		return () => {
-			i18n.off('languageChanged', handleLanguageChange);
+			if (i18n && typeof i18n.off === 'function') {
+				i18n.off('languageChanged', handleLanguageChange);
+			}
 		};
 	}, [i18n]);
+
+	useEffect(() => {
+		if (router.locale && router.locale !== currentLang) {
+			setCurrentLang(router.locale);
+		}
+	}, [router.locale, currentLang]);
 
 	return (
 		<Stack className="hero-section" key={currentLang}>
