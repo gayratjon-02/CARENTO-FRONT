@@ -11,6 +11,7 @@ import Advertisement from '../libs/components/homepage/Advertisement';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import TrendCars from '../libs/components/homepage/TrendCars';
 import CarBrands from '../libs/components/homepage/CarBrands';
+import InfoRent from '../libs/components/homepage/InfoRent';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -26,6 +27,7 @@ const Home: NextPage = () => {
 			<Stack className={'home-page'}>
 				<CarBrands />
 				<TrendCars />
+				<InfoRent />
 				<PopularProperties />
 				<Advertisement />
 				<TopProperties />
@@ -37,6 +39,7 @@ const Home: NextPage = () => {
 			<Stack className={'home-page'}>
 				<CarBrands />
 				<TrendCars />
+				<InfoRent />
 				<PopularProperties />
 				<Advertisement />
 				<TopProperties />

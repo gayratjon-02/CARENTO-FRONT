@@ -1079,4 +1079,102 @@
       }
     }
   }
+
+  .info-rent {
+    width: 100%;
+    padding: 28px 14px 38px;
+    background: #f3f6fa;
+    .container {
+      width: 100%;
+      flex-direction: column;
+      gap: 16px;
+    }
+      .visual {
+        width: 100%;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        .visual-card {
+          width: 100%;
+          max-width: 520px;
+          height: 280px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, #cfd3d8, #d8dbde);
+          box-shadow: 0 18px 38px rgba(17, 24, 39, 0.14);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          .info-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+          }
+        }
+        .play-btn {
+          position: absolute;
+          width: 70px;
+          height: 70px;
+          min-width: 70px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3cf083, #22c55e);
+        box-shadow: 0 14px 26px rgba(34, 197, 94, 0.25);
+        color: #0f172a;
+      }
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 14px;
+        border-radius: 999px;
+        background: #ffffff;
+        box-shadow: 0 12px 20px rgba(17, 24, 39, 0.08);
+        color: #111827;
+        font-family: $font;
+        font-size: 11px;
+        font-weight: 700;
+        align-self: flex-start;
+      }
+      h3 {
+        margin: 0;
+        color: #1f2937;
+        font-family: $font;
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.35;
+        letter-spacing: -0.3px;
+      }
+      p {
+        margin: 0;
+        color: #6b7280;
+        font-family: $font;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
+      }
+      .checks {
+        margin-top: 4px;
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 10px;
+        .check-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #1f2937;
+          font-family: $font;
+          font-size: 13px;
+          font-weight: 700;
+          svg {
+            color: #22c55e;
+          }
+        }
+      }
+    }
+  }
 }
