@@ -5,8 +5,7 @@ import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper';
-import { CarsInquiry, PropertiesInquiry } from '../../types/property/property.input';
-import TrendPropertyCard from './TrendPropertyCard';
+import { CarsInquiry } from '../../types/property/property.input';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
@@ -14,6 +13,7 @@ import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAler
 import { Message } from '../../enums/common.enum';
 import { Car } from '../../types/property/cars';
 import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
+import TrendCarCard from './TrendCarCard';
 
 interface TrendCarsProps {
 	initialInput: CarsInquiry;
@@ -28,12 +28,7 @@ const TrendCars = (props: TrendCarsProps) => {
 	/** APOLLO REQUESTS **/
 	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 
-	const {
-		loading: getCarsLoading,
-		data: getCarsData,
-		error: getCarsError,
-		refetch: getCarsRefetch,
-	} = useQuery(GET_CARS, {
+	const { refetch: getCarsRefetch } = useQuery(GET_CARS, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
 			input: {
@@ -69,41 +64,62 @@ const TrendCars = (props: TrendCarsProps) => {
 		}
 	};
 
-	if (TrendCars) console.log('TrendCars:', TrendCars);
-	if (!TrendCars) return null;
+	const isMobile = device === 'mobile';
+	const hasCars = cars && cars.length > 0;
 
-	if (device === 'mobile') {
+	const renderCarsSwiper = (mobile = false) => (
+		<Swiper
+			className={'trend-property-swiper'}
+			slidesPerView={mobile ? 1.1 : 3}
+			spaceBetween={mobile ? 14 : 18}
+			centeredSlides={mobile}
+			modules={mobile ? [Autoplay] : [Autoplay, Navigation, Pagination]}
+			autoplay={{ delay: 4200, disableOnInteraction: false }}
+			navigation={
+				mobile
+					? undefined
+					: {
+							nextEl: '.swiper-trend-next',
+							prevEl: '.swiper-trend-prev',
+					  }
+			}
+			pagination={
+				mobile
+					? undefined
+					: {
+							el: '.swiper-trend-pagination',
+					  }
+			}
+			breakpoints={{
+				1024: { slidesPerView: 3 },
+				900: { slidesPerView: 2.6 },
+				768: { slidesPerView: 2.2 },
+				640: { slidesPerView: 1.6 },
+			}}
+		>
+			{cars.map((car: Car) => (
+				<SwiperSlide key={car._id} className={'trend-property-slide'}>
+					<TrendCarCard car={car} likeCarHandler={likeCarHandler} />
+				</SwiperSlide>
+			))}
+		</Swiper>
+	);
+
+	if (isMobile) {
 		return (
 			<Stack className={'trend-properties'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
-						<span>Most Searched Vehiclessd hwwn</span>
+						<span>Most Searched Vehicles</span>
+						<p>The world&apos;s leading car brands</p>
 					</Stack>
 					<Stack className={'card-box'}>
-						{getCarsData.length !== 0 ? (
+						{!hasCars ? (
 							<Box component={'div'} className={'empty-list'}>
 								Trends Empty
 							</Box>
 						) : (
-							<Swiper
-								className={'trend-property-swiper'}
-								slidesPerView={'auto'}
-								centeredSlides={true}
-								spaceBetween={15}
-								modules={[Autoplay]}
-							>
-								{getCarsData.map((car: Car) => {
-									return (
-										<SwiperSlide key={car._id} className={'trend-property-slide'}>
-											<Stack key={car._id}>
-												{car.carTitle} sadsa Lorem, ipsum dolor sit amet consectetur adipisicing elit. Facere
-												voluptatibus in, aperiam non aliquid dolor illo ipsum perspiciatis reprehenderit? Officiis.
-											</Stack>
-											<TrendPropertyCard car={car} likePropertyHandler={likeCarHandler} />
-										</SwiperSlide>
-									);
-								})}
-							</Swiper>
+							renderCarsSwiper(true)
 						)}
 					</Stack>
 				</Stack>
@@ -115,8 +131,8 @@ const TrendCars = (props: TrendCarsProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
-							<span>Most Searched Vehiclesaaaa</span>
-							<p>Trend is based on likes</p>
+							<span>Most Searched Vehicles</span>
+							<p>The world&apos;s leading car brands</p>
 						</Box>
 						<Box component={'div'} className={'right'}>
 							<div className={'pagination-box'}>
@@ -127,32 +143,12 @@ const TrendCars = (props: TrendCarsProps) => {
 						</Box>
 					</Stack>
 					<Stack className={'card-box'}>
-						{cars.length === 0 ? (
+						{!hasCars ? (
 							<Box component={'div'} className={'empty-list'}>
 								Trends Empty
 							</Box>
 						) : (
-							<Swiper
-								className={'trend-property-swiper'}
-								slidesPerView={'auto'}
-								spaceBetween={15}
-								modules={[Autoplay, Navigation, Pagination]}
-								navigation={{
-									nextEl: '.swiper-trend-next',
-									prevEl: '.swiper-trend-prev',
-								}}
-								pagination={{
-									el: '.swiper-trend-pagination',
-								}}
-							>
-								{cars.map((car: Car) => {
-									return (
-										<SwiperSlide key={car._id} className={'trend-property-slide'}>
-											<TrendPropertyCard car={car} likePropertyHandler={likeCarHandler} />
-										</SwiperSlide>
-									);
-								})}
-							</Swiper>
+							renderCarsSwiper()
 						)}
 					</Stack>
 				</Stack>

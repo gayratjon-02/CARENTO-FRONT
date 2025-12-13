@@ -115,16 +115,63 @@
 			}
 		}
 		.trend-properties {
-			padding: 108px 0px 76px;
+			padding: 96px 0 86px;
 			width: 100%;
-			height: 697px;
+			height: auto;
 			display: flex;
 			flex-direction: row;
+			background: #f7f8fb;
 			.container {
 				flex-direction: column;
+				.info-box {
+					align-items: flex-start;
+					.left {
+						span {
+							letter-spacing: -0.4px;
+						}
+						p {
+							margin-top: 8px;
+							color: #5f6067;
+							font-size: 15px;
+							line-height: 24px;
+						}
+					}
+					.right {
+						.pagination-box {
+							padding: 8px 12px;
+							border-radius: 12px;
+							background: #fff;
+							border: 1px solid #e5e7eb;
+							box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+							.swiper-trend-prev,
+							.swiper-trend-next {
+								width: 36px;
+								height: 36px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								border-radius: 50%;
+								background: #f3f4f6;
+								color: #222;
+								transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+								&:hover {
+									background: #10b981;
+									color: #fff;
+									transform: translateY(-2px);
+								}
+							}
+							.swiper-trend-prev {
+								margin-right: 12px;
+							}
+							.swiper-trend-next {
+								margin-left: 12px;
+							}
+						}
+					}
+				}
 				.card-box {
 					position: relative;
-					margin-top: 64px;
+					margin-top: 46px;
 					display: flex;
 					flex-direction: row;
 					.empty-list {
@@ -133,143 +180,180 @@
 						display: flex;
 						justify-content: center;
 						align-items: center;
+						border-radius: 16px;
+						border: 1px dashed #d1d5db;
+						background: #fff;
 					}
 					.trend-property-swiper {
 						width: 100%;
-						height: 400px;
+						height: auto;
 						display: flex;
 						flex-direction: row;
+						padding: 4px 6px 14px;
 						.trend-property-slide {
-							width: auto;
+							width: 360px;
 							height: auto;
 							display: flex;
-							margin: 10px 0 0 10px;
+							margin: 6px 6px 10px 6px;
 						}
 					}
-					.trend-card-box {
-						position: relative;
-						width: 300px;
-						height: 375px;
+					.trend-car-card {
+						width: 100%;
+						max-width: 360px;
 						display: flex;
 						flex-direction: column;
-						transition: transform 0.3s;
+						border-radius: 16px;
+						background: #fff;
+						border: 1px solid #e6e7eb;
+						box-shadow: 0 15px 35px rgba(19, 25, 38, 0.08);
+						overflow: hidden;
+						cursor: pointer;
+						transition: transform 0.25s ease, box-shadow 0.25s ease;
 						&:hover {
-							opacity: 1;
-							transform: scale(1.05);
+							transform: translateY(-6px);
+							box-shadow: 0 18px 40px rgba(19, 25, 38, 0.12);
 						}
-						.card-img {
+						.trend-car-image {
 							position: relative;
 							width: 100%;
-							height: 203px;
+							height: 195px;
+							border-radius: 16px 16px 0 0;
 							background-size: cover;
-							border-radius: 12px 12px 0px 0px;
-							cursor: pointer;
-							div {
-								position: absolute;
-								padding: 8px 12px;
-								left: 12px;
-								bottom: 12px;
-								border-radius: 6px;
-								background: #fff;
-								color: #181a20;
-								font-family: $font;
-								font-size: 15px;
-								font-style: normal;
-								font-weight: 600;
-								line-height: normal;
+							background-repeat: no-repeat;
+							background-position: center;
+							overflow: hidden;
+							&.no-image {
+								background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								.placeholder {
+									color: #7b7d86;
+									font-family: $font;
+									font-size: 14px;
+								}
 							}
 						}
-						.info {
-							padding: 20px 22px 17px;
+						.trend-car-body {
+							position: relative;
+							padding: 18px 18px 16px;
 							display: flex;
 							flex-direction: column;
-							box-sizing: border-box;
-							border-radius: 0px 0px 12px 12px;
-							border: 1px solid rgba(196, 196, 196, 0.71);
-							border-top: none;
-							background: #fff;
-							box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-							.title {
-								overflow: hidden;
-								color: #181a20;
-								text-overflow: ellipsis;
-								white-space: nowrap;
+							gap: 8px;
+							.rating-pill {
+								position: absolute;
+								top: 7px;
+								left: 247px;
+								display: inline-flex;
+								align-items: center;
+								gap: 6px;
+								padding: 8px 12px;
+								border-radius: 999px;
+								background: #fff;
+								box-shadow: 0 10px 26px rgba(16, 185, 129, 0.18);
+								color: #0f9f6e;
 								font-family: $font;
-								font-size: 15px;
-								font-style: normal;
+								font-size: 12px;
 								font-weight: 600;
-								line-height: normal;
-								text-transform: capitalize;
-								cursor: pointer;
+								.reviews {
+									color: #6b7280;
+									font-weight: 500;
+								}
+								svg {
+									width: 18px;
+									height: 18px;
+									color: #0f9f6e;
+								}
 							}
-							.desc {
-								margin-top: 5px;
-								overflow: hidden;
-								color: #717171;
+							.car-title {
+								color: #1f2937;
+								font-family: $font;
+								font-size: 16px;
+								font-style: normal;
+								font-weight: 700;
+								line-height: 1.4;
+								text-transform: none;
+							}
+							.car-brand-year {
+								color: #6b7280;
 								font-family: $font;
 								font-size: 13px;
-								font-style: normal;
-								font-weight: 400;
-								line-height: normal;
-								text-overflow: ellipsis;
-								white-space: nowrap;
-							}
-							.options {
-								margin-top: 15px;
-								display: flex;
-								flex-direction: row;
-								justify-content: space-between;
-								div {
-									display: flex;
-									flex-direction: row;
-									img {
-										margin-right: 5px;
-										width: 17px;
-										height: 17px;
-									}
-									span {
-										color: #181a20;
-										font-family: $font;
-										font-size: 13px;
-										font-style: normal;
-										font-weight: 400;
-										line-height: normal;
-									}
-								}
-							}
-							.bott {
-								display: flex;
-								flex-direction: row;
-								justify-content: space-between;
-								align-items: center;
-								p {
-									color: #181a20;
-									font-family: $font;
-									font-size: 13px;
-									font-style: normal;
-									font-weight: 400;
-									line-height: normal;
+								font-weight: 500;
+								span {
 									text-transform: capitalize;
 								}
-								button {
-									margin-left: 7px;
-									width: 16px;
-									height: 16px;
-									box-sizing: border-box;
+							}
+							.car-location {
+								display: inline-flex;
+								align-items: center;
+								gap: 8px;
+								color: #4b5563;
+								font-family: $font;
+								font-size: 14px;
+								font-weight: 500;
+								letter-spacing: -0.1px;
+								svg {
+									color: #9ca3af;
 								}
-								.view-like-box {
-									display: flex;
-									flex-direction: row;
-									gap: 7px;
+							}
+							.car-specs {
+								margin-top: 4px;
+								display: grid;
+								grid-template-columns: repeat(2, minmax(0, 1fr));
+								gap: 10px 12px;
+								.spec-item {
+									display: inline-flex;
 									align-items: center;
-									.view-cnt {
-										color: #717171;
+									gap: 8px;
+									color: #4b5563;
+									font-family: $font;
+									font-size: 13px;
+									font-weight: 600;
+									letter-spacing: -0.08px;
+									svg {
+										color: #a0a0aa;
+									}
+								}
+							}
+							.card-footer {
+								margin-top: 10px;
+								display: flex;
+								align-items: center;
+								justify-content: space-between;
+								.price-box {
+									display: flex;
+									flex-direction: column;
+									line-height: 1.2;
+									span {
+										color: #6b7280;
 										font-family: $font;
 										font-size: 13px;
-										font-style: normal;
-										font-weight: 400;
-										line-height: normal;
-										text-overflow: ellipsis;
+										font-weight: 500;
+									}
+									strong {
+										margin-top: 2px;
+										color: #111827;
+										font-family: $font;
+										font-size: 17px;
+										font-weight: 800;
+										letter-spacing: -0.2px;
+									}
+								}
+								.book-btn {
+									padding: 10px 16px;
+									border-radius: 30px;
+									background: linear-gradient(135deg, #22c55e, #16a34a);
+									box-shadow: 0 10px 24px rgba(34, 197, 94, 0.28);
+									color: #fff;
+									border: none;
+									min-width: 0;
+									font-family: $font;
+									font-size: 13px;
+									font-weight: 700;
+									text-transform: none;
+									&:hover {
+										background: linear-gradient(135deg, #16a34a, #15803d);
+										box-shadow: 0 12px 28px rgba(21, 128, 61, 0.3);
 									}
 								}
 							}
