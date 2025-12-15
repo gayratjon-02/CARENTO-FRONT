@@ -1,8 +1,9 @@
+import { Article } from 'phosphor-react';
 import { BoardArticleCategory, BoardArticleStatus } from '../../enums/board-article.enum';
 import { Member } from '../member/member';
 import { MeLiked, TotalCounter } from '../property/property';
 
-export interface BoardArticle {
+export interface Article {
 	_id: string;
 	articleCategory: BoardArticleCategory;
 	articleStatus: BoardArticleStatus;
@@ -20,7 +21,7 @@ export interface BoardArticle {
 	memberData?: Member;
 }
 
-export interface BoardArticles {
-	list: BoardArticle[];
+export interface Articles {
+	list: Article[];
 	metaCounter: TotalCounter[];
 }

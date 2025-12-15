@@ -32,6 +32,7 @@ const Home: NextPage = () => {
 				<ChooseByCarType />
 				<HowItWorks />
 				<PopularCars />
+				<CommunityBoards />
 				<TopProperties />
 				<TopAgents />
 			</Stack>
@@ -45,10 +46,10 @@ const Home: NextPage = () => {
 				<ChooseByCarType />
 				<HowItWorks />
 				<PopularCars />
+				<CommunityBoards />
 				<TopProperties />
 				<TopAgents />
 				<Events />
-				<CommunityBoards />
 			</Stack>
 		);
 	}

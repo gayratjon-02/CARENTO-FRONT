@@ -20,7 +20,7 @@ export const GET_AGENTS = gql`
 				memberDesc
 				memberWarnings
 				memberBlocks
-				memberProperties
+				memberCars
 				memberRank
 				memberPoints
 				memberLikes
@@ -55,7 +55,7 @@ export const GET_MEMBER = gql(`
         memberImage
         memberAddress
         memberDesc
-        memberProperties
+        memberCars
         memberArticles
         memberPoints
         memberLikes
@@ -177,7 +177,7 @@ export const GET_PROPERTIES = gql`
 					memberDesc
 					memberWarnings
 					memberBlocks
-					memberProperties
+					memberCars
 					memberRank
 					memberPoints
 					memberLikes
@@ -334,7 +334,7 @@ export const GET_FAVORITES = gql`
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberCars
 					memberArticles
 					memberPoints
 					memberLikes
@@ -397,7 +397,7 @@ export const GET_VISITED = gql`
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberCars
 					memberArticles
 					memberPoints
 					memberLikes
@@ -453,7 +453,7 @@ export const GET_BOARD_ARTICLE = gql`
 				memberDesc
 				memberWarnings
 				memberBlocks
-				memberProperties
+				memberCars
 				memberRank
 				memberPoints
 				memberLikes
@@ -471,9 +471,9 @@ export const GET_BOARD_ARTICLE = gql`
 	}
 `;
 
-export const GET_BOARD_ARTICLES = gql`
-	query GetBoardArticles($input: BoardArticlesInquiry!) {
-		getBoardArticles(input: $input) {
+export const GET_ARTICLES = gql`
+	query GetArticles($input: ArticlesInquiry!) {
+		getArticles(input: $input) {
 			list {
 				_id
 				articleCategory
@@ -487,11 +487,6 @@ export const GET_BOARD_ARTICLES = gql`
 				memberId
 				createdAt
 				updatedAt
-				meLiked {
-					memberId
-					likeRefId
-					myFavorite
-				}
 				memberData {
 					_id
 					memberType
@@ -503,16 +498,23 @@ export const GET_BOARD_ARTICLES = gql`
 					memberImage
 					memberAddress
 					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
-					memberRank
+					memberCars
+					memberArticles
+					memberFollowers
+					memberFollowings
 					memberPoints
 					memberLikes
 					memberViews
+					memberComments
+					memberRank
+					memberWarnings
+					memberBlocks
+					drivingLicenseNumber
+					drivingLicensePhoto
 					deletedAt
 					createdAt
 					updatedAt
+					accessToken
 				}
 			}
 			metaCounter {
@@ -551,7 +553,7 @@ export const GET_COMMENTS = gql`
 					memberDesc
 					memberWarnings
 					memberBlocks
-					memberProperties
+					memberCars
 					memberRank
 					memberPoints
 					memberLikes
@@ -602,7 +604,7 @@ export const GET_MEMBER_FOLLOWERS = gql`
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberCars
 					memberArticles
 					memberPoints
 					memberLikes
@@ -645,7 +647,7 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberCars
 					memberArticles
 					memberPoints
 					memberLikes

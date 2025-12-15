@@ -27,15 +27,15 @@ const tokenRefreshLink = new TokenRefreshLink({
 		// execute refresh token
 		return null;
 	},
-});
+})
 
 // Custom WebSocket client
 class LoggingWebSocket {
 	private socket: WebSocket;
 
 	constructor(url: string) {
-	this.socket = new WebSocket(`${url}?token=${getJwtToken()}`);
-	socketVar(this.socket);
+		this.socket = new WebSocket(`${url}?token=${getJwtToken()}`);
+		socketVar(this.socket);
 
 		this.socket.onopen = () => {
 			console.log('WebSocket connection!');
