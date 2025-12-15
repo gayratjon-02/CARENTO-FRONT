@@ -220,10 +220,12 @@ export const GET_CARS = gql`
 				carImages
 				pricePerDay
 				pricePerHour
+				carLikes
 				carViews
 				deletedAt
 				createdAt
 				updatedAt
+				carRank
 				memberData {
 					_id
 					memberType

@@ -1,18 +1,25 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { Stack, Typography, Box, Button } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { GET_ARTICLES } from '../../../apollo/user/query';
 import { BoardArticleCategory } from '../../enums/board-article.enum';
 import { Article } from '../../types/board-article/board-article';
+import { T } from '../../types/common';
 
 const CommunityBoards = () => {
 	const device = useDeviceDetect();
 	const isDesktop = device !== 'mobile';
+	const [newsArticles, setNewsArticles] = useState<Article[]>([]);
 
 	const [selectedCategory, setSelectedCategory] = useState<BoardArticleCategory>(BoardArticleCategory.FREE);
 
-	const { data, loading, error } = useQuery(GET_ARTICLES, {
+	const {
+		loading: getArticlesLoading,
+		data: getArticlesData,
+		error: getArticlesError,
+		refetch: getArticlesRefetch,
+	} = useQuery(GET_ARTICLES, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
 			input: {
@@ -24,9 +31,11 @@ const CommunityBoards = () => {
 			},
 		},
 		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			setNewsArticles(data?.getArticles?.list);
+		},
 	});
 
-	const newsArticles: Article[] = useMemo(() => data?.getArticles?.list ?? [], [data]);
 	console.log('newsArticles::++++', newsArticles);
 
 	const renderRating = (value: number) => {
@@ -40,7 +49,7 @@ const CommunityBoards = () => {
 	};
 
 	const renderCards = () => {
-		if (loading) {
+		if (getArticlesLoading) {
 			return (
 				<Box className="reviews-placeholder">
 					<span>Fikrlar yuklanmoqda...</span>
@@ -48,10 +57,10 @@ const CommunityBoards = () => {
 			);
 		}
 
-		if (error) {
+		if (getArticlesError) {
 			return (
 				<Box className="reviews-placeholder">
-					<span>{error.message || "Fikrlarni yuklash imkoni bo'lmadi"}</span>
+					<span>{getArticlesError.message || "Fikrlarni yuklash imkoni bo'lmadi"}</span>
 				</Box>
 			);
 		}

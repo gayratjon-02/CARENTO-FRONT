@@ -90,12 +90,12 @@ const App = ({ Component, pageProps }: AppProps) => {
 				]}
 			/>
 			{/* Apollo Provider */}
-			<ApolloProvider client={client}>
-				<ThemeProvider theme={theme}>
-					<CssBaseline />
-					<Component {...pageProps} />
-				</ThemeProvider>
-			</ApolloProvider>
+		<ApolloProvider client={client}>
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<Component {...pageProps} />
+			</ThemeProvider>
+		</ApolloProvider>
 		</>
 	);
 };

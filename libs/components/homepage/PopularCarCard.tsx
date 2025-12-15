@@ -32,9 +32,9 @@ const PopularCarCard = (props: PopularCarCardProps) => {
 
 	const renderCard = () => (
 		<Stack className="popular-card-box" onClick={() => pushDetailHandler(car?._id)}>
-			<Box
-				component={'div'}
-				className={'card-img'}
+				<Box
+					component={'div'}
+					className={'card-img'}
 				style={{
 					backgroundImage: car?.carImages?.[0]
 						? `url(${REACT_APP_API_URL}/${car.carImages[0]})`
@@ -48,8 +48,8 @@ const PopularCarCard = (props: PopularCarCardProps) => {
 					<span>From</span>
 					<strong>${car?.pricePerDay ?? 0}</strong>
 				</Box>
-			</Box>
-			<Box component={'div'} className={'info'}>
+				</Box>
+				<Box component={'div'} className={'info'}>
 				<Box className="title-block">
 					<strong className={'title'}>{car?.carTitle}</strong>
 					<p className={'desc'}>{car?.carDescription || 'Premium curated ride for every journey.'}</p>
@@ -72,9 +72,9 @@ const PopularCarCard = (props: PopularCarCardProps) => {
 						<strong>{(car?.carLikes ?? 0).toLocaleString()}</strong>
 					</Box>
 				</Box>
-			</Box>
-		</Stack>
-	);
+				</Box>
+			</Stack>
+		);
 
 	return renderCard();
 };

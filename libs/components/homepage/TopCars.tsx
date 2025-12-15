@@ -1,152 +1,216 @@
-import React, { useState } from 'react';
-import { Stack, Box } from '@mui/material';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
-import WestIcon from '@mui/icons-material/West';
-import EastIcon from '@mui/icons-material/East';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper';
-import TopPropertyCard from './TopPropertyCard';
-import { PropertiesInquiry } from '../../types/property/property.input';
-import { Property } from '../../types/property/property';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Stack, Box, Pagination } from '@mui/material';
+import { CarsInquiry } from '../../types/property/property.input';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_PROPERTIES } from '../../../apollo/user/query';
+import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
 import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
+import { Car } from 'libs/types/property/cars';
+import TopCarCard from './TopCarCard';
+import { useRouter } from 'next/router';
 
-interface TopPropertiesProps {
-	initialInput: PropertiesInquiry;
+interface TopCarsProps {
+	initialInput: CarsInquiry;
 }
 
-const TopProperties = (props: TopPropertiesProps) => {
+const PAGE_SIZE = 4;
+
+const TopCars = (props: TopCarsProps) => {
 	const { initialInput } = props;
-	const device = useDeviceDetect();
-	const [topProperties, setTopProperties] = useState<Property[]>([]);
+	const router = useRouter();
+	const [topCars, setTopCars] = useState<Car[]>([]);
+	const [page, setPage] = useState(1);
 
 	/** APOLLO REQUESTS **/
 	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 
 	const {
-		loading: getPropertiesLoading,
-		data: getPropertiesData,
-		error: getPropertiesError,
-		refetch: getPropertiesRefetch,
-	} = useQuery(GET_PROPERTIES, {
+		loading: getCarsLoading,
+		data: getCarsData,
+		error: getCarsError,
+		refetch: getCarsRefetch,
+	} = useQuery(GET_CARS, {
 		fetchPolicy: 'cache-and-network',
-		variables: { input: initialInput },
+		variables: {
+			input: initialInput,
+		},
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setTopProperties(data?.getProperties?.list);
+			setTopCars(data?.getCars?.list);
 		},
 	});
+	console.log('getCarsData+___(())', getCarsData);
+	console.log('topCars+___(())', topCars);
+
+	useEffect(() => {
+		setPage(1);
+	}, [topCars.length]);
+
+	const curatedLabel = useMemo(() => {
+		if (!topCars.length) return 'Curating new rides for you';
+		return `${topCars.length} curated rides, updated hourly`;
+	}, [topCars]);
+
+	const heroStats = useMemo(() => {
+		if (!topCars.length) {
+			return [
+				{ label: 'Avg. daily rate', value: '$—' },
+				{ label: 'Community likes', value: '—' },
+				{ label: 'Seats this week', value: '—' },
+			];
+		}
+		const totalPrice = topCars.reduce((acc, car) => acc + (Number(car?.pricePerDay) || 0), 0);
+		const totalLikes = topCars.reduce((acc, car) => acc + (Number(car?.carLikes) || 0), 0);
+		const totalSeats = topCars.reduce((acc, car) => acc + (Number(car?.seats) || 0), 0);
+		const avgPrice = totalPrice && topCars.length ? Math.round(totalPrice / topCars.length) : 0;
+
+		return [
+			{ label: 'Avg. daily rate', value: avgPrice ? `$${avgPrice}` : '$—' },
+			{ label: 'Community likes', value: totalLikes.toLocaleString() },
+			{ label: 'Seats this week', value: `${totalSeats}+` },
+		];
+	}, [topCars]);
+
+	const handleViewAllCars = () => {
+		router.push('/car');
+	};
+
+	const handleWhyCurated = () => {
+		router.push('/car?tab=top');
+	};
+
+	const isEmptyState = !getCarsLoading && topCars.length === 0;
+	const totalPages = Math.max(1, Math.ceil(topCars.length / PAGE_SIZE));
+
+	const paginatedCars = useMemo(() => {
+		if (!topCars.length) return [];
+		const start = (page - 1) * PAGE_SIZE;
+		return topCars.slice(start, start + PAGE_SIZE);
+	}, [page, topCars]);
+
+	const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+		setPage(value);
+	};
+
+	const showPagination = !isEmptyState && totalPages > 1;
+	const showingLabel = useMemo(() => {
+		if (!topCars.length) return '0 cars';
+		const start = (page - 1) * PAGE_SIZE + 1;
+		const end = Math.min(page * PAGE_SIZE, topCars.length);
+		return `${start}–${end} / ${topCars.length}`;
+	}, [page, topCars]);
 
 	/** HANDLERS **/
 
-	const likePropertyHandler = async (user: T, id: string) => {
-			try {
-				if (!id) return;
-				if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
-	
-				// execute likeTargetProperty Mutation
-				await likeTargetCar({
-					variables: { input: id },
-				});
-	
-				// execute getPropertiesRefetch
-				getPropertiesRefetch({input: initialInput})
-	
-				await sweetTopSmallSuccessAlert('success', 800);
-			} catch (err: any) {
-				console.log('ERROR: likePropertyHandler', err.message);
-				sweetMixinErrorAlert(err.message).then;
-			}
-		};
+	const likeCarHandler = async (user: T, id: string) => {
+		try {
+			if (!id) return;
+			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
 
+			// execute likeTargetProperty Mutation
+			await likeTargetCar({
+				variables: { input: id },
+			});
 
-		
+			// execute getCarsRefetch
+			getCarsRefetch({ input: initialInput });
 
-	if (device === 'mobile') { 
-		return (
-			<Stack className={'top-properties'}>
-				<Stack className={'container'}>
-					<Stack className={'info-box'}>
-						<span>Top properties</span>
-					</Stack>
-					<Stack className={'card-box'}>
-						<Swiper
-							className={'top-property-swiper'}
-							slidesPerView={'auto'}
-							centeredSlides={true}
-							spaceBetween={15}
-							modules={[Autoplay]}
-						>
-							{topProperties.map((property: Property) => {
-								return (
-									<SwiperSlide className={'top-property-slide'} key={property?._id}>
-										<TopPropertyCard property={property} likePropertyHandler={likeTargetCar} />
-									</SwiperSlide>
-								);
-							})}
-						</Swiper>
-					</Stack>
-				</Stack>
-			</Stack>
-		);
-	} else {
-		return (
-			<Stack className={'top-properties'}>
-				<Stack className={'container'}>
-					<Stack className={'info-box'}>
-						<Box component={'div'} className={'left'}>
-							<span>Top properties</span>
-							<p>Check out our Top Properties</p>
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR: likeCarHandler', err.message);
+			sweetMixinErrorAlert(err.message).then;
+		}
+	};
+
+	return (
+		<Stack className={'top-properties top-cars-section'}>
+			<Stack className={'container'}>
+				<Box className="top-hero">
+					<Box className="top-hero__copy">
+						<span className="eyebrow-pill live">Garage spotlight</span>
+						<h2 className="hero-title">Weekend-worthy rides, curated by real trips</h2>
+						<p className="hero-desc">
+							We mine community likes, uptime, and host response times to surface rides that feel effortless from key
+							handoff to drop-off.
+						</p>
+						<Box className="hero-meta">
+							<span className="pulse" />
+							<span>{curatedLabel}</span>
 						</Box>
-						<Box component={'div'} className={'right'}>
-							<div className={'pagination-box'}>
-								<WestIcon className={'swiper-top-prev'} />
-								<div className={'swiper-top-pagination'}></div>
-								<EastIcon className={'swiper-top-next'} />
+						<Box className="cta-row">
+							<button className="primary-cta" onClick={handleViewAllCars}>
+								Browse all cars
+							</button>
+							<button className="ghost-cta" onClick={handleWhyCurated}>
+								How we rank
+							</button>
+						</Box>
+						<Box className="stat-grid">
+							{heroStats.map((item) => (
+								<Box key={item.label} className="stat-card">
+									<span>{item.label}</span>
+									<strong>{item.value}</strong>
+									<p>Based on live garage data</p>
+								</Box>
+							))}
+						</Box>
+					</Box>
+					<Box className="top-hero__badge">
+						<div className="glow" />
+						<div className="badge-card">
+							<p>Confidence score</p>
+							<strong>96%</strong>
+							<span>Hosts respond under 15m</span>
+							<div className="badge-row">
+								<span className="dot live" />
+								<span>Realtime refresh</span>
 							</div>
-						</Box>
-					</Stack>
-					<Stack className={'card-box'}>
-						<Swiper
-							className={'top-property-swiper'}
-							slidesPerView={'auto'}
-							spaceBetween={15}
-							modules={[Autoplay, Navigation, Pagination]}
-							navigation={{
-								nextEl: '.swiper-top-next',
-								prevEl: '.swiper-top-prev',
-							}}
-							pagination={{
-								el: '.swiper-top-pagination',
-							}}
-						>
-							{topProperties.map((property: Property) => {
-								return (
-									<SwiperSlide className={'top-property-slide'} key={property?._id}>
-										<TopPropertyCard property={property} likePropertyHandler={likePropertyHandler} />
-									</SwiperSlide>
-								);
-							})}
-						</Swiper>
-					</Stack>
+						</div>
+						<div className="badge-chip">{curatedLabel}</div>
+					</Box>
+				</Box>
+
+				<Stack className={'card-box top-grid-shell'}>
+					<Box className="grid-shell">
+						{getCarsLoading && !topCars.length ? (
+							<Box className="empty-top-cars">Loading top cars...</Box>
+						) : isEmptyState ? (
+							<Box className="empty-top-cars">
+								{getCarsError?.message || 'We are refreshing the garage. Check back soon!'}
+							</Box>
+						) : (
+							<Box className="top-grid">
+								{paginatedCars.map((car: Car) => (
+									<Box className="top-grid-card" key={car?._id}>
+										<TopCarCard car={car} likeCarHandler={likeCarHandler} />
+									</Box>
+								))}
+							</Box>
+						)}
+					</Box>
 				</Stack>
+				<Box className="grid-footer">
+					<div className="grid-badges">
+						<span className="pill accent">{curatedLabel}</span>
+						<span className="pill">{showingLabel}</span>
+					</div>
+					<Pagination count={totalPages} page={page} onChange={handlePageChange} variant="outlined" shape="rounded" />
+				</Box>
 			</Stack>
-		);
-	}
+		</Stack>
+	);
 };
 
-TopProperties.defaultProps = {
+TopCars.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 8,
-		sort: 'propertyRank',
+		sort: 'carLikes',
 		direction: 'DESC',
 		search: {},
 	},
 };
 
-export default TopProperties;
+export default TopCars;
