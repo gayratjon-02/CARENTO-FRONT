@@ -1,135 +1,82 @@
 import React from 'react';
-import { Stack, Box, Divider, Typography } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
+import { Stack, Box } from '@mui/material';
+import EventSeatIcon from '@mui/icons-material/EventSeat';
+import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
+import SpeedIcon from '@mui/icons-material/Speed';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { Property } from '../../types/property/property';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import { REACT_APP_API_URL, topPropertyRank } from '../../config';
+import { REACT_APP_API_URL } from '../../config';
 import { useRouter } from 'next/router';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
+import { Car } from '../../types/property/cars';
 
-interface PopularPropertyCardProps {
-	property: Property;
+interface PopularCarCardProps {
+	car: Car;
 }
 
-const PopularPropertyCard = (props: PopularPropertyCardProps) => {
-	const { property } = props;
+const PopularCarCard = (props: PopularCarCardProps) => {
+	const { car } = props;
 	const device = useDeviceDetect();
 	const router = useRouter();
-	const user = useReactiveVar(userVar);
 
 	/** HANDLERS **/
-	const pushDetailHandler = async (propertyId: string) => {
-		console.log('propertyId', propertyId);
-		await router.push({ pathname: '/property/detail', query: { id: propertyId } });
+	const pushDetailHandler = async (carId: string) => {
+		await router.push({ pathname: '/car/detail', query: { id: carId } });
 	};
 
-	if (device === 'mobile') {
-		return (
-			<Stack className="popular-card-box">
-				<Box
-					component={'div'}
-					className={'card-img'}
-					style={{ backgroundImage: `url(${REACT_APP_API_URL}/${property?.propertyImages[0]})` }}
-					onClick={() => pushDetailHandler(property?._id)}
-				>
-					{property && property?.propertyRank >= topPropertyRank ? (
-						<div className={'status'}>
-							<img src="/img/icons/electricity.svg" alt="" />
-							<span>top</span>
-						</div>
-					) : (
-						''
-					)}
+	const specList = [
+		{ key: 'seats', label: `${car?.seats ?? 0} seats`, icon: <EventSeatIcon fontSize="small" /> },
+		{ key: 'doors', label: `${car?.doors ?? 0} doors`, icon: <MeetingRoomOutlinedIcon fontSize="small" /> },
+		{ key: 'mileage', label: `${(car?.mileage ?? 0).toLocaleString()} km`, icon: <SpeedIcon fontSize="small" /> },
+		{ key: 'fuel', label: car?.fuelType ?? 'Fuel', icon: <LocalGasStationIcon fontSize="small" /> },
+	];
 
-					<div className={'price'}>${property.propertyPrice}</div>
+	const renderCard = () => (
+		<Stack className="popular-card-box" onClick={() => pushDetailHandler(car?._id)}>
+			<Box
+				component={'div'}
+				className={'card-img'}
+				style={{
+					backgroundImage: car?.carImages?.[0]
+						? `url(${REACT_APP_API_URL}/${car.carImages[0]})`
+						: 'linear-gradient(120deg, #2c2f3b, #1a1d27)',
+				}}
+			>
+				<Box className={'tag-pill'}>
+					<span>{car?.carType || 'Luxury'}</span>
 				</Box>
-				<Box component={'div'} className={'info'}>
-					<strong className={'title'} onClick={() => pushDetailHandler(property?._id)}>
-						{property.propertyTitle}
-					</strong>
-					<p className={'desc'}>{property.propertyAddress}</p>
-					<div className={'options'}>
-						<div>
-							<img src="/img/icons/bed.svg" alt="" />
-							<span>{property?.propertyBeds} bed</span>
-						</div>
-						<div>
-							<img src="/img/icons/room.svg" alt="" />
-							<span>{property?.propertyRooms} rooms</span>
-						</div>
-						<div>
-							<img src="/img/icons/expand.svg" alt="" />
-							<span>{property?.propertySquare} m2</span>
-						</div>
-					</div>
-					<Divider sx={{ mt: '15px', mb: '17px' }} />
-					<div className={'bott'}>
-						<p>{property?.propertyRent ? 'rent' : 'sale'}</p>
-						<div className="view-like-box">
-							<IconButton color={'default'}>
-								<RemoveRedEyeIcon />
-							</IconButton>
-							<Typography className="view-cnt">{property?.propertyViews}</Typography>
-						</div>
-					</div>
+				<Box className={'price'}>
+					<span>From</span>
+					<strong>${car?.pricePerDay ?? 0}</strong>
 				</Box>
-			</Stack>
-		);
-	} else {
-		return (
-			<Stack className="popular-card-box">
-				<Box
-					component={'div'}
-					className={'card-img'}
-					style={{ backgroundImage: `url(${REACT_APP_API_URL}/${property?.propertyImages[0]})` }}
-					onClick={() => pushDetailHandler(property?._id)}
-				>
-					{property?.propertyRank && property?.propertyRank >= topPropertyRank ? (
-						<div className={'status'}>
-							<img src="/img/icons/electricity.svg" alt="" />
-							<span>top</span>
-						</div>
-					) : (
-						''
-					)}
+			</Box>
+			<Box component={'div'} className={'info'}>
+				<Box className="title-block">
+					<strong className={'title'}>{car?.carTitle}</strong>
+					<p className={'desc'}>{car?.carDescription || 'Premium curated ride for every journey.'}</p>
+				</Box>
+				<Box className={'options'}>
+					{specList.map((spec) => (
+						<Box key={spec.key} className={'option-chip'}>
+							{spec.icon}
+							<span>{spec.label}</span>
+						</Box>
+					))}
+				</Box>
+				<Box className={'bott'}>
+					<Box className={'stat'}>
+						<span>Views</span>
+						<strong>{(car?.carViews ?? 0).toLocaleString()}</strong>
+					</Box>
+					<Box className={'stat'}>
+						<span>Likes</span>
+						<strong>{(car?.carLikes ?? 0).toLocaleString()}</strong>
+					</Box>
+				</Box>
+			</Box>
+		</Stack>
+	);
 
-					<div className={'price'}>${property.propertyPrice}</div>
-				</Box>
-				<Box component={'div'} className={'info'}>
-					<strong className={'title'} onClick={() => pushDetailHandler(property?._id)}>
-						{property.propertyTitle}
-					</strong>
-					<p className={'desc'}>{property.propertyAddress}</p>
-					<div className={'options'}>
-						<div>
-							<img src="/img/icons/bed.svg" alt="" />
-							<span>{property?.propertyBeds} bed</span>
-						</div>
-						<div>
-							<img src="/img/icons/room.svg" alt="" />
-							<span>{property?.propertyRooms} rooms</span>
-						</div>
-						<div>
-							<img src="/img/icons/expand.svg" alt="" />
-							<span>{property?.propertySquare} m2</span>
-						</div>
-					</div>
-					<Divider sx={{ mt: '15px', mb: '17px' }} />
-					<div className={'bott'}>
-						<p>{property?.propertyRent ? 'rent' : 'sale'}</p>
-						<div className="view-like-box">
-							<IconButton color={'default'}>
-								<RemoveRedEyeIcon />
-							</IconButton>
-							<Typography className="view-cnt">{property?.propertyViews}</Typography>
-						</div>
-					</div>
-				</Box>
-			</Stack>
-		);
-	}
+	return renderCard();
 };
 
-export default PopularPropertyCard;
+export default PopularCarCard;
