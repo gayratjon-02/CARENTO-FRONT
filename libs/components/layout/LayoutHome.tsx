@@ -67,7 +67,6 @@ const withLayoutMain = (Component: any) => {
 							<VideoCarousel />
 							<HeroSection />
 							{/* <FiberContainer /> */}
-							
 						</Stack>
 
 						<Stack id={'main'}>

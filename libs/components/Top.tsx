@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import { alpha, styled } from '@mui/material/styles';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { CaretDown, CaretUp } from 'phosphor-react';
+import { CaretDown, CaretUp, BellRinging, GlobeSimple } from 'phosphor-react';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import Link from 'next/link';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
@@ -245,7 +245,7 @@ const Top = () => {
 			<Stack className={'navbar'}>
 				<Stack
 					direction={'column'}
-					className={`navbar-main ${colorChange ? 'transparent' : ''} ${bgColor ? 'transparent' : ''}`}
+					className={`navbar-main glass ${colorChange ? 'transparent' : ''} ${bgColor ? 'transparent' : ''}`}
 				>
 					<Stack className="top-container">
 						<Stack className="call-info-box">
@@ -303,17 +303,15 @@ const Top = () => {
 										}
 									}}
 								>
-									<NotificationsOutlinedIcon 
+									<BellRinging 
+										size={22} 
+										weight="duotone" 
 										className="notification-icon"
-										sx={{ 
-											color: '#fff', 
-											fontSize: '22px',
+										color="#fff"
+										style={{
 											cursor: 'pointer',
-											transition: 'transform 0.3s ease',
-											'&:hover': {
-												transform: 'scale(1.1)'
-											}
-										}} 
+											transition: 'transform 0.3s ease'
+										}}
 									/>
 								</Badge>
 							</div>
@@ -372,16 +370,10 @@ const Top = () => {
 									disableRipple
 									className="btn-currency"
 									onClick={currencyClick}
-									endIcon={<CaretDown size={14} color="#616161" weight="fill" />}
+									endIcon={<CaretDown size={14} color="#8b8b8b" weight="fill" />}
 								>
-									<Box component={'div'} className={'currency-flag'}>
-										{currency === 'KRW' ? (
-											<img src={`/img/flag/langkr.png`} alt={'koreanFlag'} />
-										) : currency === 'USD' ? (
-											<img src={`/img/flag/langen.png`} alt={'usaFlag'} />
-										) : (
-											<img src={`/img/flag/langkr.png`} alt={'flag'} />
-										)}
+									<Box component={'div'} className={'currency-icon'}>
+										{currency === 'USD' ? '$' : '₩'}
 									</Box>
 									<Box component={'div'} className={'currency-text'}>
 										{currency !== null ? currency : 'KRW'}

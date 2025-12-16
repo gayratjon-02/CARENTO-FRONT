@@ -49,14 +49,11 @@ const HeroSection = () => {
 				{/* @ts-ignore */}
 				{t('Looking for a vehicle? You are in the perfect spot.')}
 			</Stack>
+			<Stack className="hero-subline">
+				{/* @ts-ignore */}
+				{t('High quality at a low cost.')}
+			</Stack>
 			<Stack className="hero-features">
-				<Box component="div" className="feature-item">
-					<CheckCircleIcon className="check-icon" />
-					<span>
-						{/* @ts-ignore */}
-						{t('High quality at a low cost.')}
-					</span>
-				</Box>
 				<Box component="div" className="feature-item">
 					<CheckCircleIcon className="check-icon" />
 					<span>
@@ -69,6 +66,13 @@ const HeroSection = () => {
 					<span>
 						{/* @ts-ignore */}
 						{t('24/7 roadside support')}
+					</span>
+				</Box>
+				<Box component="div" className="feature-item">
+					<CheckCircleIcon className="check-icon" />
+					<span>
+						{/* @ts-ignore */}
+						{t('High quality at a low cost.')}
 					</span>
 				</Box>
 			</Stack>

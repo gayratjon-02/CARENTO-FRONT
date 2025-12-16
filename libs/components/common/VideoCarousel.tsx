@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 const VideoCarousel = () => {
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-	const videos = ['/video/video1.mp4', '/video/video2.mp4', '/video/video3.mp4'];
+	// Fresh showcase reel for the hero background
+	const videos = ['/video/InfoRent.mp4', '/video/video3.mp4', '/video/video2.mp4'];
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -46,4 +47,3 @@ const VideoCarousel = () => {
 };
 
 export default VideoCarousel;
-
