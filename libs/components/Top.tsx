@@ -272,7 +272,7 @@ const Top = () => {
 									alignItems: 'center',
 									justifyContent: 'center',
 									transition: 'transform 0.3s ease',
-									color: '#fff',
+									color: '$fff',
 									'&:hover': {
 										transform: 'scale(1.2)'
 									}

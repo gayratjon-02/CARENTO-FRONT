@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Avatar, Box, Stack } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import Badge from '@mui/material/Badge';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
-import MarkChatUnreadIcon from '@mui/icons-material/MarkChatUnread';
+import MarkUnreadChatAltRoundedIcon from '@mui/icons-material/MarkUnreadChatAltRounded';
+import ElectricCarRoundedIcon from '@mui/icons-material/ElectricCarRounded';
+import FlashOnRoundedIcon from '@mui/icons-material/FlashOnRounded';
 import { useRouter } from 'next/router';
 import ScrollableFeed from 'react-scrollable-feed';
 import { RippleBadge } from '../../scss/MaterialTheme/styled';
@@ -52,6 +53,8 @@ interface InfoPayload {
 
 const Chat = () => {
 	const chatContentRef = useRef<HTMLDivElement>(null);
+	const chatFrameRef = useRef<HTMLDivElement>(null);
+	const chatButtonRef = useRef<HTMLButtonElement>(null);
 	const [messagesList, setMessagesList] = useState<MessagePayload[]>([]);
 	const [onlineUsers, setOnlineUsers] = useState<number>(0);
 	const [messageInput, setMessageInput] = useState<string>('');
@@ -103,6 +106,22 @@ const Chat = () => {
 		setOpenButton(false);
 	}, [router.pathname]);
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (!open) return;
+			const target = event.target as Node;
+			const frame = chatFrameRef.current;
+			const button = chatButtonRef.current;
+			if (frame && frame.contains(target)) return;
+			if (button && button.contains(target)) return;
+			setOpen(false);
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [open]);
+
 	/** HANDLERS **/
 	const handleOpenChat = () => {
 		setOpen((prevState) => !prevState);
@@ -124,35 +143,63 @@ const Chat = () => {
 	};
 
 	const onClickHandler = () => {
-		if (!messageInput) sweetErrorAlert(Messages.error4);
-		else {
-			socket.send(
-				JSON.stringify({
-					event: 'message',
-					data: messageInput,
-				}),
-			);
-			setMessageInput('');
+		const trimmed = messageInput?.trim();
+		if (!trimmed) {
+			sweetErrorAlert(Messages.error4);
+			return;
 		}
+		// Optimistically render outgoing message
+		const localMessage: MessagePayload = {
+			event: 'message',
+			text: trimmed,
+			memberData: user as Member,
+		};
+		setMessagesList((prev) => [...prev, localMessage]);
+
+		try {
+			if (socket) {
+				socket.send(
+					JSON.stringify({
+						event: 'message',
+						data: trimmed,
+					}),
+				);
+			}
+		} catch (err) {
+			console.log('CHAT SEND ERROR:', err);
+		}
+
+		setMessageInput('');
 	};
 
 	return (
 		<Stack className="chatting">
 			{openButton ? (
-				<button className="chat-button" onClick={handleOpenChat}>
-					{open ? <CloseFullscreenIcon /> : <MarkChatUnreadIcon />}
+				<button ref={chatButtonRef} className={`chat-button ${open ? 'open' : ''}`} onClick={handleOpenChat}>
+					<span className="pulse-dot" />
+					{open ? <CloseFullscreenIcon /> : <ElectricCarRoundedIcon className="spin-icon" />}
 				</button>
 			) : null}
-			<Stack className={`chat-frame ${open ? 'open' : ''}`}>
+			<Stack ref={chatFrameRef} className={`chat-frame ${open ? 'open' : ''}`}>
 				<Box className={'chat-top'} component={'div'}>
-					<div style={{ fontFamily: 'Nunito' }}>Online Chat</div>
-					<RippleBadge style={{ margin: '-18px 0 0 21px' }} badgeContent={onlineUsers} />
+					<div className="chat-title">
+						<FlashOnRoundedIcon />
+						<span>Concierge Chat</span>
+					</div>
+					<div className="chat-stats">
+						<RippleBadge style={{ margin: '-10px 0 0 0' }} badgeContent={onlineUsers} />
+						<MarkUnreadChatAltRoundedIcon className="chat-stats__icon" />
+						<small>Avg reply &lt; 1 min</small>
+					</div>
 				</Box>
 				<Box className={'chat-content'} id="chat-content" ref={chatContentRef} component={'div'}>
 					<ScrollableFeed>
 						<Stack className={'chat-main'}>
 							<Box flexDirection={'row'} style={{ display: 'flex' }} sx={{ m: '10px 0px' }} component={'div'}>
-								<div className={'welcome'}>Welcome to Live chat!</div>
+								<div className={'welcome'}>
+									<strong>Instant Concierge</strong>
+									<span>Ask anything, we reply in under a minute.</span>
+								</div>
 							</Box>
 							{messagesList.map((ele: MessagePayload, index: number) => {
 								const { text, memberData } = ele;
