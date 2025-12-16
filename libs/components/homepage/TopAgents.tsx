@@ -8,9 +8,12 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import TopAgentCard from './TopAgentCard';
 import { Member } from '../../types/member/member';
 import { AgentsInquiry } from '../../types/member/member.input';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { GET_AGENTS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
+import { LIKE_TARGET_MEMBER } from 'apollo/user/mutation';
+import { Message } from 'libs/enums/common.enum';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from 'libs/sweetAlert';
 
 interface TopAgentsProps {
 	initialInput: AgentsInquiry;
@@ -37,27 +40,52 @@ const TopAgents = (props: TopAgentsProps) => {
 			setTopAgents(data?.getAgents?.list);
 		},
 	});
+
+	const [likeTargetMember] = useMutation(LIKE_TARGET_MEMBER);
+
 	/** HANDLERS **/
+
+	const likeMemberHandler = async (user: T, id: string) => {
+		try {
+			if (!id) return;
+			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
+
+			// execute likeCarHandler Mutation
+			await likeTargetMember({
+				variables: { input: id },
+			});
+
+			// refresh agents to update like count/state
+			await getAgentsRefetch({ input: initialInput });
+
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR: likeCarHandler', err.message);
+			sweetMixinErrorAlert(err.message).then();
+		}
+	};
 
 	if (device === 'mobile') {
 		return (
 			<Stack className={'top-agents'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
+						<div className={'eyebrow'}>Community Picks</div>
 						<span>Top Agents</span>
+						<p>Verified partners with quick response time.</p>
 					</Stack>
 					<Stack className={'wrapper'}>
 						<Swiper
 							className={'top-agents-swiper'}
 							slidesPerView={'auto'}
 							centeredSlides={true}
-							spaceBetween={29}
+							spaceBetween={18}
 							modules={[Autoplay]}
 						>
 							{topAgents.map((agent: Member) => {
 								return (
 									<SwiperSlide className={'top-agents-slide'} key={agent?._id}>
-										<TopAgentCard agent={agent} key={agent?.memberNick} />
+										<TopAgentCard agent={agent} key={agent?.memberNick} likeMemberHandler={likeMemberHandler} />
 									</SwiperSlide>
 								);
 							})}
@@ -69,11 +97,24 @@ const TopAgents = (props: TopAgentsProps) => {
 	} else {
 		return (
 			<Stack className={'top-agents'}>
+				<Box component={'div'} className={'halo halo-left'} />
+				<Box component={'div'} className={'halo halo-right'} />
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
+							<div className={'eyebrow'}>Trusted partners</div>
 							<span>Top Agents</span>
-							<p>Our Top Agents always ready to serve you</p>
+							<p>Handpicked professionals ready to serve you any time.</p>
+							<Box component={'div'} className={'stats'}>
+								<div className={'stat'}>
+									<strong>{topAgents?.length || 0}</strong>
+									<small>verified experts</small>
+								</div>
+								<div className={'stat'}>
+									<strong>24/7</strong>
+									<small>support on call</small>
+								</div>
+							</Box>
 						</Box>
 						<Box component={'div'} className={'right'}>
 							<div className={'more-box'}>
@@ -89,18 +130,23 @@ const TopAgents = (props: TopAgentsProps) => {
 						<Box component={'div'} className={'card-wrapper'}>
 							<Swiper
 								className={'top-agents-swiper'}
-								slidesPerView={'auto'}
-								spaceBetween={29}
+								slidesPerView={4}
+								spaceBetween={32}
 								modules={[Autoplay, Navigation, Pagination]}
 								navigation={{
 									nextEl: '.swiper-agents-next',
 									prevEl: '.swiper-agents-prev',
 								}}
+								breakpoints={{
+									1200: { slidesPerView: 4, spaceBetween: 32 },
+									992: { slidesPerView: 3, spaceBetween: 28 },
+									768: { slidesPerView: 2, spaceBetween: 24 },
+								}}
 							>
 								{topAgents.map((agent: Member) => {
 									return (
 										<SwiperSlide className={'top-agents-slide'} key={agent?._id}>
-											<TopAgentCard agent={agent} key={agent?.memberNick} />
+											<TopAgentCard agent={agent} key={agent?.memberNick}  likeMemberHandler={likeMemberHandler} />
 										</SwiperSlide>
 									);
 								})}
