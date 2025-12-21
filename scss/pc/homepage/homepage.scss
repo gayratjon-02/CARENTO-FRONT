@@ -2117,28 +2117,56 @@
 									border-color: rgba(79, 70, 229, 0.12);
 								}
 							}
-							.card-header {
-								position: relative;
-								display: flex;
-								flex-direction: row;
-								justify-content: space-between;
-								gap: 8px;
-								.pill {
-									padding: 6px 10px;
-									border-radius: 999px;
-									background: rgba(17, 24, 39, 0.06);
-									color: #111827;
-									font-family: $font;
-									font-size: 11px;
-									font-weight: 700;
-									text-transform: uppercase;
-									letter-spacing: 0.08em;
-									&.accent {
-										background: rgba(99, 102, 241, 0.12);
-										color: #4f46e5;
+								.card-header {
+									position: relative;
+									display: flex;
+									flex-direction: row;
+									justify-content: space-between;
+									gap: 8px;
+									.header-left {
+										display: inline-flex;
+										align-items: center;
+										gap: 8px;
+									}
+									.pill {
+										padding: 6px 10px;
+										border-radius: 999px;
+										background: rgba(17, 24, 39, 0.06);
+										color: #111827;
+										font-family: $font;
+										font-size: 11px;
+										font-weight: 700;
+										text-transform: uppercase;
+										letter-spacing: 0.08em;
+										&.accent {
+											background: rgba(99, 102, 241, 0.12);
+											color: #4f46e5;
+										}
+									}
+									.like-pill {
+										display: inline-flex;
+										align-items: center;
+										gap: 6px;
+										padding: 8px 12px;
+										border-radius: 999px;
+										background: rgba(239, 68, 68, 0.08);
+										border: 1px solid rgba(239, 68, 68, 0.18);
+										color: #ef4444;
+										.MuiSvgIcon-root {
+											font-size: 18px;
+											color: #ef4444;
+										}
+										span {
+											color: #ef4444;
+											font-size: 13px;
+											font-weight: 800;
+										}
+										&.active {
+											background: rgba(239, 68, 68, 0.12);
+											border-color: rgba(239, 68, 68, 0.25);
+										}
 									}
 								}
-							}
 							.avatar {
 								position: relative;
 								display: flex;
@@ -2164,7 +2192,7 @@
 									}
 								}
 							}
-							.card-body {
+								.card-body {
 								position: relative;
 								display: flex;
 								flex-direction: column;
@@ -2190,7 +2218,7 @@
 									font-weight: 500;
 									line-height: 22px;
 								}
-								.tags {
+									.tags {
 									display: flex;
 									flex-wrap: wrap;
 									gap: 8px;
@@ -2207,65 +2235,31 @@
 										text-transform: uppercase;
 										letter-spacing: 0.08em;
 									}
+									}
 								}
-									.meta {
-										margin-top: 10px;
-										width: 100%;
-										display: flex;
-										flex-direction: row;
-										justify-content: center;
-										gap: 12px;
-										.meta-item {
-											display: inline-flex;
-											align-items: center;
-											gap: 6px;
-											padding: 8px 10px;
-											border-radius: 12px;
-											background: rgba(17, 24, 39, 0.05);
-										border: 1px solid rgba(17, 24, 39, 0.05);
-										img,
-										svg {
-											width: 16px;
-											height: 16px;
-											&.heart path {
-												transition: stroke 0.25s ease, fill 0.25s ease;
-											}
-										}
-										span {
-											color: #111827;
-											font-size: 13px;
-											font-weight: 700;
-										}
-										&.like {
-											cursor: pointer;
-											transition: all 0.25s ease;
-											&.active {
-												background: linear-gradient(140deg, rgba(79, 70, 229, 0.14), rgba(14, 165, 233, 0.12));
-												border-color: rgba(79, 70, 229, 0.25);
-												span {
-													color: #ef4444;
-												}
-												.heart path {
-													stroke: #ef4444;
-													fill: rgba(239, 68, 68, 0.1);
-												}
-												svg path,
-												svg circle {
-													stroke: #ef4444;
-												}
-											}
-											&:hover {
-												transform: translateY(-1px);
-												box-shadow: 0px 10px 30px rgba(14, 27, 53, 0.08);
-												border-color: rgba(79, 70, 229, 0.2);
-												.heart path {
-													stroke: #4f46e5;
-												}
-											}
+								.card-footer {
+									margin-top: auto;
+									padding-top: 14px;
+									border-top: 1px solid rgba(17, 24, 39, 0.06);
+									display: flex;
+									align-items: center;
+									justify-content: space-between;
+									.footer-item {
+										display: inline-flex;
+										align-items: center;
+										gap: 8px;
+										color: rgba(107, 114, 128, 0.9);
+										font-family: $font;
+										font-size: 15px;
+										font-weight: 700;
+										svg,
+										.MuiSvgIcon-root {
+											width: 18px;
+											height: 18px;
+											color: rgba(107, 114, 128, 0.75);
 										}
 									}
 								}
-							}
 							}
 						}
 				}
