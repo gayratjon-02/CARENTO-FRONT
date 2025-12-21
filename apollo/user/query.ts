@@ -226,6 +226,11 @@ export const GET_CARS = gql`
 				createdAt
 				updatedAt
 				carRank
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
 				memberData {
 					_id
 					memberType

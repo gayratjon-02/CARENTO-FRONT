@@ -205,6 +205,11 @@ export const LIKE_TARGET_CAR = gql`
 			createdAt
 			updatedAt
 			carLikes
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
 		}
 	}
 `;

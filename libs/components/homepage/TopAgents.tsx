@@ -16,6 +16,7 @@ import { Message } from 'libs/enums/common.enum';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from 'libs/sweetAlert';
 
 interface TopAgentsProps {
+	
 	initialInput: AgentsInquiry;
 }
 
