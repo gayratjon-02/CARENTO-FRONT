@@ -494,6 +494,11 @@ export const GET_ARTICLES = gql`
 				memberId
 				createdAt
 				updatedAt
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
 				memberData {
 					_id
 					memberType

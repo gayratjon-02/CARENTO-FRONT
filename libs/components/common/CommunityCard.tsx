@@ -1,31 +1,51 @@
-import React from 'react';
+import React, { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { Stack, Typography } from '@mui/material';
+import { ButtonBase, Stack, Typography } from '@mui/material';
 import { BoardArticle } from '../../types/board-article/board-article';
 import Moment from 'react-moment';
 import { REACT_APP_API_URL } from '../../config';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
-import IconButton from '@mui/material/IconButton';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 interface CommunityCardProps {
 	boardArticle: BoardArticle;
 	size?: string;
-	likeArticleHandler: any;
+	likeArticleHandler?: any;
+	likeBoArticleHandler?: any;
 }
 
 const CommunityCard = (props: CommunityCardProps) => {
-	const { boardArticle, size = 'normal', likeArticleHandler: likeArticleHandler } = props;
+	const { boardArticle, size = 'normal', likeArticleHandler, likeBoArticleHandler } = props;
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const likeHandler = likeArticleHandler ?? likeBoArticleHandler;
 	const imagePath: string = boardArticle?.articleImage
 		? `${REACT_APP_API_URL}/${boardArticle?.articleImage}`
 		: '/img/community/communityImg.png';
+
+	const isLikedFromApi = useMemo(() => {
+		const anyArticle = boardArticle as any;
+		if (Array.isArray(anyArticle?.meLiked) && anyArticle.meLiked.length > 0) {
+			return Boolean(anyArticle.meLiked[0]?.myFavorite);
+		}
+		return Boolean(anyArticle?.isLiked ?? anyArticle?.liked ?? anyArticle?.isFavorite ?? false);
+	}, [boardArticle]);
+
+	const [liked, setLiked] = useState<boolean>(isLikedFromApi);
+
+	useEffect(() => {
+		setLiked(isLikedFromApi);
+	}, [isLikedFromApi]);
+
+	const likesCount = useMemo(() => {
+		const anyArticle = boardArticle as any;
+		const v = anyArticle?.articleLikes ?? anyArticle?.likes ?? anyArticle?.likeCount ?? 0;
+		return typeof v === 'number' ? v : Number(v) || 0;
+	}, [boardArticle]);
 
 	/** HANDLERS **/
 	const chooseArticleHandler = (e: React.SyntheticEvent, boardArticle: BoardArticle) => {
@@ -42,6 +62,22 @@ const CommunityCard = (props: CommunityCardProps) => {
 	const goMemberPage = (id: string) => {
 		if (id === user?._id) router.push('/mypage');
 		else router.push(`/member?memberId=${id}`);
+	};
+
+	const handleLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		e.preventDefault();
+		if (!boardArticle?._id || !likeHandler) return;
+
+		const prev = liked;
+		const next = !prev;
+		setLiked(next);
+
+		try {
+			await likeHandler(e, user, boardArticle?._id);
+		} catch (err) {
+			setLiked(prev);
+		}
 	};
 
 	if (device === 'mobile') {
@@ -70,18 +106,10 @@ const CommunityCard = (props: CommunityCardProps) => {
 						<Typography className="title">{boardArticle?.articleTitle}</Typography>
 					</Stack>
 					<Stack className={'buttons'}>
-						<IconButton color={'default'}>
-							<RemoveRedEyeIcon />
-						</IconButton>
-						<Typography className="view-cnt">{boardArticle?.articleViews}</Typography>
-						<IconButton color={'default'} onClick={(e: any) => likeArticleHandler(e, user, boardArticle?._id)}>
-							{boardArticle?.meLiked && boardArticle?.meLiked[0]?.myFavorite ? (
-								<FavoriteIcon color={'primary'} />
-							) : (
-								<FavoriteBorderIcon />
-							)}
-						</IconButton>
-						<Typography className="view-cnt">{boardArticle?.articleLikes}</Typography>
+						<ButtonBase className={`community-like-btn ${liked ? 'liked' : ''}`} onClick={handleLikeClick}>
+							{liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+							<Typography className="community-like-count">{Number(likesCount).toLocaleString()}</Typography>
+						</ButtonBase>
 					</Stack>
 				</Stack>
 				<Stack className="date-box">

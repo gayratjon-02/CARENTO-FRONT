@@ -2191,3 +2191,38 @@
     opacity: 0;
   }
 }
+
+.user-reviews {
+  .review-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .review-like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 10px;
+    background: transparent !important;
+    &:hover {
+      background: transparent !important;
+    }
+    svg {
+      width: 22px;
+      height: 22px;
+      color: rgba(15, 23, 42, 0.55);
+    }
+    &.liked {
+      svg {
+        color: #ef4444;
+      }
+    }
+  }
+  .review-like-count {
+    color: #6b7280;
+    font-family: $font;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}

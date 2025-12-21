@@ -274,6 +274,38 @@
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			gap: 10px;
+			.MuiButtonBase-root {
+				background: transparent !important;
+				&:hover {
+					background: transparent !important;
+				}
+			}
+			.community-like-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 6px;
+				border-radius: 10px;
+				background: transparent !important;
+				svg {
+					width: 22px;
+					height: 22px;
+					color: rgba(24, 26, 32, 0.55);
+				}
+				&.liked {
+					svg {
+						color: #ef4444;
+					}
+				}
+				.community-like-count {
+					font-size: 13px;
+					color: #717171;
+					font-family: $font;
+					font-weight: 400;
+					line-height: normal;
+				}
+			}
 			svg {
 				width: 24px;
 				height: 24px;
