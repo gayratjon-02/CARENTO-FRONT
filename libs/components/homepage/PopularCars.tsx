@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Stack, Box } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,11 +8,13 @@ import EastIcon from '@mui/icons-material/East';
 import Link from 'next/link';
 import { CarsInquiry } from '../../types/property/property.input';
 import { GET_CARS } from '../../../apollo/user/query';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { T } from '../../types/common';
 import { Car } from '../../types/property/cars';
 import PopularCarCard from './PopularCarCard';
-import { Direction } from '../../enums/common.enum';
+import { Message } from '../../enums/common.enum';
+import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 
 interface PopularCarsProps {
 	initialInput: CarsInquiry;
@@ -23,7 +25,9 @@ const PopularCars = (props: PopularCarsProps) => {
 	const device = useDeviceDetect();
 	const [popularCars, setPopularCars] = useState<Car[]>([]);
 
-	// /** APOLLO REQUESTS **/
+	/** APOLLO REQUESTS **/
+	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
+
 	const { refetch: getCarsRefetch } = useQuery(GET_CARS, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
@@ -40,6 +44,21 @@ const PopularCars = (props: PopularCarsProps) => {
 	});
 
 	console.log('popularCars++++', popularCars);
+
+	const likeCarHandler = async (userData: T, id: string) => {
+		try {
+			if (!id) return;
+			if (!userData?._id) throw new Error(Message.NOT_AUTHENTICATED);
+
+			await likeTargetCar({ variables: { input: id } });
+			await getCarsRefetch({ input: initialInput });
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR: likeCarHandler', err.message);
+			sweetMixinErrorAlert(err.message).then;
+			throw err;
+		}
+	};
 
 	const renderSwiper = (mobile = false) => (
 		<Swiper
@@ -74,7 +93,7 @@ const PopularCars = (props: PopularCarsProps) => {
 		>
 			{popularCars.map((car: Car) => (
 				<SwiperSlide key={car._id} className={'popular-car-slide'}>
-					<PopularCarCard car={car} />
+					<PopularCarCard car={car} likeCarHandler={likeCarHandler} />
 				</SwiperSlide>
 			))}
 		</Swiper>
