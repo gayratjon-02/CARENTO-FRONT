@@ -1,27 +1,25 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import PropertyBigCard from '../../libs/components/common/PropertyBigCard';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
-import { Box, Button, Pagination, Stack, Typography } from '@mui/material';
+import { Box, Button, Pagination, Stack, Tabs, Tab, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { Property } from '../../libs/types/property/property';
+import { Car } from '../../libs/types/property/cars';
 import { Member } from '../../libs/types/member/member';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 import { userVar } from '../../apollo/store';
-import { PropertiesInquiry } from '../../libs/types/property/property.input';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
 import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/user/mutation';
-import { GET_COMMENTS, GET_MEMBER, GET_PROPERTIES } from '../../apollo/user/query';
+import { GET_CARS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
-import { Message } from '../../libs/enums/common.enum';
+import DealerCarCard from '../../libs/components/dealers/DealerCarCard';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -35,21 +33,23 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 	const user = useReactiveVar(userVar);
 	const [agentId, setAgentId] = useState<string | null>(null);
 	const [agent, setAgent] = useState<Member | null>(null);
-	const [searchFilter, setSearchFilter] = useState<PropertiesInquiry>(initialInput);
-	const [agentProperties, setAgentProperties] = useState<Property[]>([]);
-	const [propertyTotal, setPropertyTotal] = useState<number>(0);
+	const [searchFilter, setSearchFilter] = useState<any>(initialInput);
+	const [dealerCars, setDealerCars] = useState<Car[]>([]);
+	const [carTotal, setCarTotal] = useState<number>(0);
 	const [commentInquiry, setCommentInquiry] = useState<CommentsInquiry>(initialComment);
 	const [agentComments, setAgentComments] = useState<Comment[]>([]);
 	const [commentTotal, setCommentTotal] = useState<number>(0);
+	const [activeTab, setActiveTab] = useState<'cars' | 'reviews'>('cars');
 	const [insertCommentData, setInsertCommentData] = useState<CommentInput>({
 		commentGroup: CommentGroup.MEMBER,
 		commentContent: '',
 		commentRefId: '',
 	});
+	const carsTotal = useMemo(() => Number((agent as any)?.memberCars ?? agent?.memberProperties ?? 0), [agent]);
 
 	/** APOLLO REQUESTS **/
 	const [createComment] = useMutation(CREATE_COMMENT);
-	const [likeTargetProperty] = useMutation(LIKE_TARGET_CAR);
+	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 
 	const {
 		loading: getMemberLoading,
@@ -62,38 +62,25 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 		skip: !agentId,
 		onCompleted: (data: T) => {
 			setAgent(data?.getMember);
-			setSearchFilter({
-				...searchFilter,
-				search: {
-					memberId: data?.getMember?._id,
-				},
-			});
-			setCommentInquiry({
-				...commentInquiry,
-				search: {
-					commentRefId: data?.getMember?._id,
-				},
-			});
-			setInsertCommentData({
-				...insertCommentData,
-				commentRefId: data?.getMember?._id,
-			});
+			setSearchFilter((prev) => ({ ...prev, search: { ...prev.search, memberId: data?.getMember?._id } }));
+			setCommentInquiry((prev) => ({ ...prev, search: { ...prev.search, commentRefId: data?.getMember?._id } }));
+			setInsertCommentData((prev) => ({ ...prev, commentRefId: data?.getMember?._id }));
 		},
 	});
 
 	const {
-		loading: getPropertiesLoading,
-		data: getPropertiesData,
-		error: getPropertiesError,
-		refetch: getPropertiesRefetch,
-	} = useQuery(GET_PROPERTIES, {
+		loading: getCarsLoading,
+		data: getCarsData,
+		error: getCarsError,
+		refetch: getCarsRefetch,
+	} = useQuery(GET_CARS, {
 		fetchPolicy: 'network-only',
 		variables: { input: searchFilter },
 		skip: !searchFilter.search.memberId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setAgentProperties(data?.getProperties?.list);
-			setPropertyTotal(data?.getProperties?.metaCounter[0]?.total ?? 0);
+			setDealerCars(data?.getCars?.list ?? []);
+			setCarTotal(data?.getCars?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -109,7 +96,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setAgentComments(data?.getComments?.list);
-			setCommentTotal(data?.getComments?.metaCounter[0]?.total ?? 0);
+			setCommentTotal(data?.getComments?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -131,14 +118,26 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 		}
 	};
 
-	const propertyPaginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
-		searchFilter.page = value;
-		setSearchFilter({ ...searchFilter });
+	const carPaginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
+		const next = { ...searchFilter, page: value };
+		setSearchFilter(next);
+
+		const refetchRes = await getCarsRefetch({ input: next });
+		if (refetchRes?.data?.getCars) {
+			setDealerCars(refetchRes.data.getCars.list ?? []);
+			setCarTotal(refetchRes.data.getCars.metaCounter?.[0]?.total ?? 0);
+		}
 	};
 
 	const commentPaginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
-		commentInquiry.page = value;
-		setCommentInquiry({ ...commentInquiry });
+		const next = { ...commentInquiry, page: value };
+		setCommentInquiry(next);
+
+		const refetchRes = await getCommentsRefetch({ input: next });
+		if (refetchRes?.data?.getComments) {
+			setAgentComments(refetchRes.data.getComments.list ?? []);
+			setCommentTotal(refetchRes.data.getComments.metaCounter?.[0]?.total ?? 0);
+		}
 	};
 
 	const createCommentHandler = async () => {
@@ -159,47 +158,203 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 		}
 	};
 
-	const likePropertyHandler = async (user: any, id: string) => {
+	const likeCarHandler = async (user: any, id: string) => {
 		try {
 			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
 
-			await likeTargetProperty({
+			await likeTargetCar({
 				variables: {
 					input: id,
 				},
 			});
-			await getPropertiesRefetch({ input: searchFilter });
+			await getCarsRefetch({ input: searchFilter });
 			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
-			console.log('ERROR, likePropertyHandler:', err.message);
+			console.log('ERROR, likeCarHandler:', err.message);
 			sweetMixinErrorAlert(err.message).then();
 		}
 	};
 
 	if (device === 'mobile') {
-		return <div>AGENT DETAIL PAGE MOBILE</div>;
+		return (
+			<Stack className={'dealer-detail-page mobile'}>
+				<Stack className={'container'}>
+					<Stack className="dealer-hero">
+						<Box className="dealer-hero__avatar">
+							<img
+								src={agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'}
+								alt=""
+							/>
+						</Box>
+						<Box className="dealer-hero__meta">
+							<Typography className="dealer-hero__name">{agent?.memberFullName ?? agent?.memberNick}</Typography>
+							<Typography className="dealer-hero__role">Dealer</Typography>
+							{agent?.memberPhone && (
+								<Typography className="dealer-hero__phone">
+									<img src="/img/icons/call.svg" alt="" />
+									<span>{agent.memberPhone}</span>
+								</Typography>
+							)}
+						</Box>
+						<Box className="dealer-hero__stats">
+							<div className="stat">
+								<strong>{carsTotal.toLocaleString()}</strong>
+								<span>Cars</span>
+							</div>
+							<div className="stat">
+								<strong>{Number(agent?.memberLikes ?? 0).toLocaleString()}</strong>
+								<span>Likes</span>
+							</div>
+							<div className="stat">
+								<strong>{Number(agent?.memberViews ?? 0).toLocaleString()}</strong>
+								<span>Views</span>
+							</div>
+						</Box>
+					</Stack>
+
+					<Stack className="dealer-panels">
+						<Box className="dealer-tabs">
+							<Tabs
+								value={activeTab}
+								onChange={(_, v) => setActiveTab(v)}
+								variant="fullWidth"
+								textColor="primary"
+								indicatorColor="primary"
+							>
+								<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
+								<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
+							</Tabs>
+						</Box>
+
+						{activeTab === 'cars' && (
+							<Stack className="dealer-panel">
+								<Stack className={'card-wrap'}>
+									{dealerCars.map((car: Car) => (
+										<DealerCarCard car={car} likeCarHandler={likeCarHandler} key={car?._id} />
+									))}
+								</Stack>
+								<Stack className={'pagination'}>
+									{carTotal ? (
+										<>
+											<Stack className="pagination-box">
+												<Pagination
+													page={searchFilter.page}
+													count={Math.ceil(carTotal / searchFilter.limit) || 1}
+													onChange={carPaginationChangeHandler}
+													shape="circular"
+													color="primary"
+												/>
+											</Stack>
+											<span>Total {carTotal.toLocaleString()} cars available</span>
+										</>
+									) : (
+										<div className={'no-data'}>
+											<img src="/img/icons/icoAlert.svg" alt="" />
+											<p>No cars found!</p>
+										</div>
+									)}
+								</Stack>
+							</Stack>
+						)}
+
+						{activeTab === 'reviews' && (
+							<Stack className="dealer-panel">
+								<Stack className={'main-intro'}>
+									<span>Reviews</span>
+									<p>Share your experience with this dealer</p>
+								</Stack>
+
+								{commentTotal !== 0 && (
+									<Stack className={'review-wrap'}>
+										<Box component={'div'} className={'title-box'}>
+											<StarIcon />
+											<span>
+												{commentTotal} review{commentTotal > 1 ? 's' : ''}
+											</span>
+										</Box>
+										{agentComments?.map((comment: Comment) => {
+											return <ReviewCard comment={comment} key={comment?._id} />;
+										})}
+										<Box component={'div'} className={'pagination-box'}>
+											<Pagination
+												page={commentInquiry.page}
+												count={Math.ceil(commentTotal / commentInquiry.limit) || 1}
+												onChange={commentPaginationChangeHandler}
+												shape="circular"
+												color="primary"
+											/>
+										</Box>
+									</Stack>
+								)}
+
+								<Stack className={'leave-review-config'}>
+									<Typography className={'main-title'}>Leave A Review</Typography>
+									<Typography className={'review-title'}>Review</Typography>
+									<textarea
+										onChange={({ target: { value } }: any) => {
+											setInsertCommentData({ ...insertCommentData, commentContent: value });
+										}}
+										value={insertCommentData.commentContent}
+									></textarea>
+									<Box className={'submit-btn'} component={'div'}>
+										<Button
+											className={'submit-review'}
+											disabled={insertCommentData.commentContent === '' || user?._id === ''}
+											onClick={createCommentHandler}
+										>
+											<Typography className={'title'}>Submit Review</Typography>
+										</Button>
+									</Box>
+								</Stack>
+							</Stack>
+						)}
+					</Stack>
+				</Stack>
+			</Stack>
+		);
 	} else {
 		return (
 			<Stack className={'dealer-detail-page'}>
 				<Stack className={'container'}>
 					<Stack className="dealer-detail-grid">
 						<Stack className="dealer-profile-card">
-							<img
-								src={agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'}
-								alt=""
-							/>
-							<Box component={'div'} className={'info'} onClick={() => redirectToMemberPageHandler(agent?._id as string)}>
-								<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
-								<span className="role">Dealer</span>
-								<div className="phone">
-									<img src="/img/icons/call.svg" alt="" />
-									<span>{agent?.memberPhone}</span>
-								</div>
+							<Box className="profile-top">
+								<img
+									src={
+										agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'
+									}
+									alt=""
+								/>
+								<Box
+									className="profile-meta"
+									onClick={() => redirectToMemberPageHandler(agent?._id as string)}
+									role="button"
+								>
+									<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
+									<span className="role">Dealer</span>
+									{agent?.memberAddress ? (
+										<span className="sub">{agent.memberAddress}</span>
+									) : (
+										<span className="sub muted">Unknown location</span>
+									)}
+								</Box>
 							</Box>
+
+							{agent?.memberPhone && (
+								<Box className="profile-actions">
+									<Button className="primary" href={`tel:${agent.memberPhone}`}>
+										Call
+									</Button>
+									<Button className="ghost" href={`tel:${agent.memberPhone}`}>
+										Save
+									</Button>
+								</Box>
+							)}
+
 							<Box className="quick-stats">
 								<div className="stat">
-									<strong>{Number((agent as any)?.memberCars ?? agent?.memberProperties ?? 0).toLocaleString()}</strong>
+									<strong>{carsTotal.toLocaleString()}</strong>
 									<span>Cars</span>
 								</div>
 								<div className="stat">
@@ -214,103 +369,110 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 						</Stack>
 
 						<Stack className="dealer-content">
-							<Stack className={'dealer-home-list'}>
-								<Stack className={'card-wrap'}>
-									{agentProperties.map((property: Property) => {
-										return (
-											<div className={'wrap-main'} key={property?._id}>
-												<PropertyBigCard
-													property={property}
-													likePropertyHandler={likePropertyHandler}
-													key={property?._id}
-												/>
-											</div>
-										);
-									})}
-								</Stack>
-								<Stack className={'pagination'}>
-									{propertyTotal ? (
-										<>
-											<Stack className="pagination-box">
-												<Pagination
-													page={searchFilter.page}
-													count={Math.ceil(propertyTotal / searchFilter.limit) || 1}
-													onChange={propertyPaginationChangeHandler}
-													shape="circular"
-													color="primary"
-												/>
+							<Stack className="dealer-panels">
+								<Box className="dealer-tabs">
+							<Tabs
+								value={activeTab}
+								onChange={(_, v) => setActiveTab(v)}
+								variant="fullWidth"
+								textColor="primary"
+								indicatorColor="primary"
+							>
+								<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
+								<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
+							</Tabs>
+						</Box>
+
+								{activeTab === 'cars' && (
+									<Stack className="dealer-panel">
+										<Box className="panel-head">
+											<Typography className="panel-title">Cars</Typography>
+											<Typography className="panel-sub">
+												{carTotal ? `${carTotal.toLocaleString()} available` : 'No cars found'}
+											</Typography>
+										</Box>
+
+										<Stack className={'card-wrap'}>
+											{dealerCars.map((car: Car) => (
+												<DealerCarCard car={car} likeCarHandler={likeCarHandler} key={car?._id} />
+											))}
+										</Stack>
+
+										<Stack className={'pagination'}>
+											{carTotal ? (
+												<>
+													<Stack className="pagination-box">
+														<Pagination
+															page={searchFilter.page}
+															count={Math.ceil(carTotal / searchFilter.limit) || 1}
+															onChange={carPaginationChangeHandler}
+															shape="circular"
+															color="primary"
+														/>
+													</Stack>
+													<span>Total {carTotal.toLocaleString()} cars available</span>
+												</>
+											) : (
+												<div className={'no-data'}>
+													<img src="/img/icons/icoAlert.svg" alt="" />
+													<p>No cars found!</p>
+												</div>
+											)}
+										</Stack>
+									</Stack>
+								)}
+
+								{activeTab === 'reviews' && (
+									<Stack className="dealer-panel">
+										<Stack className={'main-intro'}>
+											<span>Reviews</span>
+											<p>Share your experience with this dealer</p>
+										</Stack>
+
+										{commentTotal !== 0 && (
+											<Stack className={'review-wrap'}>
+												<Box component={'div'} className={'title-box'}>
+													<StarIcon />
+													<span>
+														{commentTotal} review{commentTotal > 1 ? 's' : ''}
+													</span>
+												</Box>
+												{agentComments?.map((comment: Comment) => {
+													return <ReviewCard comment={comment} key={comment?._id} />;
+												})}
+												<Box component={'div'} className={'pagination-box'}>
+													<Pagination
+														page={commentInquiry.page}
+														count={Math.ceil(commentTotal / commentInquiry.limit) || 1}
+														onChange={commentPaginationChangeHandler}
+														shape="circular"
+														color="primary"
+													/>
+												</Box>
 											</Stack>
-											<span>Total {propertyTotal} listings available</span>
-										</>
-									) : (
-										<div className={'no-data'}>
-											<img src="/img/icons/icoAlert.svg" alt="" />
-											<p>No listings found!</p>
-										</div>
-									)}
-								</Stack>
-							</Stack>
+										)}
 
-							<Stack className={'review-box'}>
-						<Stack className={'main-intro'}>
-							<span>Reviews</span>
-							<p>Share your experience with this dealer</p>
-						</Stack>
-						{commentTotal !== 0 && (
-							<Stack className={'review-wrap'}>
-								<Box component={'div'} className={'title-box'}>
-									<StarIcon />
-									<span>
-										{commentTotal} review{commentTotal > 1 ? 's' : ''}
-									</span>
-								</Box>
-								{agentComments?.map((comment: Comment) => {
-									return <ReviewCard comment={comment} key={comment?._id} />;
-								})}
-								<Box component={'div'} className={'pagination-box'}>
-									<Pagination
-										page={commentInquiry.page}
-										count={Math.ceil(commentTotal / commentInquiry.limit) || 1}
-										onChange={commentPaginationChangeHandler}
-										shape="circular"
-										color="primary"
-									/>
-								</Box>
-							</Stack>
-						)}
-
-						<Stack className={'leave-review-config'}>
-							<Typography className={'main-title'}>Leave A Review</Typography>
-							<Typography className={'review-title'}>Review</Typography>
-							<textarea
-								onChange={({ target: { value } }: any) => {
-									setInsertCommentData({ ...insertCommentData, commentContent: value });
-								}}
-								value={insertCommentData.commentContent}
-							></textarea>
-							<Box className={'submit-btn'} component={'div'}>
-								<Button
-									className={'submit-review'}
-									disabled={insertCommentData.commentContent === '' || user?._id === ''}
-									onClick={createCommentHandler}
-								>
-									<Typography className={'title'}>Submit Review</Typography>
-									<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-										<g clipPath="url(#clip0_6975_3642)">
-											<path
-												d="M16.1571 0.5H6.37936C6.1337 0.5 5.93491 0.698792 5.93491 0.944458C5.93491 1.19012 6.1337 1.38892 6.37936 1.38892H15.0842L0.731781 15.7413C0.558156 15.915 0.558156 16.1962 0.731781 16.3698C0.818573 16.4566 0.932323 16.5 1.04603 16.5C1.15974 16.5 1.27345 16.4566 1.36028 16.3698L15.7127 2.01737V10.7222C15.7127 10.9679 15.9115 11.1667 16.1572 11.1667C16.4028 11.1667 16.6016 10.9679 16.6016 10.7222V0.944458C16.6016 0.698792 16.4028 0.5 16.1571 0.5Z"
-												fill="#181A20"
-											/>
-										</g>
-										<defs>
-											<clipPath id="clip0_6975_3642">
-												<rect width="16" height="16" fill="white" transform="translate(0.601562 0.5)" />
-											</clipPath>
-										</defs>
-									</svg>
-								</Button>
-							</Box>
-						</Stack>
+										<Stack className={'leave-review-config'}>
+											<Typography className={'main-title'}>Leave A Review</Typography>
+											<Typography className={'review-title'}>Review</Typography>
+											<textarea
+												onChange={({ target: { value } }: any) => {
+													setInsertCommentData({ ...insertCommentData, commentContent: value });
+												}}
+												value={insertCommentData.commentContent}
+											></textarea>
+											<Box className={'submit-btn'} component={'div'}>
+												<Button
+													className={'submit-review'}
+													disabled={insertCommentData.commentContent === '' || user?._id === ''}
+													onClick={createCommentHandler}
+												>
+													<Typography className={'title'}>Submit Review</Typography>
+												</Button>
+											</Box>
+										</Stack>
+									</Stack>
+								)}
 							</Stack>
 						</Stack>
 					</Stack>
