@@ -62,7 +62,7 @@ const Top = () => {
 			if (autoCloseTimerRef.current) {
 				clearTimeout(autoCloseTimerRef.current);
 			}
-			
+
 			// 5 soniyalik yangi timer yaratish
 			autoCloseTimerRef.current = setTimeout(() => {
 				setIsContainerVisible(false);
@@ -134,7 +134,7 @@ const Top = () => {
 	const toggleContainer = () => {
 		const newState = !isContainerVisible;
 		setIsContainerVisible(newState);
-		
+
 		// Timer'ni reset qilish
 		if (autoCloseTimerRef.current) {
 			clearTimeout(autoCloseTimerRef.current);
@@ -259,23 +259,23 @@ const Top = () => {
 							</Stack>
 						</Stack>
 						<Stack style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-						<Stack className="carento-brand-box">
+							<Stack className="carento-brand-box">
 								{t('CarentoBrandSlogan') || 'CARENTO — Your reliable car partner'}
 							</Stack>
-							<Box 
-								component="div" 
+							<Box
+								component="div"
 								onClick={toggleContainer}
 								className="toggle-arrow"
-								sx={{ 
-									cursor: 'pointer', 
-									display: 'flex', 
+								sx={{
+									cursor: 'pointer',
+									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
 									transition: 'transform 0.3s ease',
 									color: '$fff',
 									'&:hover': {
-										transform: 'scale(1.2)'
-									}
+										transform: 'scale(1.2)',
+									},
 								}}
 							>
 								{isContainerVisible ? (
@@ -287,8 +287,8 @@ const Top = () => {
 						</Stack>
 						<Stack className="lang-currency-box">
 							<div className={'notification-box'}>
-								<Badge 
-									badgeContent={notificationCount} 
+								<Badge
+									badgeContent={notificationCount}
 									color="error"
 									max={99}
 									sx={{
@@ -299,18 +299,18 @@ const Top = () => {
 											fontWeight: 600,
 											minWidth: '18px',
 											height: '18px',
-											padding: '0 4px'
-										}
+											padding: '0 4px',
+										},
 									}}
 								>
-									<BellRinging 
-										size={22} 
-										weight="duotone" 
+									<BellRinging
+										size={22}
+										weight="duotone"
 										className="notification-icon"
 										color="#fff"
 										style={{
 											cursor: 'pointer',
-											transition: 'transform 0.3s ease'
+											transition: 'transform 0.3s ease',
 										}}
 									/>
 								</Badge>
@@ -410,7 +410,7 @@ const Top = () => {
 							</div>
 						</Stack>
 					</Stack>
-					<Stack 
+					<Stack
 						className={`container ${isContainerVisible ? 'visible' : 'hidden'}`}
 						onMouseMove={handleContainerInteraction}
 						onClick={handleContainerInteraction}
@@ -425,11 +425,11 @@ const Top = () => {
 							<Link href={'/'}>
 								<div>{t('Home')}</div>
 							</Link>
-							<Link href={'/property'}>
+							<Link href={'/cars'}>
 								<div>{t('Cars')}</div>
 							</Link>
-							<Link href={'/agent'}>
-								<div> {t('Agents')} </div>
+							<Link href={'/dealers'}>
+								<div> {t('Dealers')} </div>
 							</Link>
 							<Link href={'/community?articleCategory=FREE'}>
 								<div> {t('Community')} </div>
@@ -474,9 +474,7 @@ const Top = () => {
 								<Link href={'/account/join'}>
 									<div className={'join-box'}>
 										<AccountCircleOutlinedIcon />
-										<span>
-											{t('Login')}
-										</span>
+										<span>{t('Login')}</span>
 									</div>
 								</Link>
 							)}

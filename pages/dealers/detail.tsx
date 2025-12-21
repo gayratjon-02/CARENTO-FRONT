@@ -18,7 +18,7 @@ import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
+import { CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/user/mutation';
 import { GET_COMMENTS, GET_MEMBER, GET_PROPERTIES } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { Message } from '../../libs/enums/common.enum';
@@ -29,7 +29,7 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
-const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) => {
+const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
@@ -49,7 +49,7 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 
 	/** APOLLO REQUESTS **/
 	const [createComment] = useMutation(CREATE_COMMENT);
-	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
+	const [likeTargetProperty] = useMutation(LIKE_TARGET_CAR);
 
 	const {
 		loading: getMemberLoading,
@@ -181,63 +181,80 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		return <div>AGENT DETAIL PAGE MOBILE</div>;
 	} else {
 		return (
-			<Stack className={'agent-detail-page'}>
+			<Stack className={'dealer-detail-page'}>
 				<Stack className={'container'}>
-					<Stack className={'agent-info'}>
-						<img
-							src={agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'}
-							alt=""
-						/>
-						<Box component={'div'} className={'info'} onClick={() => redirectToMemberPageHandler(agent?._id as string)}>
-							<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
-							<div>
-								<img src="/img/icons/call.svg" alt="" />
-								<span>{agent?.memberPhone}</span>
-							</div>
-						</Box>
-					</Stack>
-					<Stack className={'agent-home-list'}>
-						<Stack className={'card-wrap'}>
-							{agentProperties.map((property: Property) => {
-								return (
-									<div className={'wrap-main'} key={property?._id}>
-										<PropertyBigCard
-											property={property}
-											likePropertyHandler={likePropertyHandler}
-											key={property?._id}
-										/>
-									</div>
-								);
-							})}
-						</Stack>
-						<Stack className={'pagination'}>
-							{propertyTotal ? (
-								<>
-									<Stack className="pagination-box">
-										<Pagination
-											page={searchFilter.page}
-											count={Math.ceil(propertyTotal / searchFilter.limit) || 1}
-											onChange={propertyPaginationChangeHandler}
-											shape="circular"
-											color="primary"
-										/>
-									</Stack>
-									<span>
-										Total {propertyTotal} propert{propertyTotal > 1 ? 'ies' : 'y'} available
-									</span>
-								</>
-							) : (
-								<div className={'no-data'}>
-									<img src="/img/icons/icoAlert.svg" alt="" />
-									<p>No properties found!</p>
+					<Stack className="dealer-detail-grid">
+						<Stack className="dealer-profile-card">
+							<img
+								src={agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'}
+								alt=""
+							/>
+							<Box component={'div'} className={'info'} onClick={() => redirectToMemberPageHandler(agent?._id as string)}>
+								<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
+								<span className="role">Dealer</span>
+								<div className="phone">
+									<img src="/img/icons/call.svg" alt="" />
+									<span>{agent?.memberPhone}</span>
 								</div>
-							)}
+							</Box>
+							<Box className="quick-stats">
+								<div className="stat">
+									<strong>{Number((agent as any)?.memberCars ?? agent?.memberProperties ?? 0).toLocaleString()}</strong>
+									<span>Cars</span>
+								</div>
+								<div className="stat">
+									<strong>{Number(agent?.memberLikes ?? 0).toLocaleString()}</strong>
+									<span>Likes</span>
+								</div>
+								<div className="stat">
+									<strong>{Number(agent?.memberViews ?? 0).toLocaleString()}</strong>
+									<span>Views</span>
+								</div>
+							</Box>
 						</Stack>
-					</Stack>
-					<Stack className={'review-box'}>
+
+						<Stack className="dealer-content">
+							<Stack className={'dealer-home-list'}>
+								<Stack className={'card-wrap'}>
+									{agentProperties.map((property: Property) => {
+										return (
+											<div className={'wrap-main'} key={property?._id}>
+												<PropertyBigCard
+													property={property}
+													likePropertyHandler={likePropertyHandler}
+													key={property?._id}
+												/>
+											</div>
+										);
+									})}
+								</Stack>
+								<Stack className={'pagination'}>
+									{propertyTotal ? (
+										<>
+											<Stack className="pagination-box">
+												<Pagination
+													page={searchFilter.page}
+													count={Math.ceil(propertyTotal / searchFilter.limit) || 1}
+													onChange={propertyPaginationChangeHandler}
+													shape="circular"
+													color="primary"
+												/>
+											</Stack>
+											<span>Total {propertyTotal} listings available</span>
+										</>
+									) : (
+										<div className={'no-data'}>
+											<img src="/img/icons/icoAlert.svg" alt="" />
+											<p>No listings found!</p>
+										</div>
+									)}
+								</Stack>
+							</Stack>
+
+							<Stack className={'review-box'}>
 						<Stack className={'main-intro'}>
 							<span>Reviews</span>
-							<p>we are glad to see you again</p>
+							<p>Share your experience with this dealer</p>
 						</Stack>
 						{commentTotal !== 0 && (
 							<Stack className={'review-wrap'}>
@@ -294,6 +311,8 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 								</Button>
 							</Box>
 						</Stack>
+							</Stack>
+						</Stack>
 					</Stack>
 				</Stack>
 			</Stack>
@@ -301,7 +320,7 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 	}
 };
 
-AgentDetail.defaultProps = {
+DealerDetail.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 9,
@@ -320,4 +339,4 @@ AgentDetail.defaultProps = {
 	},
 };
 
-export default withLayoutBasic(AgentDetail);
+export default withLayoutBasic(DealerDetail);
