@@ -1442,6 +1442,8 @@
 										margin-right: 5px;
 										width: 17px;
 										height: 17px;
+										filter: brightness(0) invert(1);
+										opacity: 0.9;
 									}
 									span {
 										color: #f3f4f6;
@@ -1479,10 +1481,16 @@
 									gap: 7px;
 									align-items: center;
 									.MuiIconButton-root {
+										width: 32px;
+										height: 32px;
+										color: rgba(229, 231, 235, 0.78);
 										background: transparent !important;
 										&:hover {
 											background: transparent !important;
 										}
+									}
+									.MuiSvgIcon-root {
+										font-size: 22px;
 									}
 									.view-cnt {
 										color: rgba(229, 231, 235, 0.6);
@@ -1804,6 +1812,10 @@
 					.desc {
 						color: rgba(229, 231, 235, 0.72);
 						font-size: 13px;
+					}
+					.options div img {
+						filter: brightness(0) invert(1);
+						opacity: 0.9;
 					}
 					.options div span {
 						color: #f3f4f6;

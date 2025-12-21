@@ -2,16 +2,16 @@ import React from 'react';
 import { Stack, Box, Divider, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { Property } from '../../types/property/property';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { REACT_APP_API_URL } from '../../config';
 import { useRouter } from 'next/router';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { Car } from 'libs/types/property/cars';
 
-	interface TopCarCardProps {
+interface TopCarCardProps {
 	car: Car;
 	likeCarHandler: any;
 }
@@ -66,15 +66,19 @@ const TopCarCard = (props: TopCarCardProps) => {
 							{car?.pricePerHour ? 'Hour' : ''}
 						</p>
 						<div className="view-like-box">
-							<IconButton color={'default'}>
-								<RemoveRedEyeIcon />
+							<IconButton color={'default'} sx={{ color: 'rgba(229, 231, 235, 0.78)' }}>
+								<VisibilityOutlinedIcon />
 							</IconButton>
-								<Typography className="view-cnt">{car?.carViews}</Typography>
-							<IconButton color={'default'} onClick={() => likeCarHandler(user, car?._id)}>
+							<Typography className="view-cnt">{car?.carViews}</Typography>
+							<IconButton
+								color={'default'}
+								sx={{ color: 'rgba(229, 231, 235, 0.78)' }}
+								onClick={() => likeCarHandler(user, car?._id)}
+							>
 								{car?.meLiked && car?.meLiked[0]?.myFavorite ? (
-									<FavoriteIcon style={{ color: 'red' }} />
+									<FavoriteRoundedIcon style={{ color: '#ef4444' }} />
 								) : (
-									<FavoriteIcon />
+									<FavoriteBorderRoundedIcon />
 								)}
 							</IconButton>
 							<Typography className="view-cnt">{car?.carLikes}</Typography>
@@ -121,15 +125,19 @@ const TopCarCard = (props: TopCarCardProps) => {
 							{car?.pricePerHour ? 'Hour' : ''}
 						</p>
 						<div className="view-like-box">
-							<IconButton color={'default'}>
-								<RemoveRedEyeIcon />
+							<IconButton color={'default'} sx={{ color: 'rgba(229, 231, 235, 0.78)' }}>
+								<VisibilityOutlinedIcon />
 							</IconButton>
 							<Typography className="view-cnt">{car?.carViews}</Typography>
-							<IconButton color={'default'} onClick={() => likeCarHandler(user, car?._id)}>
+							<IconButton
+								color={'default'}
+								sx={{ color: 'rgba(229, 231, 235, 0.78)' }}
+								onClick={() => likeCarHandler(user, car?._id)}
+							>
 								{car?.meLiked && car?.meLiked[0]?.myFavorite ? (
-									<FavoriteIcon style={{ color: 'red' }} />
+									<FavoriteRoundedIcon style={{ color: '#ef4444' }} />
 								) : (
-									<FavoriteIcon />
+									<FavoriteBorderRoundedIcon />
 								)}
 							</IconButton>
 							<Typography className="view-cnt">{car?.carLikes}</Typography>
