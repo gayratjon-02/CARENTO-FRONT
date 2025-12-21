@@ -78,8 +78,6 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 
 	useEffect(() => {
 		if (!router.isReady) return;
-		// Only handle initial page load. Subsequent router.query.input changes happen during SPA interactions
-		// (debounced search, pagination, sorting) and should not reset search input.
 		if (didInitFromUrlRef.current) return;
 
 		if (router.query.input) {
@@ -101,7 +99,6 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 				setCurrentPage(input_obj?.page ?? 1);
 			}
 		} else {
-			// First entry without a query: keep state as-is (usually empty) and sync to URL
 			setSearchText(searchFilter?.search?.text ?? '');
 			router.replace(`/dealers?input=${JSON.stringify(searchFilter)}`, `/dealers?input=${JSON.stringify(searchFilter)}`, {
 				scroll: false,
@@ -111,7 +108,6 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 		didInitFromUrlRef.current = true;
 	}, [router.isReady, router.query.input]);
 
-	// Live search (debounced) while typing
 	useEffect(() => {
 		if (!router.isReady) return;
 		if (!didInitFromUrlRef.current) return;
@@ -138,7 +134,6 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 					setTotal(refetchRes.data.getAgents.metaCounter?.[0]?.total ?? 0);
 				}
 			} catch (err) {
-				// keep UI stable; errorLink/sweetAlert already handles most GraphQL errors
 			}
 		}, 350);
 
@@ -146,7 +141,6 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 			cancelled = true;
 			if (searchDebounceRef.current) window.clearTimeout(searchDebounceRef.current);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchText]);
 
 	/** HANDLERS **/

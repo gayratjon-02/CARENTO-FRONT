@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
@@ -19,76 +19,87 @@ const withLayoutBasic = (Component: any) => {
 		const router = useRouter();
 		const { t, i18n } = useTranslation('common');
 		const device = useDeviceDetect();
-		const [authHeader, setAuthHeader] = useState<boolean>(false);
 		const user = useReactiveVar(userVar);
+		const isAuthHeader = router.pathname === '/account/join';
 
 		const memoizedValues = useMemo(() => {
 			let title = '',
 				desc = '',
-				bgImage = '';
+				bgImage = '',
+				bgPos = 'center';
 
 			switch (router.pathname) {
 				case '/property':
 					title = 'Property Search';
 					desc = 'We are glad to see you again!';
-					bgImage = '/img/banner/properties.png';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
 					break;
 				case '/agent':
 					title = 'Agents';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/agents.webp';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
 					break;
 				case '/dealers':
 					title = 'Dealers';
 					desc = 'Home / Dealers';
-					bgImage = '/img/banner/agents.webp';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
 					break;
 				case '/agent/detail':
 					title = 'Agent Page';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				case '/dealers/detail':
 					title = 'Dealer Page';
 					desc = 'Home / Dealers';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				case '/mypage':
 					title = 'my page';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header1.svg';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				case '/community':
 					title = 'Community';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
 					break;
 				case '/community/detail':
 					title = 'Community Detail';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				case '/cs':
 					title = 'CS';
 					desc = 'We are glad to see you again!';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
 					break;
 				case '/account/join':
 					title = 'Login/Signup';
 					desc = 'Authentication Process';
-					bgImage = '/img/banner/header2.svg';
-					setAuthHeader(true);
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				case '/member':
 					title = 'Member Page';
 					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header1.svg';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
 					break;
 				default:
 					break;
 			}
 
-			return { title, desc, bgImage };
+			return { title, desc, bgImage, bgPos };
 		}, [router.pathname]);
 
 		/** LIFECYCLES **/
@@ -103,8 +114,8 @@ const withLayoutBasic = (Component: any) => {
 			return (
 				<>
 					<Head>
-						<title>Nestar</title>
-						<meta name={'title'} content={`Nestar`} />
+						<title>CARENTO</title>
+						<meta name={'title'} content={`CARENTO`} />
 					</Head>
 					<Stack id="mobile-wrap">
 						<Stack id={'top'}>
@@ -125,8 +136,8 @@ const withLayoutBasic = (Component: any) => {
 			return (
 				<>
 					<Head>
-						<title>Nestar</title>
-						<meta name={'title'} content={`Nestar`} />
+						<title>CARENTO</title>
+						<meta name={'title'} content={`CARENTO`} />
 					</Head>
 					<Stack id="pc-wrap">
 						<Stack id={'top'}>
@@ -134,16 +145,19 @@ const withLayoutBasic = (Component: any) => {
 						</Stack>
 
 						<Stack
-							className={`header-basic ${authHeader && 'auth'}`}
+							className={`header-basic ${isAuthHeader ? 'auth' : ''}`}
 							style={{
 								backgroundImage: `url(${memoizedValues.bgImage})`,
 								backgroundSize: 'cover',
-								boxShadow: 'inset 10px 40px 150px 40px rgb(24 22 36)',
+								backgroundPosition: memoizedValues.bgPos ?? 'center',
 							}}
 						>
+							<div className="header-basic__overlay" />
 							<Stack className={'container'}>
-								<strong>{t(memoizedValues.title)}</strong>
-								<span>{t(memoizedValues.desc)}</span>
+								<Stack className="header-basic__content">
+									<span className="header-basic__crumb">{t(memoizedValues.desc)}</span>
+									<strong className="header-basic__title">{t(memoizedValues.title)}</strong>
+								</Stack>
 							</Stack>
 						</Stack>
 
