@@ -55,20 +55,16 @@ const Top = () => {
 		}
 	}, [router]);
 
-	// Container ochilgandan keyin 5 soniyadan keyin avtomatik yopish
 	useEffect(() => {
 		if (isContainerVisible) {
-			// Eski timer'ni to'xtatish
 			if (autoCloseTimerRef.current) {
 				clearTimeout(autoCloseTimerRef.current);
 			}
 
-			// 5 soniyalik yangi timer yaratish
 			autoCloseTimerRef.current = setTimeout(() => {
 				setIsContainerVisible(false);
 			}, 5000);
 		} else {
-			// Container yopilganda timer'ni to'xtatish
 			if (autoCloseTimerRef.current) {
 				clearTimeout(autoCloseTimerRef.current);
 				autoCloseTimerRef.current = null;
@@ -85,7 +81,7 @@ const Top = () => {
 
 	useEffect(() => {
 		switch (router.pathname) {
-			case '/property/detail':
+			case '/car/detail':
 				setBgColor(true);
 				break;
 			default:
@@ -226,8 +222,8 @@ const Top = () => {
 				<Link href={'/'}>
 					<div>{t('Home')}</div>
 				</Link>
-				<Link href={'/property'}>
-					<div>{t('Cars')}</div>
+				<Link href={'/car'}>
+					<div>{t('Car')}</div>
 				</Link>
 				<Link href={'/agent'}>
 					<div> {t('Agents')} </div>
@@ -425,8 +421,8 @@ const Top = () => {
 							<Link href={'/'}>
 								<div>{t('Home')}</div>
 							</Link>
-							<Link href={'/cars'}>
-								<div>{t('Cars')}</div>
+							<Link href={'/car'}>
+								<div>{t('Car')}</div>
 							</Link>
 							<Link href={'/dealers'}>
 								<div> {t('Dealers')} </div>

@@ -35,6 +35,12 @@ const withLayoutBasic = (Component: any) => {
 					bgImage = '/img/banner/banner1.jpg';
 					bgPos = 'center 18%';
 					break;
+				case '/car':
+					title = 'Cars';
+					desc = 'Home / Cars';
+					bgImage = '/img/banner/banner1.jpg';
+					bgPos = 'center 18%';
+					break;
 				case '/agent':
 					title = 'Agents';
 					desc = 'Home / For Rent';
@@ -50,6 +56,12 @@ const withLayoutBasic = (Component: any) => {
 				case '/agent/detail':
 					title = 'Agent Page';
 					desc = 'Home / For Rent';
+					bgImage = '/img/banner/banner2.jpg';
+					bgPos = 'center 22%';
+					break;
+				case '/car/detail':
+					title = 'Car Page';
+					desc = 'Home / Cars';
 					bgImage = '/img/banner/banner2.jpg';
 					bgPos = 'center 22%';
 					break;
