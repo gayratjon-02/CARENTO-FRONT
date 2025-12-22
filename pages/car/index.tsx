@@ -10,13 +10,12 @@ import { CarsInquiry } from '../../libs/types/property/property.input';
 import { Car } from '../../libs/types/property/cars';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Direction } from '../../libs/enums/common.enum';
-import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { GET_CARS } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 import { LIKE_TARGET_CAR } from '../../apollo/user/mutation';
 import { Message } from '../../libs/enums/common.enum';
-import { userVar } from 'apollo/store';
 import CarCard from '../../libs/components/car/CarCard';
 import CarFilter from '../../libs/components/car/CarFilter';
 
@@ -26,19 +25,111 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
+const parseQueryInput = (raw: unknown): any | null => {
+	if (typeof raw !== 'string' || raw.trim() === '') return null;
+	try {
+		return JSON.parse(decodeURIComponent(raw));
+	} catch {
+		try {
+			return JSON.parse(raw);
+		} catch {
+			return null;
+		}
+	}
+};
+
+const normalizeRange = (range: any): any | undefined => {
+	if (!range || typeof range !== 'object') return undefined;
+	const start = typeof range.start === 'number' ? range.start : Number(range.start);
+	const end = typeof range.end === 'number' ? range.end : Number(range.end);
+	const hasStart = Number.isFinite(start);
+	const hasEnd = Number.isFinite(end);
+	if (!hasStart && !hasEnd) return undefined;
+	return { start: hasStart ? start : 0, end: hasEnd ? end : 999999 };
+};
+
+const sanitizeCarsInquiry = (input: any, fallback: CarsInquiry): CarsInquiry => {
+	const safe: CarsInquiry = {
+		page: Number.isFinite(Number(input?.page)) ? Math.max(1, Number(input.page)) : fallback.page,
+		limit: Number.isFinite(Number(input?.limit)) ? Math.max(1, Number(input.limit)) : fallback.limit,
+		sort: typeof input?.sort === 'string' ? input.sort : fallback.sort,
+		direction: Object.values(Direction).includes(input?.direction) ? input.direction : fallback.direction,
+		search: typeof input?.search === 'object' && input.search ? input.search : (fallback.search ?? {}),
+	};
+
+	const allowedSorts = new Set(['createdAt', 'carLikes', 'carViews', 'carRank']);
+	if (!safe.sort || !allowedSorts.has(safe.sort)) {
+		safe.sort = fallback.sort;
+		safe.direction = fallback.direction;
+	}
+
+	// Ranges: backend requires both start/end when object is present.
+	const search: any = { ...(safe.search ?? {}) };
+	const allowedSearchKeys = new Set([
+		'carStatus',
+		'carLocation',
+		'carType',
+		'brandType',
+		'fuelType',
+		'transmission',
+		'seats',
+		'year',
+		'pricePerDay',
+		'pricePerHour',
+		'mileage',
+		'text',
+	]);
+	Object.keys(search).forEach((k) => {
+		if (!allowedSearchKeys.has(k)) delete search[k];
+	});
+
+	const arrayKeys = ['carLocation', 'carType', 'brandType', 'fuelType', 'transmission', 'seats', 'year'] as const;
+	arrayKeys.forEach((k) => {
+		const v = search[k];
+		if (v === undefined || v === null) return;
+		if (Array.isArray(v)) {
+			search[k] = v.filter((x) => x !== undefined && x !== null);
+			return;
+		}
+		search[k] = [v];
+	});
+	(['seats', 'year'] as const).forEach((k) => {
+		if (!Array.isArray(search[k])) return;
+		search[k] = (search[k] as any[])
+			.map((x) => (typeof x === 'number' ? x : Number(x)))
+			.filter((x) => Number.isFinite(x));
+	});
+
+	search.pricePerDay = normalizeRange(search.pricePerDay);
+	search.pricePerHour = normalizeRange(search.pricePerHour);
+	search.mileage = normalizeRange(search.mileage);
+
+	Object.keys(search).forEach((k) => {
+		const v = search[k];
+		if (Array.isArray(v) && v.length === 0) delete search[k];
+		if (typeof v === 'string' && v.trim() === '') delete search[k];
+		if (v === undefined) delete search[k];
+	});
+
+	safe.search = search;
+	return safe;
+};
+
+const serializeCarsInquiry = (input: CarsInquiry) => encodeURIComponent(JSON.stringify(input));
+
 const CarList: NextPage = ({ initialInput }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
-	const user = useReactiveVar(userVar);
 
 	const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const [sortingOpen, setSortingOpen] = useState(false);
-	const [filterSortName, setFilterSortName] = useState('Recent');
+	const [filterSortName, setFilterSortName] = useState('Likes');
 
-	const [searchFilter, setSearchFilter] = useState<CarsInquiry>(
-		router?.query?.input ? JSON.parse(router?.query?.input as string) : initialInput,
-	);
+	const [searchFilter, setSearchFilter] = useState<CarsInquiry>(() => {
+		const parsed = parseQueryInput(router?.query?.input);
+		return sanitizeCarsInquiry(parsed ?? initialInput, initialInput);
+	});
 	const searchFilterRef = useRef<CarsInquiry>(searchFilter);
 
 	const [cars, setCars] = useState<Car[]>([]);
@@ -66,24 +157,49 @@ const CarList: NextPage = ({ initialInput }: any) => {
 
 	useEffect(() => {
 		if (!router.isReady) return;
-		if (router.query.input) {
-			const inputObj = JSON.parse(router.query.input as string);
-			setSearchFilter(inputObj);
-			setCurrentPage(inputObj?.page ?? 1);
-		} else {
-			router.replace(`/car?input=${JSON.stringify(searchFilter)}`, `/car?input=${JSON.stringify(searchFilter)}`);
-			setCurrentPage(searchFilter.page ?? 1);
+		const parsed = parseQueryInput(router.query.input);
+		const next = sanitizeCarsInquiry(parsed ?? searchFilterRef.current ?? initialInput, initialInput);
+		setSearchFilter(next);
+		setCurrentPage(next?.page ?? 1);
+
+		switch (next?.sort) {
+			case 'carLikes':
+				setFilterSortName('Likes');
+				break;
+			case 'carViews':
+				setFilterSortName('Views');
+				break;
+			case 'createdAt':
+				setFilterSortName(next?.direction === Direction.ASC ? 'Oldest' : 'Recent');
+				break;
+			default:
+				setFilterSortName('Likes');
+				break;
+		}
+
+		const desired = serializeCarsInquiry(next);
+		const raw = typeof router.query.input === 'string' ? router.query.input : '';
+		const rawLooksEncoded = raw.includes('%7B') || raw.includes('%22');
+		const rawDecodedOk = !rawLooksEncoded && raw.startsWith('{');
+		const isSame =
+			raw === desired ||
+			(rawDecodedOk && raw === JSON.stringify(next)) ||
+			(!raw && desired === serializeCarsInquiry(searchFilterRef.current ?? next));
+		if (!isSame) {
+			router.replace(`/car?input=${desired}`, undefined, { scroll: false });
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [router.isReady, router.query.input]);
 
 	/** HANDLERS **/
 	const applyAndRefetch = async (next: CarsInquiry) => {
-		setSearchFilter(next);
-		setCurrentPage(next.page ?? 1);
-		await router.replace(`/car?input=${JSON.stringify(next)}`, `/car?input=${JSON.stringify(next)}`, { scroll: false });
+		const safeNext = sanitizeCarsInquiry(next, initialInput);
+		setSearchFilter(safeNext);
+		setCurrentPage(safeNext.page ?? 1);
+		const encoded = serializeCarsInquiry(safeNext);
+		await router.replace(`/car?input=${encoded}`, undefined, { scroll: false });
 
-		const refetchRes = await getCarsRefetch({ input: next });
+		const refetchRes = await getCarsRefetch({ input: safeNext });
 		if (refetchRes?.data?.getCars) {
 			setCars(refetchRes.data.getCars.list ?? []);
 			setTotal(refetchRes.data.getCars.metaCounter?.[0]?.total ?? 0);
@@ -141,14 +257,6 @@ const CarList: NextPage = ({ initialInput }: any) => {
 			case 'old':
 				next = { ...next, sort: 'createdAt', direction: Direction.ASC };
 				setFilterSortName('Oldest');
-				break;
-			case 'price_low':
-				next = { ...next, sort: 'pricePerDay', direction: Direction.ASC };
-				setFilterSortName('Lowest Price');
-				break;
-			case 'price_high':
-				next = { ...next, sort: 'pricePerDay', direction: Direction.DESC };
-				setFilterSortName('Highest Price');
 				break;
 			case 'likes':
 				next = { ...next, sort: 'carLikes', direction: Direction.DESC };
@@ -232,12 +340,6 @@ const CarList: NextPage = ({ initialInput }: any) => {
 					<MenuItem onClick={sortingHandler} id={'old'} disableRipple>
 						Oldest
 					</MenuItem>
-					<MenuItem onClick={sortingHandler} id={'price_low'} disableRipple>
-						Lowest Price
-					</MenuItem>
-					<MenuItem onClick={sortingHandler} id={'price_high'} disableRipple>
-						Highest Price
-					</MenuItem>
 					<MenuItem onClick={sortingHandler} id={'likes'} disableRipple>
 						Likes
 					</MenuItem>
@@ -267,45 +369,39 @@ const CarList: NextPage = ({ initialInput }: any) => {
 					</Box>
 				</Box>
 
-				<Box className="car-layout">
-					<Box className="car-aside">
-						<CarFilter
-							value={searchFilter}
-							onChange={async (next) => {
-								await applyAndRefetch(next);
-							}}
-							onReset={resetFilters}
-						/>
+					<CarFilter
+						value={searchFilter}
+						onChange={async (next) => {
+							await applyAndRefetch(next);
+						}}
+						onReset={resetFilters}
+					/>
+
+					<Box className="car-grid">
+						{cars.length === 0 ? (
+							<div className={'no-data'}>
+								<img src="/img/icons/icoAlert.svg" alt="" />
+								<p>No Cars found!</p>
+							</div>
+						) : (
+							cars.map((car: Car) => <CarCard car={car} likeCarHandler={likeCarHandler} key={car._id} />)
+						)}
 					</Box>
 
-					<Box className="car-main">
-						<Box className="car-grid">
-							{cars.length === 0 ? (
-								<div className={'no-data'}>
-									<img src="/img/icons/icoAlert.svg" alt="" />
-									<p>No Cars found!</p>
-								</div>
-							) : (
-								cars.map((car: Car) => <CarCard car={car} likeCarHandler={likeCarHandler} key={car._id} />)
-							)}
-						</Box>
-
-						<Stack className="car-pagination">
-							{cars.length !== 0 && totalPages > 1 && (
-								<Stack className="pagination-box">
-									<Pagination
-										page={currentPage}
-										count={totalPages}
-										onChange={handlePaginationChange}
-										shape="circular"
-										color="primary"
-									/>
-								</Stack>
-							)}
-							{cars.length !== 0 && <span>Total {(total ?? 0).toLocaleString()} cars available</span>}
-						</Stack>
-					</Box>
-				</Box>
+					<Stack className="car-pagination">
+						{cars.length !== 0 && totalPages > 1 && (
+							<Stack className="pagination-box">
+								<Pagination
+									page={currentPage}
+									count={totalPages}
+									onChange={handlePaginationChange}
+									shape="circular"
+									color="primary"
+								/>
+							</Stack>
+						)}
+						{cars.length !== 0 && <span>Total {(total ?? 0).toLocaleString()} cars available</span>}
+					</Stack>
 
 			</Stack>
 
@@ -315,12 +411,6 @@ const CarList: NextPage = ({ initialInput }: any) => {
 				</MenuItem>
 				<MenuItem onClick={sortingHandler} id={'old'} disableRipple>
 					Oldest
-				</MenuItem>
-				<MenuItem onClick={sortingHandler} id={'price_low'} disableRipple>
-					Lowest Price
-				</MenuItem>
-				<MenuItem onClick={sortingHandler} id={'price_high'} disableRipple>
-					Highest Price
 				</MenuItem>
 				<MenuItem onClick={sortingHandler} id={'likes'} disableRipple>
 					Likes
@@ -337,7 +427,7 @@ CarList.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 9,
-		sort: 'createdAt',
+		sort: 'carLikes',
 		direction: Direction.DESC,
 		search: {},
 	},

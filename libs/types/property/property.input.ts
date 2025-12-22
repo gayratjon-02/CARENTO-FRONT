@@ -55,6 +55,10 @@ interface CSearch {
 	transmission?: Transmission[];
 	seats?: number[];
 	year?: number[];
+	pricePerDay?: Range;
+	pricePerHour?: Range;
+	mileage?: Range;
+	text?: string;
 }
 
 interface APISearch {

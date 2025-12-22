@@ -66,31 +66,10 @@
 			}
 		}
 
-		.car-layout {
-			width: 100%;
-			display: grid;
-			grid-template-columns: 340px minmax(0, 1fr);
-			gap: 18px;
-			align-items: start;
-		}
-
-		.car-aside {
-			position: sticky;
-			top: 110px;
-			align-self: start;
-		}
-
-		.car-main {
-			display: flex;
-			flex-direction: column;
-			gap: 14px;
-			min-width: 0;
-		}
-
-		.car-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 16px;
+			.car-grid {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 16px;
 			align-items: start;
 			align-content: start;
 		}
@@ -106,93 +85,41 @@
 				font-family: $font;
 				font-size: 13px;
 				font-weight: 700;
-			}
-		}
-
-		.car-filter {
-			border-radius: 18px;
-			background: rgba(255, 255, 255, 0.88);
-			border: 1px solid rgba(17, 24, 39, 0.08);
-			backdrop-filter: blur(14px);
-			box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
-			padding: 14px;
-			gap: 12px;
-		}
-
-		.car-filter__header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 10px;
-			.title {
-				display: inline-flex;
-				align-items: center;
-				gap: 8px;
-				color: #0f172a;
-				font-family: $font;
-				font-size: 14px;
-				font-weight: 900;
-				svg {
-					width: 18px;
-					height: 18px;
-					color: rgba(79, 70, 229, 0.85);
-				}
-				small {
-					display: inline-flex;
-					align-items: center;
-					justify-content: center;
-					min-width: 22px;
-					height: 22px;
-					padding: 0 8px;
-					border-radius: 999px;
-					background: rgba(79, 70, 229, 0.12);
-					border: 1px solid rgba(79, 70, 229, 0.18);
-					color: rgba(79, 70, 229, 0.95);
-					font-size: 12px;
-					font-weight: 900;
 				}
 			}
-			.reset {
-				border-radius: 12px;
-				padding: 8px 10px;
-				background: rgba(255, 255, 255, 0.75);
-				border: 1px solid rgba(17, 24, 39, 0.12);
-				color: rgba(107, 114, 128, 0.95);
-				font-family: $font;
-				font-size: 12px;
-				font-weight: 900;
-				text-transform: none;
-			}
-		}
 
-		.car-filter__group {
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-		}
-
-		.car-filter__label {
-			color: rgba(107, 114, 128, 0.95);
-			font-family: $font;
-			font-size: 12px;
-			font-weight: 900;
-			letter-spacing: 0.12em;
-			text-transform: uppercase;
-		}
-
-		.car-filter__chips {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 8px;
-			.chip {
-				border-radius: 999px;
-				padding: 7px 10px;
+			.car-filterbar {
+				padding: 12px 12px;
+				border-radius: 18px;
 				background: rgba(255, 255, 255, 0.82);
-				border: 1px solid rgba(17, 24, 39, 0.1);
-				color: rgba(15, 23, 42, 0.78);
+				border: 1px solid rgba(17, 24, 39, 0.08);
+				backdrop-filter: blur(12px);
+				box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
+			}
+
+			.car-filterbar__row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+			}
+
+			.car-filterbar__left {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				justify-content: flex-start;
+			}
+
+			.filter-pill {
+				border-radius: 999px;
+				padding: 9px 12px;
+				background: #fff;
+				border: 1px solid rgba(17, 24, 39, 0.12);
+				color: rgba(15, 23, 42, 0.82);
 				font-family: $font;
-				font-size: 12px;
-				font-weight: 800;
+				font-size: 13px;
+				font-weight: 900;
 				text-transform: none;
 				&:hover {
 					background: #fff;
@@ -203,7 +130,132 @@
 					color: rgba(79, 70, 229, 0.95);
 				}
 			}
-		}
+
+			.car-filterbar__right {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				.active-count {
+					color: rgba(107, 114, 128, 0.95);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 900;
+					text-transform: uppercase;
+					letter-spacing: 0.08em;
+				}
+				.reset {
+					border-radius: 999px;
+					padding: 9px 12px;
+					background: #fff;
+					border: 1px solid rgba(17, 24, 39, 0.12);
+					color: rgba(107, 114, 128, 0.95);
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 900;
+					text-transform: none;
+				}
+			}
+
+			.car-filterbar__menu {
+				border-radius: 16px;
+				border: 1px solid rgba(17, 24, 39, 0.08);
+				box-shadow: 0 18px 45px rgba(17, 24, 39, 0.18);
+				padding: 10px 0;
+				min-width: 300px;
+				max-height: 420px;
+			}
+
+			.menu-head {
+				padding: 12px 16px 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				strong {
+					color: #0f172a;
+					font-family: $font;
+					font-size: 14px;
+					font-weight: 900;
+				}
+				span {
+					color: rgba(107, 114, 128, 0.9);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 700;
+				}
+			}
+
+			.price-menu {
+				padding: 12px 14px;
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.preset-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				.preset {
+					border-radius: 999px;
+					padding: 7px 10px;
+					background: rgba(255, 255, 255, 0.9);
+					border: 1px solid rgba(17, 24, 39, 0.1);
+					color: rgba(15, 23, 42, 0.78);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 800;
+					text-transform: none;
+				}
+			}
+
+			.price-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+				.field {
+					display: flex;
+					flex-direction: column;
+					gap: 6px;
+					label {
+						color: rgba(107, 114, 128, 0.95);
+						font-family: $font;
+						font-size: 12px;
+						font-weight: 900;
+					}
+					.MuiOutlinedInput-root {
+						border-radius: 14px;
+						background: #fff;
+						font-family: $font;
+						font-size: 13px;
+						font-weight: 800;
+					}
+				}
+			}
+
+			.price-actions {
+				display: flex;
+				justify-content: flex-end;
+				.apply {
+					border-radius: 14px;
+					padding: 10px 14px;
+					background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+					color: #fff;
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 900;
+					text-transform: none;
+				}
+			}
+
+			.menu-item {
+				gap: 10px;
+				span {
+					color: rgba(15, 23, 42, 0.85);
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 800;
+				}
+			}
 
 		.car-card {
 			border-radius: 18px;
@@ -403,13 +455,119 @@
 		}
 
 		@media (max-width: 1280px) {
-			.car-layout {
-				grid-template-columns: 320px minmax(0, 1fr);
-			}
 			.car-grid {
 				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+			.car-filterbar__row {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+			.car-filterbar__right {
+				width: 100%;
+				justify-content: flex-end;
 			}
 		}
 	}
 }
 
+// MUI Menu/Popover is rendered in a portal (outside #pc-wrap), so these must be global.
+.car-filterbar__menu {
+	border-radius: 16px;
+	border: 1px solid rgba(17, 24, 39, 0.08);
+	box-shadow: 0 18px 45px rgba(17, 24, 39, 0.18);
+	padding: 10px 0;
+	min-width: 300px;
+	max-height: 420px;
+}
+
+.car-filterbar__menu .menu-head {
+	padding: 12px 16px 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.car-filterbar__menu .menu-head strong {
+	color: #0f172a;
+	font-family: $font;
+	font-size: 14px;
+	font-weight: 900;
+}
+.car-filterbar__menu .menu-head span {
+	color: rgba(107, 114, 128, 0.9);
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.car-filterbar__menu .price-menu {
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.car-filterbar__menu .preset-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.car-filterbar__menu .preset-row .preset {
+	border-radius: 999px;
+	padding: 7px 10px;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid rgba(17, 24, 39, 0.1);
+	color: rgba(15, 23, 42, 0.78);
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 800;
+	text-transform: none;
+}
+
+.car-filterbar__menu .price-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+.car-filterbar__menu .price-grid .field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.car-filterbar__menu .price-grid .field label {
+	color: rgba(107, 114, 128, 0.95);
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 900;
+}
+.car-filterbar__menu .price-grid .field .MuiOutlinedInput-root {
+	border-radius: 14px;
+	background: #fff;
+	font-family: $font;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.car-filterbar__menu .price-actions {
+	display: flex;
+	justify-content: flex-end;
+}
+.car-filterbar__menu .price-actions .apply {
+	border-radius: 14px;
+	padding: 10px 14px;
+	background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+	color: #fff;
+	font-family: $font;
+	font-size: 13px;
+	font-weight: 900;
+	text-transform: none;
+}
+
+.car-filterbar__menu .menu-item {
+	gap: 10px;
+}
+.car-filterbar__menu .menu-item span {
+	color: rgba(15, 23, 42, 0.85);
+	font-family: $font;
+	font-size: 13px;
+	font-weight: 800;
+}
