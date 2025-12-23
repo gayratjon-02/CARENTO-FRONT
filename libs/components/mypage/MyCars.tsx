@@ -7,7 +7,7 @@ import { Car } from '../../types/property/cars';
 import { T } from '../../types/common';
 import { userVar } from '../../../apollo/store';
 import { useRouter } from 'next/router';
-import { UPDATE_CAR } from '../../../apollo/user/mutation';
+import { ARCHIVE_CAR } from '../../../apollo/user/mutation';
 import { GET_AGENT_CARS } from '../../../apollo/user/query';
 import { sweetConfirmAlert, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { REACT_APP_API_URL } from '../../config';
@@ -18,7 +18,7 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { CarStatus } from '../../enum/car.enum';
 
-const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
+const MyCars: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();
 	const [searchFilter, setSearchFilter] = useState<any>(initialInput);
 	const [agentCars, setAgentCars] = useState<Car[]>([]);
@@ -30,7 +30,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	const router = useRouter();
 
 	/** APOLLO REQUESTS **/
-	const [updateCar] = useMutation(UPDATE_CAR);
+	const [archiveCar] = useMutation(ARCHIVE_CAR);
 
 	const {
 		loading: getAgentCarsLoading,
@@ -61,7 +61,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 			e.stopPropagation();
 			e.preventDefault();
 			if (!id) return;
-			await router.push({ pathname: '/mypage', query: { category: 'addProperty', carId: id } });
+			await router.push({ pathname: '/mypage', query: { category: 'addCar', carId: id } });
 		} catch (err: any) {
 			console.log('ERROR, editCarHandler:', err.message);
 			sweetMixinErrorAlert(err.message).then();
@@ -75,19 +75,57 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 			if (!id) return;
 			if (!(await sweetConfirmAlert('Are you sure to archive this car?'))) return;
 
-			await updateCar({
+			const snapshot = agentCars;
+			setAgentCars((prev) =>
+				prev.map((car) => (String(car?._id) === String(id) ? ({ ...car, carStatus: CarStatus.DELETED } as Car) : car)),
+			);
+
+			const res = await archiveCar({
 				variables: {
 					input: {
 						_id: id,
-						carStatus: 'DELETED',
+						carStatus: CarStatus.DELETED,
 					},
 				},
+				errorPolicy: 'all',
 			});
+
+			const gqlErrorMessage = res?.errors?.[0]?.message;
+			const hasData = Boolean(res?.data?.updateCar?._id);
+
+			const isMomentFnError = (msg: string) => {
+				const normalized = String(msg || '').toLowerCase();
+				return normalized.includes('moment_1.default') && normalized.includes('not a function');
+			};
+
+			if (!hasData) {
+				const refetched = await getAgentCarsRefetch({ input: searchFilter });
+				const list: Car[] = refetched?.data?.getAgentCars?.list ?? [];
+				const updated = list.find((car) => String(car?._id) === String(id));
+				const isArchived = String((updated as any)?.carStatus ?? '') === String(CarStatus.DELETED);
+				if (isArchived || !updated) {
+					await sweetTopSmallSuccessAlert('Archived', 800);
+					return;
+				}
+
+				setAgentCars(snapshot);
+				throw new Error(gqlErrorMessage || 'Could not archive car');
+			}
+
 			await getAgentCarsRefetch({ input: searchFilter });
 			await sweetTopSmallSuccessAlert('Archived', 800);
+
+			if (gqlErrorMessage && !isMomentFnError(gqlErrorMessage)) {
+				console.warn('ArchiveCar returned GraphQL errors:', gqlErrorMessage);
+			}
 		} catch (err: any) {
-			console.log('ERROR, deleteCarHandler:', err.message);
-			sweetMixinErrorAlert(err.message).then();
+			const message =
+				err?.graphQLErrors?.[0]?.message ||
+				err?.networkError?.message ||
+				err?.message ||
+				'Something went wrong';
+			console.log('ERROR, deleteCarHandler:', message, err);
+			sweetMixinErrorAlert(String(message)).then();
 		}
 	};
 
@@ -124,7 +162,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 							<Typography sx={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.3 }}>My Cars</Typography>
 							<Typography sx={{ color: 'text.secondary', fontSize: 13 }}>Manage your listings.</Typography>
 						</Stack>
-						<Button variant="contained" size="small" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addProperty' } })}>
+						<Button variant="contained" size="small" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addCar' } })}>
 							Add
 						</Button>
 					</Stack>
@@ -279,7 +317,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 										<Typography sx={{ color: 'text.secondary', fontSize: 13, mt: 0.5 }}>
 											Create a listing or switch tabs to see other cars.
 										</Typography>
-										<Button variant="contained" sx={{ mt: 2 }} onClick={() => router.push({ pathname: '/mypage', query: { category: 'addProperty' } })}>
+										<Button variant="contained" sx={{ mt: 2 }} onClick={() => router.push({ pathname: '/mypage', query: { category: 'addCar' } })}>
 											Add car
 										</Button>
 									</Box>
@@ -314,7 +352,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 				</Stack>
 				<Stack className="right" alignItems="flex-end" spacing={1}>
 					<Typography className="count">{total.toLocaleString()} cars</Typography>
-					<Button className="add-btn" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addProperty' } })}>
+					<Button className="add-btn" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addCar' } })}>
 						Add car
 					</Button>
 				</Stack>
@@ -378,7 +416,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 							<img src="/img/icons/icoAlert.svg" alt="" />
 							<Typography className="empty-title">No {formatEnumValue(String(statusFilter))} cars</Typography>
 							<Typography className="empty-desc">Create a listing or switch tabs to see other cars.</Typography>
-							<Button className="add-btn" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addProperty' } })}>
+							<Button className="add-btn" onClick={() => router.push({ pathname: '/mypage', query: { category: 'addCar' } })}>
 								Add car
 							</Button>
 						</Box>
@@ -479,7 +517,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	);
 };
 
-MyProperties.defaultProps = {
+MyCars.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 100,
@@ -489,4 +527,4 @@ MyProperties.defaultProps = {
 	},
 };
 
-export default MyProperties;
+export default MyCars;

@@ -142,7 +142,7 @@ const AddProperty = ({ initialValues, ...props }: any) => {
 			await router.push({
 				pathname: '/mypage',
 				query: {
-					category: 'myProperties',
+					category: 'myCars',
 				},
 			});
 		} catch (err: any) {
@@ -164,7 +164,7 @@ const AddProperty = ({ initialValues, ...props }: any) => {
 			await router.push({
 				pathname: '/mypage',
 				query: {
-					category: 'myProperties',
+					category: 'myCars',
 				},
 			});
 		} catch (err: any) {

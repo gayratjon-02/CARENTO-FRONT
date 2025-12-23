@@ -4,7 +4,7 @@ import { NextPage } from 'next';
 import { Avatar, Box, Button, Chip, Divider, Stack, Typography } from '@mui/material';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import MyProperties from '../../libs/components/mypage/MyProperties';
+import MyCars from '../../libs/components/mypage/MyCars';
 import MyFavorites from '../../libs/components/mypage/MyFavorites';
 import RecentlyVisited from '../../libs/components/mypage/RecentlyVisited';
 import AddCar from '../../libs/components/mypage/AddNewCar';
@@ -48,6 +48,21 @@ const MyPage: NextPage = () => {
 				pathname: '/account/join',
 				query: { redirect: router.asPath },
 			});
+			return;
+		}
+
+		// Backward compatibility: normalize old property-based categories
+		if (router.query?.category === 'addProperty') {
+			router.replace({ pathname: '/mypage', query: { ...router.query, category: 'addCar' } }, undefined, {
+				shallow: true,
+				scroll: false,
+			});
+		}
+		if (router.query?.category === 'myProperties') {
+			router.replace({ pathname: '/mypage', query: { ...router.query, category: 'myCars' } }, undefined, {
+				shallow: true,
+				scroll: false,
+			});
 		}
 	}, [router.isReady, user?._id]);
 
@@ -64,8 +79,8 @@ const MyPage: NextPage = () => {
 
 	const categoryLabel: Record<string, string> = {
 		myProfile: 'My Profile',
-		addProperty: 'Add Car',
-		myProperties: 'My Cars',
+		addCar: 'Add Car',
+		myCars: 'My Cars',
 		myFavorites: 'Favorites',
 		recentlyVisited: 'Recently Visited',
 		myArticles: 'My Articles',
@@ -88,7 +103,7 @@ const MyPage: NextPage = () => {
 	const isAgent = user?.memberType === 'AGENT';
 	const quickNav = [
 		{ key: 'myProfile', label: 'Profile' },
-		...(isAgent ? [{ key: 'myProperties', label: 'My Cars' }] : []),
+		...(isAgent ? [{ key: 'myCars', label: 'My Cars' }] : []),
 		{ key: 'myFavorites', label: 'Favorites' },
 		{ key: 'myArticles', label: 'Articles' },
 		{ key: 'writeArticle', label: 'Write' },
@@ -161,8 +176,8 @@ const MyPage: NextPage = () => {
 
 	const content = (
 		<>
-			{category === 'addProperty' && <AddCar />}
-			{category === 'myProperties' && <MyProperties />}
+			{category === 'addCar' && <AddCar />}
+			{category === 'myCars' && <MyCars />}
 			{category === 'myFavorites' && <MyFavorites />}
 			{category === 'recentlyVisited' && <RecentlyVisited />}
 			{category === 'myArticles' && <MyArticles />}
@@ -260,7 +275,7 @@ const MyPage: NextPage = () => {
 								<Button
 									fullWidth
 									variant="outlined"
-									onClick={() => navigateCategory('addProperty')}
+									onClick={() => navigateCategory('addCar')}
 									sx={{
 										borderRadius: 14,
 										height: 40,

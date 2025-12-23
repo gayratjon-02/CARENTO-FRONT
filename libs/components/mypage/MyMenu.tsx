@@ -43,8 +43,8 @@ const MyMenu = () => {
 		{
 			title: 'Manage',
 			items: [
-				{ key: 'addProperty', label: 'Add Car', agentOnly: true },
-				{ key: 'myProperties', label: 'My Cars', agentOnly: true },
+				{ key: 'addCar', label: 'Add Car', agentOnly: true },
+				{ key: 'myCars', label: 'My Cars', agentOnly: true },
 				{ key: 'myFavorites', label: 'Favorites' },
 				{ key: 'recentlyVisited', label: 'Recently Visited' },
 				{ key: 'followers', label: 'Followers' },

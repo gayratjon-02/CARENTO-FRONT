@@ -322,6 +322,16 @@ export const UPDATE_CAR = gql`
 	}
 `;
 
+export const ARCHIVE_CAR = gql`
+	mutation ArchiveCar($input: CarsUpdate!) {
+		updateCar(input: $input) {
+			_id
+			carStatus
+			updatedAt
+		}
+	}
+`;
+
 export const LIKE_TARGET_CAR = gql`
 	mutation LikeTargetCar($input: String!) {
 		likeTargetCar(carId: $input) {

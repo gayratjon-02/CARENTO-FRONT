@@ -249,7 +249,6 @@ export const GET_AGENT_CARS = gql`
 				pricePerHour
 				carLikes
 				carViews
-				deletedAt
 				createdAt
 				updatedAt
 				memberData {

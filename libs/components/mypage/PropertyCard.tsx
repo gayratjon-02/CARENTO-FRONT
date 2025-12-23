@@ -29,7 +29,7 @@ export const PropertyCard = (props: PropertyCardProps) => {
 		console.log('+pushEditProperty: ', id);
 		await router.push({
 			pathname: '/mypage',
-			query: { category: 'addProperty', propertyId: id },
+			query: { category: 'addCar', propertyId: id },
 		});
 	};
 

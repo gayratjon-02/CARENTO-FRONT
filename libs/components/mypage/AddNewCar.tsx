@@ -212,7 +212,7 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 				}
 			}
 
-			await router.push({ pathname: '/mypage', query: { category: 'myProperties' } });
+			await router.push({ pathname: '/mypage', query: { category: 'myCars' } });
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		} finally {
@@ -538,7 +538,7 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 					</div>
 
 					<div className="actions">
-						<Button className="ghost" onClick={() => router.push({ pathname: '/mypage', query: { category: 'myProperties' } })}>
+						<Button className="ghost" onClick={() => router.push({ pathname: '/mypage', query: { category: 'myCars' } })}>
 							Cancel
 						</Button>
 						<Button className="primary" disabled={disabled} onClick={submitHandler}>
