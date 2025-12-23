@@ -25,7 +25,7 @@ const CommunityCard = (props: CommunityCardProps) => {
 	const likeHandler = likeArticleHandler ?? likeBoArticleHandler;
 	const imagePath: string = boardArticle?.articleImage
 		? `${REACT_APP_API_URL}/${boardArticle?.articleImage}`
-		: '/img/community/communityImg.png';
+		: '/img/types/Sedan.jpeg';
 
 	const isLikedFromApi = useMemo(() => {
 		const anyArticle = boardArticle as any;
