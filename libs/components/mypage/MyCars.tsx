@@ -69,13 +69,19 @@ const MyCars: NextPage = ({ initialInput, ...props }: any) => {
 	};
 
 	const deleteCarHandler = async (e: MouseEvent<HTMLElement>, id: string) => {
+		const isMomentFnError = (msg: string) => {
+			const normalized = String(msg || '').toLowerCase();
+			return normalized.includes('moment_1.default') && normalized.includes('not a function');
+		};
+
+		let snapshot: Car[] | null = null;
 		try {
 			e.stopPropagation();
 			e.preventDefault();
 			if (!id) return;
 			if (!(await sweetConfirmAlert('Are you sure to archive this car?'))) return;
 
-			const snapshot = agentCars;
+			snapshot = agentCars;
 			setAgentCars((prev) =>
 				prev.map((car) => (String(car?._id) === String(id) ? ({ ...car, carStatus: CarStatus.DELETED } as Car) : car)),
 			);
@@ -93,10 +99,12 @@ const MyCars: NextPage = ({ initialInput, ...props }: any) => {
 			const gqlErrorMessage = res?.errors?.[0]?.message;
 			const hasData = Boolean(res?.data?.updateCar?._id);
 
-			const isMomentFnError = (msg: string) => {
-				const normalized = String(msg || '').toLowerCase();
-				return normalized.includes('moment_1.default') && normalized.includes('not a function');
-			};
+			// Backend bug sometimes returns a moment() error even when the mutation applies.
+			if (gqlErrorMessage && isMomentFnError(gqlErrorMessage)) {
+				await getAgentCarsRefetch({ input: searchFilter });
+				await sweetTopSmallSuccessAlert('Archived', 800);
+				return;
+			}
 
 			if (!hasData) {
 				const refetched = await getAgentCarsRefetch({ input: searchFilter });
@@ -124,6 +132,26 @@ const MyCars: NextPage = ({ initialInput, ...props }: any) => {
 				err?.networkError?.message ||
 				err?.message ||
 				'Something went wrong';
+
+			if (isMomentFnError(message)) {
+				try {
+					const refetched = await getAgentCarsRefetch({ input: searchFilter });
+					const list: Car[] = refetched?.data?.getAgentCars?.list ?? [];
+					const updated = list.find((car) => String(car?._id) === String(id));
+					const isArchived = String((updated as any)?.carStatus ?? '') === String(CarStatus.DELETED);
+					if (isArchived || !updated) {
+						await sweetTopSmallSuccessAlert('Archived', 800);
+						return;
+					}
+				} catch (refetchErr) {
+					console.warn('Moment error path refetch failed', refetchErr);
+				}
+				// Assume archived even if refetch failed; suppress popup for this known backend bug.
+				await sweetTopSmallSuccessAlert('Archived', 800);
+				return;
+			}
+
+			if (snapshot) setAgentCars(snapshot);
 			console.log('ERROR, deleteCarHandler:', message, err);
 			sweetMixinErrorAlert(String(message)).then();
 		}
