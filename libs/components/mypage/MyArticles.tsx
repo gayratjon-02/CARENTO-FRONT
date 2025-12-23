@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Pagination, Stack, Typography } from '@mui/material';
@@ -8,7 +8,7 @@ import { userVar } from '../../../apollo/store';
 import { T } from '../../types/common';
 import { BoardArticle } from '../../types/board-article/board-article';
 import { LIKE_TARGET_BOARD_ARTICLE } from '../../../apollo/user/mutation';
-import { GET_BOARD_ARTICLES } from '../../../apollo/user/query';
+import { GET_ARTICLES } from '../../../apollo/user/query';
 import { Messages } from '../../config';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 
@@ -30,17 +30,28 @@ const MyArticles: NextPage = ({ initialInput, ...props }: T) => {
 		data: boardArticlesData,
 		error: getBoardArticlesError,
 		refetch: boardArticlesRefetch,
-	} = useQuery(GET_BOARD_ARTICLES, {
+	} = useQuery(GET_ARTICLES, {
 		fetchPolicy: 'network-only',
+		skip: !user?._id,
 		variables: {
 			input: searchCommunity,
 		},
 		notifyOnNetworkStatusChange: true,
 		onCompleted(data: T) {
-			setBoardArticles(data?.getBoardArticles?.list);
-			setTotalCount(data?.getBoardArticles?.metaCounter[0]?.total);
+			setBoardArticles(data?.getArticles?.list || []);
+			setTotalCount(data?.getArticles?.metaCounter?.[0]?.total || 0);
 		},
 	});
+
+	// Update search when user becomes available
+	useEffect(() => {
+		if (user?._id) {
+			setSearchCommunity((prev: any) => ({
+				...prev,
+				search: { ...prev.search, memberId: user._id },
+			}));
+		}
+	}, [user?._id]);
 
 	/** HANDLERS **/
 	const paginationHandler = (e: T, value: number) => {
@@ -66,7 +77,7 @@ const MyArticles: NextPage = ({ initialInput, ...props }: T) => {
 			sweetMixinErrorAlert(err.message).then();
 		}
 	};
-
+	console.log('boardArticles:', boardArticles);
 	if (device === 'mobile') {
 		return <>ARTICLE PAGE MOBILE</>;
 	} else
