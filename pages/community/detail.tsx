@@ -22,7 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { BoardArticle } from '../../libs/types/board-article/board-article';
 import { CREATE_COMMENT, LIKE_TARGET_BOARD_ARTICLE, UPDATE_COMMENT } from '../../apollo/user/mutation';
-import { GET_BOARD_ARTICLE, GET_COMMENTS } from '../../apollo/user/query';
+import { GET_ARTICLES, GET_BOARD_ARTICLE, GET_COMMENTS } from '../../apollo/user/query';
 import { Messages } from '../../libs/config';
 import {
 	sweetConfirmAlert,
@@ -32,6 +32,7 @@ import {
 } from '../../libs/sweetAlert';
 import { CommentUpdate } from '../../libs/types/comment/comment.update';
 const ToastViewerComponent = dynamic(() => import('../../libs/components/community/TViewer'), { ssr: false });
+import { Article } from '../../libs/types/board-article/board-article';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -65,6 +66,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 	const [updatedCommentId, setUpdatedCommentId] = useState<string>('');
 	const [likeLoading, setLikeLoading] = useState<boolean>(false);
 	const [boardArticle, setBoardArticle] = useState<BoardArticle>();
+	const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
 
 	/** APOLLO REQUESTS **/
 	const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
@@ -87,6 +89,23 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 			if (data?.getBoardArticle?.memberData?.memberImage) {
 				setMemberImage(`${process.env.REACT_APP_API_URL}/${data?.getBoardArticle?.memberData?.memberImage}`);
 			}
+		},
+	});
+
+	useQuery(GET_ARTICLES, {
+		fetchPolicy: 'cache-and-network',
+		skip: !articleCategory,
+		variables: {
+			input: {
+				page: 1,
+				limit: 4,
+				sort: 'createdAt',
+				direction: 'DESC',
+				search: { articleCategory: articleCategory as BoardArticleCategory },
+			},
+		},
+		onCompleted: (data: T) => {
+			setRelatedArticles(data?.getArticles?.list || []);
 		},
 	});
 
@@ -226,12 +245,13 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 	return (
 		<div id="community-detail-page">
 			<div className="container">
-				<Stack className="cd-hero">
+				<Stack className="cd-hero" sx={{ backgroundImage: boardArticle?.articleImage ? `url(${process.env.REACT_APP_API_URL}/${boardArticle.articleImage})` : undefined }}>
+					<Box className="hero-overlay" />
 					<Stack spacing={1} className="hero-text">
 						<Chip label={articleCategory || 'Board'} className="hero-chip" />
 						<Typography className="hero-title">{boardArticle?.articleTitle || 'Article'}</Typography>
 						<Typography className="hero-sub">
-							{boardArticle?.articleContent?.slice(0, 120) || 'Stories, tips, and road moments from the community.'}
+							{boardArticle?.articleContent?.slice(0, 140) || 'Stories, tips, and road moments from the community.'}
 						</Typography>
 						<Stack direction="row" spacing={1.5} alignItems="center" className="hero-meta">
 							<Avatar src={memberImage} />
@@ -259,7 +279,6 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 							</Stack>
 						</Stack>
 					</Stack>
-					<Box className="hero-cover" />
 				</Stack>
 
 				<Stack className="cd-content-card" spacing={3}>
