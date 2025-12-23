@@ -149,11 +149,11 @@ const Chat = () => {
 			return;
 		}
 		// Optimistically render outgoing message
-		const localMessage: MessagePayload = {
-			event: 'message',
-			text: trimmed,
-			memberData: user as Member,
-		};
+			const localMessage: MessagePayload = {
+				event: 'message',
+				text: trimmed,
+				memberData: user as unknown as Member,
+			};
 		setMessagesList((prev) => [...prev, localMessage]);
 
 		try {

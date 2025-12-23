@@ -1,154 +1,216 @@
 #pc-wrap {
 	#my-page {
-		background: #f6f6f6;
+		background: radial-gradient(1200px 360px at 18% 0%, rgba(124, 93, 255, 0.12) 0%, rgba(255, 255, 255, 0) 60%),
+			radial-gradient(1000px 320px at 85% 0%, rgba(235, 103, 83, 0.11) 0%, rgba(255, 255, 255, 0) 55%),
+			linear-gradient(180deg, #f7f8fb 0%, #f3f4f6 55%, #f7f8fb 100%);
 		.container {
-			.my-page {
+			.my-dashboard {
 				position: relative;
 				width: 100%;
-				flex-direction: row;
-				gap: 25px;
-				padding-top: 96px;
-				.back-frame {
-					width: 1260px;
-					height: auto;
-					display: flex;
-					flex-direction: row;
-					margin: 100px 0 200px 0;
-					border-radius: 12px;
-					border: 1px solid #c4c4c4;
-					background: #fff;
-					box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-					.left-config {
-						position: relative;
-						padding: 0 0 0 0;
-						width: 266px;
-						height: 700px;
-						border-radius: 12px;
-						background: #fff;
-						border: 1px solid rgba(196, 196, 196, 0.79);
-						box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-						margin: 180px 20px 40px 20px;
-						.profile {
-							margin-top: 5px;
-							position: relative;
-							display: flex;
-							flex-direction: row;
-							.profile-img {
-								img {
-									width: 79px;
-									height: 79px;
-									border-radius: 50%;
-									right: 30px;
-									bottom: 12px;
-									object-fit: cover;
-								}
+				padding-top: 92px;
+				gap: 18px;
+
+				.mypage-menu {
+					width: 100%;
+					padding: 18px 18px;
+					.menu-header {
+						width: 100%;
+						align-items: center;
+						.avatar {
+							width: 46px;
+							height: 46px;
+							border: 1px solid rgba(17, 24, 39, 0.12);
+						}
+						.info {
+							min-width: 0;
+							.name {
+								color: #0f172a;
+								font-family: $font;
+								font-size: 14px;
+								font-weight: 950;
+								letter-spacing: -0.2px;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
 							}
-							.user-info {
-								margin-left: 20px;
-								display: flex;
-								flex-direction: column;
-								.user-name {
-									color: #181a20;
-									font-family: $font;
-									font-size: 15px;
-									font-style: normal;
-									font-weight: 600;
-									line-height: normal;
-								}
-								.user-phone {
-									display: flex;
-									flex-direction: row;
-									img {
-										margin-top: 7px;
-										margin-right: 4px;
-										width: 16px;
-										height: 16px;
-									}
-								}
-								.view-list {
-									font-weight: bold;
-									color: red;
-								}
+							.phone {
+								color: rgba(15, 23, 42, 0.6);
+								font-family: $font;
+								font-size: 12px;
+								font-weight: 600;
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
 							}
 						}
-						.sections {
-							height: auto;
-							gap: 45px;
-							margin-top: 30px;
-							.section {
-								height: auto;
-								.title {
-									font-family: $font;
-									font-size: 15px;
-									font-style: normal;
-									font-weight: 400;
-									line-height: 28px;
-								}
-								.sub-section {
-									width: 230px;
-									height: 26px;
+						.role {
+							margin-left: auto;
+							height: 28px;
+							border-radius: 999px;
+							font-family: $font;
+							font-size: 11px;
+							font-weight: 900;
+							letter-spacing: 0.12em;
+							text-transform: uppercase;
+							border: 1px solid rgba(17, 24, 39, 0.12);
+							background: rgba(17, 24, 39, 0.04);
+						}
+					}
+
+					.admin-link {
+						margin-top: 10px;
+						.admin-btn {
+							width: 100%;
+							height: 36px;
+							border-radius: 12px;
+							background: rgba(124, 93, 255, 0.12);
+							color: #4f46e5;
+							font-family: $font;
+							font-size: 12px;
+							font-weight: 900;
+							text-transform: none;
+							&:hover {
+								background: rgba(124, 93, 255, 0.16);
+							}
+						}
+					}
+
+					.divider {
+						margin: 14px 0;
+						border-color: rgba(17, 24, 39, 0.08);
+					}
+
+					.menu-body {
+						.group {
+							.group-title {
+								color: rgba(15, 23, 42, 0.55);
+								font-family: $font;
+								font-size: 12px;
+								font-weight: 900;
+								letter-spacing: 0.16em;
+								text-transform: uppercase;
+								margin-left: 4px;
+							}
+							.list {
+								padding: 0;
+								display: flex;
+								flex-direction: column;
+								gap: 6px;
+								.item {
+									border-radius: 14px;
+									border: 1px solid rgba(17, 24, 39, 0.08);
+									background: rgba(255, 255, 255, 0.8);
+									padding: 10px 12px;
 									display: flex;
-									flex-direction: column;
+									gap: 10px;
 									align-items: center;
-									cursor: pointer;
-									padding: 0 5px 0 5px;
-									li {
-										height: 33px;
-										margin-bottom: 6px;
-										border-radius: 4px;
+									transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+									.dot {
+										width: 8px;
+										height: 8px;
+										border-radius: 999px;
+										background: rgba(17, 24, 39, 0.25);
+										flex: 0 0 auto;
 									}
-									.focus {
-										height: 50px;
-										background: #000000;
-										border-radius: 10px;
-										p {
-											font-size: 14px;
+									.label {
+										color: rgba(15, 23, 42, 0.85);
+										font-family: $font;
+										font-size: 13px;
+										font-weight: 800;
+									}
+									&:hover {
+										transform: translateY(-1px);
+										background: rgba(17, 24, 39, 0.03);
+										border-color: rgba(17, 24, 39, 0.14);
+									}
+									&.active {
+										background: #111827;
+										border-color: #111827;
+										.dot {
+											background: #ffffff;
+										}
+										.label {
 											color: #ffffff;
 										}
 									}
-									.flex-box {
-										display: flex;
-										align-items: center;
-										.com-icon {
-											display: flex;
-											flex-direction: row;
-											justify-content: flex-end;
-											margin-left: 11px;
-										}
-										p {
-											font-size: 14px;
-										}
-									}
-								}
-								img {
-									width: 16px;
-									height: 16px;
-								}
-								.sub-title {
-									margin-left: 12px;
-									color: #181a20;
-									font-family: $font;
-									font-size: 14px;
-									font-style: normal;
-									font-weight: 600;
-									line-height: 55px;
 								}
 							}
 						}
 					}
-					.main-config {
-						position: relative;
-						width: 936px;
-						margin-top: 52px;
-						align-items: center;
-						gap: 109px;
-						.list-config {
-							display: flex;
+
+					.menu-footer {
+						margin-top: 14px;
+						.logout {
 							width: 100%;
-							height: auto;
-							flex-direction: row;
-							flex-wrap: wrap;
-							gap: 22px;
+							height: 38px;
+							border-radius: 14px;
+							border: 1px solid rgba(239, 68, 68, 0.22);
+							background: rgba(239, 68, 68, 0.06);
+							color: rgba(239, 68, 68, 0.95);
+							font-family: $font;
+							font-size: 13px;
+							font-weight: 900;
+							text-transform: none;
+							&:hover {
+								background: rgba(239, 68, 68, 0.1);
+							}
+						}
+					}
+				}
+
+				.dash-grid {
+					margin-bottom: 90px;
+					align-items: flex-start;
+					.dash-side {
+						width: 296px;
+						position: sticky;
+						top: 110px;
+						border-radius: 18px;
+						background: rgba(255, 255, 255, 0.85);
+						border: 1px solid rgba(17, 24, 39, 0.08);
+						box-shadow: 0 18px 50px rgba(17, 24, 39, 0.08);
+						overflow: hidden;
+					}
+					.dash-main {
+						flex: 1;
+						min-width: 0;
+						max-width: 980px;
+						.content-card {
+							padding: 18px 18px;
+							border-radius: 18px;
+							border: 1px solid rgba(17, 24, 39, 0.08);
+							background: rgba(255, 255, 255, 0.92);
+							box-shadow: 0 20px 55px rgba(17, 24, 39, 0.08);
+						}
+					}
+				}
+
+					@media (max-width: 1100px) {
+						.dash-grid {
+							flex-direction: column;
+							.dash-side {
+							position: relative;
+							top: auto;
+							width: 100%;
+							}
+							.dash-main {
+								width: 100%;
+							}
+						}
+					}
+
+				
+			}
+
+			// keep existing card grid styles below
+			.my-page {
+				.list-config {
+					display: flex;
+					width: 100%;
+					height: auto;
+					flex-direction: row;
+					flex-wrap: wrap;
+					gap: 22px;
 							.card-config {
 								width: 296px;
 								height: 413px;
@@ -328,7 +390,10 @@
 						}
 					}
 				}
+
+				@media (max-width: 1000px) {
+					// legacy
+				}
 			}
-		}
+		
 	}
-}

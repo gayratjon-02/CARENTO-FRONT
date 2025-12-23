@@ -6,14 +6,14 @@ import { Stack, Tab, Typography, Button, Pagination } from '@mui/material';
 import CommunityCard from '../../libs/components/common/CommunityCard';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import { BoardArticle } from '../../libs/types/board-article/board-article';
+import { Article } from '../../libs/types/board-article/board-article';
 import { T } from '../../libs/types/common';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { BoardArticlesInquiry } from '../../libs/types/board-article/board-article.input';
 import { BoardArticleCategory } from '../../libs/enums/board-article.enum';
 import { useMutation, useQuery } from '@apollo/client';
 import { LIKE_TARGET_BOARD_ARTICLE } from '../../apollo/user/mutation';
-import { GET_BOARD_ARTICLES } from '../../apollo/user/query';
+import { GET_ARTICLES } from '../../apollo/user/query';
 import { Messages } from '../../libs/config';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 
@@ -29,7 +29,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 	const { query } = router;
 	const articleCategory = query?.articleCategory as string;
 	const [searchCommunity, setSearchCommunity] = useState<BoardArticlesInquiry>(initialInput);
-	const [boardArticles, setBoardArticles] = useState<BoardArticle[]>([]);
+	const [boardArticles, setBoardArticles] = useState<Article[]>([]);
 	const [totalCount, setTotalCount] = useState<number>(0);
 	if (articleCategory) initialInput.search.articleCategory = articleCategory;
 
@@ -41,7 +41,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		data: boardArticlesData,
 		error: getBoardArticlesError,
 		refetch: boardArticlesRefetch,
-	} = useQuery(GET_BOARD_ARTICLES, {
+	} = useQuery(GET_ARTICLES, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
 			input: searchCommunity,
@@ -177,7 +177,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 									<TabPanel value="FREE">
 										<Stack className="list-box">
 											{totalCount ? (
-												boardArticles?.map((boardArticle: BoardArticle) => {
+												boardArticles?.map((boardArticle: Article) => {
 													return (
 														<CommunityCard
 															boardArticle={boardArticle}
@@ -197,7 +197,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 									<TabPanel value="RECOMMEND">
 										<Stack className="list-box">
 											{totalCount ? (
-												boardArticles?.map((boardArticle: BoardArticle) => {
+												boardArticles?.map((boardArticle: Article) => {
 													return (
 														<CommunityCard
 															boardArticle={boardArticle}
@@ -217,7 +217,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 									<TabPanel value="NEWS">
 										<Stack className="list-box">
 											{totalCount ? (
-												boardArticles?.map((boardArticle: BoardArticle) => {
+												boardArticles?.map((boardArticle: Article) => {
 													return (
 														<CommunityCard
 															boardArticle={boardArticle}
@@ -237,7 +237,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 									<TabPanel value="HUMOR">
 										<Stack className="list-box">
 											{totalCount ? (
-												boardArticles?.map((boardArticle: BoardArticle) => {
+												boardArticles?.map((boardArticle: Article) => {
 													return (
 														<CommunityCard
 															boardArticle={boardArticle}

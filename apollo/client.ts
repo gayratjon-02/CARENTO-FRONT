@@ -22,12 +22,17 @@ const tokenRefreshLink = new TokenRefreshLink({
 	accessTokenField: 'accessToken',
 	isTokenValidOrUndefined: () => {
 		return true;
-	}, // @ts-ignore
-	fetchAccessToken: () => {
-		// execute refresh token
-		return null;
 	},
-})
+	fetchAccessToken: async () => null as any,
+	handleFetch: (accessToken) => {
+		if (typeof window === 'undefined') return;
+		if (!accessToken) return;
+		localStorage.setItem('accessToken', accessToken);
+	},
+	handleError: (err) => {
+		console.log('TokenRefreshLink error:', err);
+	},
+});
 
 // Custom WebSocket client
 class LoggingWebSocket {

@@ -387,6 +387,125 @@ export const LIKE_TARGET_CAR = gql`
 `;
 
 /**************************
+ *        PROPERTY        *
+ *************************/
+
+export const CREATE_PROPERTY = gql`
+	mutation CreateProperty($input: PropertyInput!) {
+		createProperty(input: $input) {
+			_id
+			propertyType
+			propertyStatus
+			propertyLocation
+			propertyAddress
+			propertyTitle
+			propertyPrice
+			propertySquare
+			propertyBeds
+			propertyRooms
+			propertyViews
+			propertyLikes
+			propertyComments
+			propertyRank
+			propertyImages
+			propertyDesc
+			propertyBarter
+			propertyRent
+			memberId
+			soldAt
+			deletedAt
+			constructedAt
+			createdAt
+			updatedAt
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+			memberData {
+				_id
+				memberType
+				memberStatus
+				memberAuthType
+				memberPhone
+				memberNick
+				memberFullName
+				memberImage
+				memberAddress
+				memberDesc
+				memberCars
+				memberArticles
+				memberFollowers
+				memberFollowings
+				memberPoints
+				memberLikes
+				memberViews
+				memberComments
+				memberRank
+				memberWarnings
+				memberBlocks
+				drivingLicenseNumber
+				drivingLicensePhoto
+				deletedAt
+				createdAt
+				updatedAt
+				accessToken
+			}
+		}
+	}
+`;
+
+export const UPDATE_PROPERTY = gql`
+	mutation UpdateProperty($input: PropertyUpdate!) {
+		updateProperty(input: $input) {
+			_id
+			propertyType
+			propertyStatus
+			propertyLocation
+			propertyAddress
+			propertyTitle
+			propertyPrice
+			propertySquare
+			propertyBeds
+			propertyRooms
+			propertyViews
+			propertyLikes
+			propertyComments
+			propertyRank
+			propertyImages
+			propertyDesc
+			propertyBarter
+			propertyRent
+			memberId
+			soldAt
+			deletedAt
+			constructedAt
+			createdAt
+			updatedAt
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+		}
+	}
+`;
+
+export const LIKE_TARGET_PROPERTY = gql`
+	mutation LikeTargetProperty($input: String!) {
+		likeTargetProperty(propertyId: $input) {
+			_id
+			propertyLikes
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+		}
+	}
+`;
+
+/**************************
  *      ARTICLE     *
  *************************/
 

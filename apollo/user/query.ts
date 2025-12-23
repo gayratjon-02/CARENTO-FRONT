@@ -434,6 +434,186 @@ export const GET_VISITED = gql`
 `;
 
 /**************************
+ *        PROPERTY        *
+ *************************/
+
+export const GET_PROPERTIES = gql`
+	query GetProperties($input: PropertiesInquiry!) {
+		getProperties(input: $input) {
+			list {
+				_id
+				propertyType
+				propertyStatus
+				propertyLocation
+				propertyAddress
+				propertyTitle
+				propertyPrice
+				propertySquare
+				propertyBeds
+				propertyRooms
+				propertyViews
+				propertyLikes
+				propertyComments
+				propertyRank
+				propertyImages
+				propertyDesc
+				propertyBarter
+				propertyRent
+				memberId
+				soldAt
+				deletedAt
+				constructedAt
+				createdAt
+				updatedAt
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
+				memberData {
+					_id
+					memberType
+					memberStatus
+					memberAuthType
+					memberPhone
+					memberNick
+					memberFullName
+					memberImage
+					memberAddress
+					memberDesc
+					memberCars
+					memberArticles
+					memberFollowers
+					memberFollowings
+					memberPoints
+					memberLikes
+					memberViews
+					memberComments
+					memberRank
+					memberWarnings
+					memberBlocks
+					drivingLicenseNumber
+					drivingLicensePhoto
+					deletedAt
+					createdAt
+					updatedAt
+					accessToken
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_PROPERTY = gql`
+	query GetProperty($input: String!) {
+		getProperty(propertyId: $input) {
+			_id
+			propertyType
+			propertyStatus
+			propertyLocation
+			propertyAddress
+			propertyTitle
+			propertyPrice
+			propertySquare
+			propertyBeds
+			propertyRooms
+			propertyViews
+			propertyLikes
+			propertyComments
+			propertyRank
+			propertyImages
+			propertyDesc
+			propertyBarter
+			propertyRent
+			memberId
+			soldAt
+			deletedAt
+			constructedAt
+			createdAt
+			updatedAt
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+			memberData {
+				_id
+				memberType
+				memberStatus
+				memberAuthType
+				memberPhone
+				memberNick
+				memberFullName
+				memberImage
+				memberAddress
+				memberDesc
+				memberCars
+				memberArticles
+				memberFollowers
+				memberFollowings
+				memberPoints
+				memberLikes
+				memberViews
+				memberComments
+				memberRank
+				memberWarnings
+				memberBlocks
+				drivingLicenseNumber
+				drivingLicensePhoto
+				deletedAt
+				createdAt
+				updatedAt
+				accessToken
+			}
+		}
+	}
+`;
+
+export const GET_AGENT_PROPERTIES = gql`
+	query GetAgentProperties($input: AgentPropertiesInquiry!) {
+		getAgentProperties(input: $input) {
+			list {
+				_id
+				propertyType
+				propertyStatus
+				propertyLocation
+				propertyAddress
+				propertyTitle
+				propertyPrice
+				propertySquare
+				propertyBeds
+				propertyRooms
+				propertyViews
+				propertyLikes
+				propertyComments
+				propertyRank
+				propertyImages
+				propertyDesc
+				propertyBarter
+				propertyRent
+				memberId
+				soldAt
+				deletedAt
+				constructedAt
+				createdAt
+				updatedAt
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
  *      BOARD-ARTICLE     *
  *************************/
 
@@ -547,6 +727,8 @@ export const GET_ARTICLES = gql`
 		}
 	}
 `;
+
+export const GET_BOARD_ARTICLES = GET_ARTICLES;
 
 /**************************
  *         COMMENT        *
