@@ -181,23 +181,32 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 
 			setSubmitting(true);
 
+			const safeNumber = (v: any) => {
+				const n = typeof v === 'number' ? v : Number(v);
+				return Number.isFinite(n) ? n : undefined;
+			};
+
 			const input: any = {
 				carTitle: form.carTitle.trim(),
 				carDescription: form.carDescription?.trim() || '',
-				brandType: form.brandType,
-				year: Number(form.year),
-				fuelType: form.fuelType,
-				transmission: form.transmission,
-				seats: Number(form.seats),
-				doors: Number(form.doors),
-				mileage: Number(form.mileage),
+				brandType: form.brandType || undefined,
+				year: safeNumber(form.year),
+				fuelType: form.fuelType || undefined,
+				transmission: form.transmission || undefined,
+				seats: safeNumber(form.seats),
+				doors: safeNumber(form.doors),
+				mileage: safeNumber(form.mileage),
 				engine: form.engine?.trim() || undefined,
-				carType: form.carType,
-				carLocation: form.carLocation,
-				carImages: form.carImages,
-				pricePerDay: Number(form.pricePerDay),
-				pricePerHour: Number(form.pricePerHour),
+				carType: form.carType || undefined,
+				carLocation: form.carLocation || undefined,
+				carImages: Array.isArray(form.carImages) ? form.carImages : [],
+				pricePerDay: safeNumber(form.pricePerDay),
+				pricePerHour: safeNumber(form.pricePerHour),
 			};
+
+			input.carStatus = form.carStatus || CarStatus.ACTIVE;
+			// Remove any undefined fields to avoid backend validation errors
+			Object.keys(input).forEach((k) => input[k] === undefined && delete input[k]);
 
 			if (isEditing) {
 				await updateCar({ variables: { input: { _id: carId, ...input } } });
@@ -214,7 +223,20 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 
 			await router.push({ pathname: '/mypage', query: { category: 'myCars' } });
 		} catch (err: any) {
-			sweetErrorHandling(err).then();
+			const gqlErr = err?.graphQLErrors?.[0];
+			const nested =
+				gqlErr?.extensions?.response?.message?.[0] ||
+				gqlErr?.extensions?.response?.message ||
+				gqlErr?.message;
+			const networkMsg = err?.networkError?.result?.errors?.[0]?.message;
+			const finalMsg = nested || networkMsg || err?.message || 'Bad Request';
+
+			console.log('ERROR, submitHandler:', finalMsg, {
+				graphQLErrors: err?.graphQLErrors,
+				networkError: err?.networkError,
+			});
+
+			sweetMixinErrorAlert(String(finalMsg)).then();
 		} finally {
 			setSubmitting(false);
 		}
