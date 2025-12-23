@@ -2,253 +2,426 @@
 	#my-page {
 		#my-property-page {
 			width: 100%;
-			height: auto;
 			display: flex;
 			flex-direction: column;
-			gap: 57px;
-			.main-title-box {
-				width: auto;
-				height: auto;
-				flex-direction: row;
-				justify-content: space-between;
-				.right-box {
-					width: 315px;
-					.main-title {
-						color: #181a20;
-						font-family: $font;
-						font-size: 30px;
-						font-style: normal;
-						font-weight: 600;
-						line-height: normal;
-						letter-spacing: 0.6px;
-						text-transform: capitalize;
-					}
-					.sub-title {
-						color: #181a20;
-						font-family: $font;
-						font-size: 14px;
-						font-style: normal;
-						font-weight: 400;
-						line-height: 26px;
-					}
-				}
-			}
-			.property-list-box {
+			gap: 16px;
+
+			.cars-header {
 				width: 100%;
-				height: auto;
-				.tab-name-box {
-					width: 100%;
-					height: 49px;
-					flex-direction: row;
-					justify-content: center;
-					align-items: flex-end;
-					gap: 10px;
-					border-radius: 12px 12px 0px 0px;
-					background: rgba(143, 143, 143, 0.08);
-					border-radius: 12px 12px 0px 0px;
-					border: 1px solid rgba(196, 196, 196, 0.79);
-					.tab-name {
-						width: 110px;
-						height: 32px;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						cursor: pointer;
-						color: #000;
+				gap: 16px;
+				.left {
+					gap: 6px;
+					.kicker {
+						color: rgba(15, 23, 42, 0.55);
 						font-family: $font;
-						font-size: 16px;
-						font-style: normal;
+						font-size: 12px;
+						font-weight: 900;
+						letter-spacing: 0.18em;
+						text-transform: uppercase;
+					}
+					.title {
+						color: #0f172a;
+						font-family: $font;
+						font-size: 22px;
+						font-weight: 950;
+						letter-spacing: -0.3px;
+					}
+					.desc {
+						color: rgba(15, 23, 42, 0.62);
+						font-family: $font;
+						font-size: 13px;
 						font-weight: 500;
-						line-height: 26px;
+						line-height: 1.6;
 					}
-					.active-tab-name {
-						width: 110px;
-						height: 32px;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						border-bottom: 2px solid #eb6753;
-						cursor: pointer;
-						color: #eb6753;
+				}
+				.right {
+					gap: 10px;
+					.count {
+						color: rgba(15, 23, 42, 0.7);
 						font-family: $font;
-						font-size: 16px;
-						font-style: normal;
-						font-weight: 600;
-						line-height: 26px;
+						font-size: 13px;
+						font-weight: 900;
+					}
+					.add-btn {
+						height: 36px;
+						padding: 0 14px;
+						border-radius: 12px;
+						background: #111827;
+						color: #ffffff;
+						font-family: $font;
+						font-size: 12px;
+						font-weight: 900;
+						text-transform: none;
+						&:hover {
+							background: #0b1220;
+						}
 					}
 				}
 			}
-			.list-box {
-				width: 100%;
-				height: auto;
-				min-height: 700px;
-				padding: 30px 28px;
-				border-radius: 0px 0px 12px 12px;
-				border: 1px solid rgba(196, 196, 196, 0.79);
-				border-top: none;
-				background: #fff;
-				box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-				.listing-title-box {
-					width: 100%;
-					height: auto;
-					flex-direction: row;
-					gap: 90px;
-					padding: 18px 15px 18px 33px;
+
+			.cars-toolbar {
+				margin-top: 2px;
+				gap: 12px;
+				.status-tabs {
+					flex-wrap: wrap;
+					.tab {
+						height: 34px;
+						padding: 0 12px;
+						border-radius: 999px;
+						border: 1px solid rgba(17, 24, 39, 0.12);
+						background: rgba(255, 255, 255, 0.8);
+						color: rgba(15, 23, 42, 0.78);
+						font-family: $font;
+						font-size: 12px;
+						font-weight: 900;
+						text-transform: none;
+						&:hover {
+							background: rgba(17, 24, 39, 0.03);
+						}
+						&.active {
+							background: #111827;
+							border-color: #111827;
+							color: #ffffff;
+						}
+					}
+				}
+				.meta {
+					color: rgba(15, 23, 42, 0.6);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 700;
+				}
+			}
+
+			.cars-error {
+				padding: 12px 14px;
+				border-radius: 14px;
+				border: 1px solid rgba(239, 68, 68, 0.25);
+				background: rgba(239, 68, 68, 0.06);
+				.err-title {
+					color: rgba(239, 68, 68, 0.95);
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 950;
+				}
+				.err-desc {
+					color: rgba(15, 23, 42, 0.7);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 500;
+					margin-top: 4px;
+				}
+				.retry {
+					margin-top: 10px;
+					height: 34px;
+					padding: 0 12px;
 					border-radius: 12px;
-					background: #f6f6f6;
-					.title-text {
-						color: #181a20;
+					border: 1px solid rgba(239, 68, 68, 0.35);
+					color: rgba(239, 68, 68, 0.95);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 900;
+					text-transform: none;
+				}
+			}
+
+			.cars-list {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.car-row {
+				display: grid;
+				grid-template-columns: 180px minmax(0, 1fr) 140px;
+				align-items: center;
+				gap: 14px;
+				padding: 12px 12px;
+				border-radius: 18px;
+				border: 1px solid rgba(17, 24, 39, 0.08);
+				background: rgba(255, 255, 255, 0.92);
+				box-shadow: 0 16px 45px rgba(17, 24, 39, 0.08);
+				cursor: pointer;
+				transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+				&:hover {
+					transform: translateY(-2px);
+					box-shadow: 0 22px 55px rgba(17, 24, 39, 0.12);
+					border-color: rgba(79, 70, 229, 0.16);
+				}
+
+				.media {
+					position: relative;
+					height: 120px;
+					border-radius: 16px;
+					background-size: cover;
+					background-position: center;
+					background-repeat: no-repeat;
+					background-color: rgba(15, 23, 42, 0.06);
+					overflow: hidden;
+					&.no-image {
+						background-image: linear-gradient(135deg, rgba(79, 70, 229, 0.14), rgba(235, 103, 83, 0.12));
+					}
+					.media-overlay {
+						position: absolute;
+						inset: 0;
+						background: linear-gradient(180deg, rgba(2, 6, 23, 0.04) 0%, rgba(2, 6, 23, 0.42) 100%);
+					}
+					.media-chip {
+						position: absolute;
+						left: 10px;
+						top: 10px;
+						padding: 6px 10px;
+						border-radius: 999px;
+						background: rgba(255, 255, 255, 0.9);
+						border: 1px solid rgba(17, 24, 39, 0.08);
+						backdrop-filter: blur(10px);
+						color: rgba(15, 23, 42, 0.82);
+						font-size: 11px;
+						font-weight: 900;
+						text-transform: uppercase;
+						letter-spacing: 0.06em;
+						z-index: 1;
+					}
+				}
+
+				.body {
+					min-width: 0;
+					.title-row {
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						gap: 10px;
+					}
+					.car-title {
+						color: #0f172a;
 						font-family: $font;
 						font-size: 15px;
-						font-style: normal;
-						font-weight: 600;
-						line-height: normal;
-					}
-					:first-child {
-						margin-right: 138px;
-					}
-				}
-				.property-card-box {
-					width: 100%;
-					height: auto;
-					flex-direction: row;
-					margin-top: 30px;
-					padding-bottom: 30px;
-					border-bottom: 1px solid #ddd;
-					.image-box {
-						width: 110px;
-						height: 90px;
+						font-weight: 950;
+						letter-spacing: -0.2px;
+						white-space: nowrap;
 						overflow: hidden;
-						margin-right: 25px;
-						padding-top: 1px;
-						img {
-							width: 100%;
-							height: 100%;
-							object-fit: contain;
-							border-radius: 12px;
+						text-overflow: ellipsis;
+					}
+					.actions {
+						display: flex;
+						gap: 8px;
+					}
+					.icon {
+						min-width: 0;
+						width: 36px;
+						height: 36px;
+						border-radius: 14px;
+						border: 1px solid rgba(17, 24, 39, 0.12);
+						background: rgba(17, 24, 39, 0.04);
+						color: rgba(15, 23, 42, 0.8);
+						&:hover {
+							background: rgba(17, 24, 39, 0.08);
+						}
+						svg {
+							width: 20px;
+							height: 20px;
 						}
 					}
-					.information-box {
-						width: 200px;
-						height: auto;
-						padding: 5px 0px;
-						.name {
-							margin-bottom: 8px;
-							color: #181a20;
-							font-family: $font;
-							font-size: 13px;
-							font-style: normal;
-							font-weight: 600;
-							line-height: normal;
-						}
-						.address {
-							margin-bottom: 13px;
-							color: #717171;
-							font-family: $font;
-							font-size: 11px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: normal;
-						}
-						.price {
-							color: #181a20;
-							font-family: $font;
-							font-size: 15px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: normal;
+					.delete {
+						border-color: rgba(239, 68, 68, 0.18);
+						background: rgba(239, 68, 68, 0.06);
+						color: rgba(239, 68, 68, 0.95);
+						&:hover {
+							background: rgba(239, 68, 68, 0.1);
 						}
 					}
-					.date-box {
-						width: 135px;
-						height: 100%;
+					.meta {
+						color: rgba(15, 23, 42, 0.62);
+						font-family: $font;
+						font-size: 13px;
+						font-weight: 500;
+						margin-top: 4px;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+					.sub-row {
+						margin-top: 10px;
+						display: flex;
 						align-items: center;
-						justify-content: center;
-						margin-right: 55px;
-						.date {
-							color: #181a20;
-							font-family: $font;
-							font-size: 12px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: 26px;
-						}
-					}
-					.status-box {
-						width: 100px;
-						height: 100%;
-						align-items: center;
-						justify-content: center;
-						margin-right: 60px;
-						.coloured-box {
-							width: 93px;
-							height: 36px;
-							align-items: center;
-							justify-content: center;
-							border-radius: 60px;
-							cursor: pointer;
-							.status {
+						justify-content: space-between;
+						gap: 12px;
+						.specs {
+							display: flex;
+							flex-wrap: wrap;
+							gap: 8px;
+							.spec {
+								padding: 6px 10px;
+								border-radius: 999px;
+								border: 1px solid rgba(17, 24, 39, 0.08);
+								background: rgba(17, 24, 39, 0.02);
+								color: rgba(15, 23, 42, 0.78);
 								font-family: $font;
 								font-size: 12px;
-								font-style: normal;
-								font-weight: 400;
-								line-height: 26px;
+								font-weight: 800;
+							}
+							.status {
+								padding: 6px 10px;
+								border-radius: 999px;
+								border: 1px solid rgba(17, 24, 39, 0.08);
+								font-family: $font;
+								font-size: 12px;
+								font-weight: 950;
+								letter-spacing: 0.06em;
+								text-transform: uppercase;
+								&.active {
+									background: rgba(16, 185, 129, 0.12);
+									border-color: rgba(16, 185, 129, 0.22);
+									color: rgba(16, 185, 129, 0.95);
+								}
+								&.blocked {
+									background: rgba(245, 158, 11, 0.12);
+									border-color: rgba(245, 158, 11, 0.22);
+									color: rgba(245, 158, 11, 0.95);
+								}
+								&.deleted {
+									background: rgba(239, 68, 68, 0.10);
+									border-color: rgba(239, 68, 68, 0.18);
+									color: rgba(239, 68, 68, 0.95);
+								}
 							}
 						}
-					}
-					.views-box {
-						width: 35px;
-						height: 100%;
-						align-items: center;
-						justify-content: center;
-						margin-right: 75px;
-						.views {
-							color: #181a20;
-							font-family: $font;
-							font-size: 12px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: 26px;
-						}
-					}
-					.action-box {
-						width: auto;
-						height: 100%;
-						flex-direction: row;
-						align-items: center;
-						justify-content: center;
-						.icon-button {
-							width: 40px;
-							height: 40px;
-							border-radius: 4px;
-							:hover {
-								background: #f6f6f6;
-							}
-							.buttons {
-								color: #181a20;
+						.stats {
+							display: flex;
+							gap: 8px;
+							.stat {
+								display: inline-flex;
+								align-items: center;
+								gap: 6px;
+								padding: 6px 10px;
+								border-radius: 999px;
+								border: 1px solid rgba(17, 24, 39, 0.08);
+								background: rgba(255, 255, 255, 0.75);
+								color: rgba(15, 23, 42, 0.8);
+								font-family: $font;
+								font-size: 12px;
+								font-weight: 900;
+								svg {
+									width: 18px;
+									height: 18px;
+									color: rgba(15, 23, 42, 0.55);
+								}
 							}
 						}
 					}
 				}
-				.pagination-config {
-					width: 100%;
-					height: auto;
-					justify-content: center;
-					align-items: center;
-					margin-top: 30px;
-					.total-result {
-						p {
-							color: #181a20;
-							text-align: center;
-							font-family: $font;
-							font-size: 14px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: 26px;
-						}
+
+				.price {
+					text-align: right;
+					padding-left: 14px;
+					border-left: 1px dashed rgba(17, 24, 39, 0.12);
+					.label {
+						display: block;
+						color: rgba(107, 114, 128, 0.9);
+						font-size: 11px;
+						font-weight: 900;
+						text-transform: uppercase;
+						letter-spacing: 0.06em;
+					}
+					strong {
+						display: block;
+						color: #0f172a;
+						font-size: 18px;
+						font-weight: 950;
+						letter-spacing: -0.2px;
+						margin-top: 4px;
+					}
+					small {
+						color: rgba(107, 114, 128, 0.9);
+						font-size: 11px;
+						font-weight: 900;
+						text-transform: uppercase;
+						letter-spacing: 0.06em;
+					}
+				}
+			}
+
+			.car-skeleton {
+				display: grid;
+				grid-template-columns: 180px minmax(0, 1fr) 140px;
+				gap: 14px;
+				padding: 12px 12px;
+				border-radius: 18px;
+				border: 1px solid rgba(17, 24, 39, 0.08);
+				background: rgba(255, 255, 255, 0.85);
+				.sk-media {
+					height: 120px;
+					border-radius: 16px;
+				}
+				.sk-body {
+					padding-top: 6px;
+				}
+			}
+
+			.cars-empty {
+				width: 100%;
+				padding: 42px 16px;
+				border-radius: 18px;
+				border: 1px dashed rgba(17, 24, 39, 0.14);
+				background: rgba(17, 24, 39, 0.02);
+				text-align: center;
+				.empty-title {
+					margin-top: 10px;
+					color: #0f172a;
+					font-family: $font;
+					font-size: 15px;
+					font-weight: 950;
+				}
+				.empty-desc {
+					margin-top: 6px;
+					color: rgba(15, 23, 42, 0.62);
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 500;
+				}
+				.add-btn {
+					margin-top: 14px;
+				}
+			}
+
+			.cars-footer {
+				margin-top: 6px;
+				.footer-meta {
+					color: rgba(15, 23, 42, 0.62);
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 700;
+				}
+			}
+
+			@media (max-width: 900px) {
+				.cars-header {
+					flex-direction: column;
+					align-items: flex-start;
+					.right {
+						align-items: flex-start;
+					}
+				}
+				.car-row,
+				.car-skeleton {
+					grid-template-columns: 140px minmax(0, 1fr);
+					.price {
+						display: none;
+					}
+				}
+			}
+
+			@media (max-width: 640px) {
+				.car-row,
+				.car-skeleton {
+					grid-template-columns: 1fr;
+					.media {
+						height: 180px;
 					}
 				}
 			}
 		}
 	}
 }
+
