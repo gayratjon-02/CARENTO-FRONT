@@ -3334,7 +3334,6 @@
       .car-card__price {
         position: absolute;
         left: 12px;
-        right: 172px;
         bottom: 12px;
         z-index: 1;
         padding: 8px 10px;
@@ -3344,8 +3343,6 @@
         display: inline-flex;
         align-items: baseline;
         gap: 6px;
-        overflow: hidden;
-        white-space: nowrap;
         span,
         small {
           color: rgba(107, 114, 128, 0.9);
@@ -3365,10 +3362,9 @@
         bottom: 12px;
         z-index: 1;
         display: flex;
-        gap: 10px;
-        max-width: 160px;
-        justify-content: flex-end;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
         .stat,
         .like {
           display: inline-flex;

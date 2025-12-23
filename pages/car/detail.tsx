@@ -58,7 +58,7 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 	const [comments, setComments] = useState<Comment[]>([]);
 	const [commentTotal, setCommentTotal] = useState<number>(0);
 	const [insertCommentData, setInsertCommentData] = useState<CommentInput>({
-		commentGroup: CommentGroup.PROPERTY,
+		commentGroup: CommentGroup.CARS,
 		commentContent: '',
 		commentRefId: '',
 	});

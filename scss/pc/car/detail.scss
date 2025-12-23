@@ -534,7 +534,6 @@
 				.car-card__price {
 					position: absolute;
 					left: 12px;
-					right: 184px;
 					bottom: 12px;
 					z-index: 1;
 					padding: 8px 10px;
@@ -545,8 +544,6 @@
 					display: inline-flex;
 					align-items: baseline;
 					gap: 6px;
-					overflow: hidden;
-					white-space: nowrap;
 					span,
 					small {
 						color: rgba(107, 114, 128, 0.9);
@@ -568,10 +565,9 @@
 					bottom: 12px;
 					z-index: 1;
 					display: flex;
-					gap: 12px;
-					max-width: 172px;
-					justify-content: flex-end;
-					flex-wrap: wrap;
+					flex-direction: column;
+					align-items: flex-end;
+					gap: 10px;
 					.stat,
 					.like {
 						display: inline-flex;
@@ -661,25 +657,10 @@
 						}
 					}
 				}
-				// Ensure price and stats don't visually collide on narrow cards
-				@media (max-width: 1100px) {
-					.car-card__price {
-						left: 14px;
-						right: 188px;
-						bottom: 14px;
-					}
-					.car-card__stats {
-						right: 14px;
-						bottom: 14px;
-					}
-				}
+				// Keep spacing consistent with the tag on small cards
 				@media (max-width: 720px) {
-					.car-card__price {
-						right: 140px;
-					}
 					.car-card__stats {
-						max-width: 132px;
-						gap: 10px;
+						gap: 8px;
 					}
 				}
 			}
