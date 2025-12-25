@@ -8,6 +8,7 @@ import { getJwtToken, updateStorage, updateUserInfo } from '../../auth';
 import { useMutation, useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { MemberUpdate } from '../../types/member/member.update';
+import { MemberType } from '../../enums/member.enum';
 import { UPDATE_MEMBER } from '../../../apollo/user/mutation';
 import { sweetErrorHandling, sweetMixinSuccessAlert } from '../../sweetAlert';
 
@@ -24,12 +25,16 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	useEffect(() => {
 		setUpdateData({
 			...updateData,
-			memberNick: user.memberNick,
-			memberPhone: user.memberPhone,
-			memberAddress: user.memberAddress,
-			memberImage: user.memberImage,
+			memberNick: user.memberNick ?? '',
+			memberPhone: user.memberPhone ?? '',
+			memberAddress: user.memberAddress ?? '',
+			memberImage: user.memberImage ?? '',
+			memberFullName: user.memberFullName ?? '',
+			memberDesc: user.memberDesc ?? '',
+			memberType: user.memberType,
 		});
-	}, [user]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user.memberNick, user.memberPhone, user.memberAddress, user.memberImage]);
 
 	/** HANDLERS **/
 	const uploadImage = async (e: any) => {
@@ -80,11 +85,31 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	const updatePropertyHandler = useCallback(async () => {
 		try {
 			if (!user._id) throw new Error(Messages.error2);
-			updateData._id = user._id;
+
+			const payload: MemberUpdate = {
+				_id: user._id,
+			};
+
+			const nick = updateData.memberNick?.trim();
+			const phone = updateData.memberPhone?.trim();
+			const addr = updateData.memberAddress?.trim();
+			const img = updateData.memberImage?.trim();
+			const fullname = updateData.memberFullName?.trim();
+			const desc = updateData.memberDesc?.trim();
+			const pwd = updateData.memberPassword?.trim();
+
+			if (nick) payload.memberNick = nick;
+			if (phone) payload.memberPhone = phone;
+			if (addr) payload.memberAddress = addr;
+			if (img) payload.memberImage = img;
+			if (fullname) payload.memberFullName = fullname;
+			if (desc) payload.memberDesc = desc;
+			if (pwd) payload.memberPassword = pwd;
+			if (updateData.memberType) payload.memberType = updateData.memberType;
 
 			const result = await updateMember({
 				variables: {
-					input: updateData,
+					input: payload,
 				},
 			});
 
@@ -96,18 +121,7 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
-	}, [updateData]);
-
-	const doDisabledCheck = () => {
-		if (
-			updateData.memberNick === '' ||
-			updateData.memberPhone === '' ||
-			updateData.memberAddress === '' ||
-			updateData.memberImage === ''
-		) {
-			return true;
-		}
-	};
+	}, [updateData, updateMember, user._id]);
 
 	console.log('+updateData', updateData);
 
@@ -171,7 +185,27 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 							/>
 						</Stack>
 					</Stack>
-					<Stack className="address-box">
+					<Stack className="small-input-box">
+						<Stack className="input-box">
+							<Typography className="title">Full Name</Typography>
+							<input
+								type="text"
+								placeholder="Your full name"
+								value={updateData.memberFullName}
+								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberFullName: value })}
+							/>
+						</Stack>
+						<Stack className="input-box">
+							<Typography className="title">Password</Typography>
+							<input
+								type="password"
+								placeholder="New password"
+								value={updateData.memberPassword ?? ''}
+								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberPassword: value })}
+							/>
+						</Stack>
+					</Stack>
+					<Stack className="input-box">
 						<Typography className="title">Address</Typography>
 						<input
 							type="text"
@@ -181,7 +215,13 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 						/>
 					</Stack>
 					<Stack className="about-me-box">
-						<Button className="update-button" onClick={updatePropertyHandler} disabled={doDisabledCheck()}>
+						<Typography className="title">About</Typography>
+						<textarea
+							placeholder="Tell about yourself"
+							value={updateData.memberDesc ?? ''}
+							onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberDesc: value })}
+						/>
+						<Button className="update-button" onClick={updatePropertyHandler}>
 							<Typography>Update Profile</Typography>
 							<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none">
 								<g clipPath="url(#clip0_7065_6985)">
