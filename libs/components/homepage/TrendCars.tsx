@@ -60,7 +60,8 @@ const TrendCars = (props: TrendCarsProps) => {
 			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
 			console.log('ERROR: likeCarHandler', err.message);
-			sweetMixinErrorAlert(err.message).then;
+			await sweetMixinErrorAlert(err.message);
+			throw err;
 		}
 	};
 

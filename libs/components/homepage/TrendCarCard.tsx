@@ -120,6 +120,16 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 		e.preventDefault();
 		if (!carId) return;
 
+		// If not authenticated, trigger handler (it will show login modal) and exit without UI toggle
+		if (!user?._id) {
+			try {
+				await likeCarHandler(user, carId);
+			} catch (err) {
+				// no-op; UI state remains unchanged for unauthenticated users
+			}
+			return;
+		}
+
 		const prev = liked;
 		const next = !prev;
 		setLiked(next);
