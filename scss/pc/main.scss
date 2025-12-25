@@ -1821,3 +1821,214 @@ body::-webkit-scrollbar {
 	border-radius: 2px;
 	margin-right: 8px;
 }
+
+/* Header / Navbar */
+#pc-wrap {
+	#top {
+		.navbar {
+			.topbar-shell {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				padding: 10px 16px;
+				box-sizing: border-box;
+				z-index: 99;
+			}
+
+			.topbar-shell.scrolled {
+				padding-top: 8px;
+				padding-bottom: 8px;
+			}
+
+			.topbar-shell.transparent {
+				background: transparent;
+			}
+
+			.topbar {
+				width: 100%;
+				background-color: gray;
+				max-width: 1320px;
+				min-height: 60px;
+				padding: 12px 16px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 14px;
+				border-radius: 999px;
+				border: 1px solid rgba(255, 255, 255, 0.65);
+				box-shadow: 0 14px 32px rgba(60, 68, 180, 0.35);
+				backdrop-filter: blur(10px);
+			}
+
+			.left-brand .brand-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				color: #fff;
+				text-decoration: none;
+				font-size: 16px;
+				font-weight: 700;
+				letter-spacing: 0.4px;
+			}
+
+			.left-brand img {
+				width: 42px;
+				height: 42px;
+				border-radius: 50%;
+				border: 2px solid rgba(255, 255, 255, 0.8);
+				box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+				background: rgba(255, 255, 255, 0.18);
+				object-fit: cover;
+			}
+
+			.main-nav {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: space-evenly;
+				gap: 16px;
+			}
+
+			.nav-pill {
+				height: 42px;
+				padding: 0 16px;
+				border-radius: 20px;
+				border: 1px solid rgba(255, 255, 255, 0.55);
+				background: rgba(255, 255, 255, 0.14);
+				color: #fff;
+				font-size: 14px;
+				font-weight: 700;
+				text-decoration: none;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				transition: all 0.25s ease;
+				backdrop-filter: blur(4px);
+				box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+			}
+
+			.nav-pill:hover {
+				border-color: rgba(255, 255, 255, 0.9);
+				background: rgba(255, 255, 255, 0.24);
+			}
+
+			.nav-pill.active {
+				background: rgba(255, 255, 255, 0.3);
+				border-color: rgba(255, 255, 255, 0.95);
+				box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+			}
+
+			.nav-icon svg {
+				width: 18px;
+				height: 18px;
+				color: #fff;
+			}
+
+			.right-actions {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.action-pill {
+				height: 42px;
+				min-width: auto;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid rgba(255, 255, 255, 0.55);
+				background: rgba(255, 255, 255, 0.14);
+				color: #fff;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				font-size: 14px;
+				font-weight: 700;
+				text-decoration: none;
+				line-height: 1;
+				transition: all 0.25s ease;
+			}
+
+			.action-pill:hover {
+				border-color: rgba(255, 255, 255, 0.9);
+				background: rgba(255, 255, 255, 0.24);
+			}
+
+			.btn-lang.MuiButton-root,
+			.btn-currency.MuiButton-root {
+				min-width: auto;
+				height: 42px;
+				padding: 0 12px;
+				border-radius: 20px;
+				text-transform: none;
+				border: 1px solid rgba(255, 255, 255, 0.55);
+				background: rgba(255, 255, 255, 0.14);
+				color: #fff;
+				line-height: 1;
+			}
+
+			.lang-box .flag img {
+				width: 22px;
+				height: 15px;
+				border-radius: 4px;
+			}
+
+			.currency-box .currency-icon {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 18px;
+				height: 18px;
+				font-size: 15px;
+				font-weight: 800;
+			}
+
+			.currency-box .currency-text {
+				font-weight: 700;
+				font-size: 14px;
+				color: #fff;
+			}
+
+			.avatar-pill {
+				width: 42px;
+				height: 42px;
+				border-radius: 50%;
+				border: 2px solid rgba(255, 255, 255, 0.7);
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(255, 255, 255, 0.2);
+				cursor: pointer;
+				transition: all 0.2s ease;
+
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+
+			.join-pill {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 42px;
+				padding: 0 14px;
+				border-radius: 20px;
+				border: 1px solid rgba(255, 255, 255, 0.55);
+				background: rgba(255, 255, 255, 0.14);
+				color: #fff;
+				font-size: 14px;
+				font-weight: 700;
+				gap: 8px;
+				text-decoration: none;
+				line-height: 1;
+			}
+		}
+	}
+}
