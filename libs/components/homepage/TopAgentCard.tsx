@@ -46,7 +46,7 @@ const TopAgentCard = (props: TopAgentProps) => {
 	/** HANDLERS **/
 	const openAgentDetail = () => {
 		if (!agentId) return;
-		router.push({ pathname: '/agent/detail', query: { agentId } });
+		router.push({ pathname: '/dealers/detail', query: { agentId } });
 	};
 
 	const handleLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {

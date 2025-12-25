@@ -72,7 +72,7 @@ const TopAgents = (props: TopAgentsProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<div className={'eyebrow'}>Community Picks</div>
-						<span>Top Agents</span>
+						<span>Top Dealers</span>
 						<p>Verified partners with quick response time.</p>
 					</Stack>
 					<Stack className={'wrapper'}>
@@ -104,7 +104,7 @@ const TopAgents = (props: TopAgentsProps) => {
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
 							<div className={'eyebrow'}>Trusted partners</div>
-							<span>Top Agents</span>
+							<span>Top Dealers</span>
 							<p>Handpicked professionals ready to serve you any time.</p>
 							<Box component={'div'} className={'stats'}>
 								<div className={'stat'}>
@@ -118,8 +118,8 @@ const TopAgents = (props: TopAgentsProps) => {
 							</Box>
 						</Box>
 						<Box component={'div'} className={'right'}>
-							<div className={'more-box'}>
-								<span>See All Agents</span>
+							<div className={'more-box'} onClick={() => router.push('/dealers')} role="button">
+								<span>See All Dealers</span>
 								<img src="/img/icons/rightup.svg" alt="" />
 							</div>
 						</Box>
