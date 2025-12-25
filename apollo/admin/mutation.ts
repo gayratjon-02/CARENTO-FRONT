@@ -116,7 +116,7 @@ export const UPDATE_CAR_BY_ADMIN = gql`
 	}
 `;
 
-export const REMOVE_PROPERTY_BY_ADMIN = gql`
+export const REMOVE_CAR_BY_ADMIN = gql`
 	mutation RemoveCarByAdmin($input: String!) {
 		removeCarByAdmin(carId: $input) {
 			_id
