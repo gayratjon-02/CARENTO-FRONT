@@ -12,7 +12,7 @@ import { alpha, styled } from '@mui/material/styles';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Logout } from '@mui/icons-material';
 
-import { CaretDown, BellRinging, HouseSimple, CarSimple, Buildings, ChatsCircle, Headset } from 'phosphor-react';
+import { CaretDown, BellRinging, HouseSimple, CarSimple, Buildings, ChatsCircle, Headset, UserCircle } from 'phosphor-react';
 
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import { getJwtToken, logOut, updateUserInfo } from '../auth';
@@ -118,8 +118,8 @@ const Top: React.FC = () => {
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
 
-	const navLinks = useMemo(
-		() => [
+	const navLinks = useMemo(() => {
+		const links = [
 			{
 				href: '/',
 				label: t('nav.home', { defaultValue: t('Home') }),
@@ -127,9 +127,7 @@ const Top: React.FC = () => {
 			},
 			{
 				href: '/car',
-				label: t('nav.car', {
-					defaultValue: t('Cars', { defaultValue: t('Car') || 'Car' }),
-				}),
+				label: t('nav.car', { defaultValue: t('Cars', { defaultValue: t('Car') || 'Car' }) }),
 				icon: <CarSimple size={18} weight="fill" />,
 			},
 			{
@@ -142,14 +140,24 @@ const Top: React.FC = () => {
 				label: t('nav.community', { defaultValue: t('Community') }),
 				icon: <ChatsCircle size={18} weight="fill" />,
 			},
-			{
-				href: '/cs',
-				label: t('nav.support', { defaultValue: t('Support') }),
-				icon: <Headset size={18} weight="fill" />,
-			},
-		],
-		[t],
-	);
+		];
+
+		if (user?._id) {
+			links.push({
+				href: '/mypage',
+				label: t('nav.myAccount', { defaultValue: t('My Page') }),
+				icon: <UserCircle size={18} weight="fill" />,
+			});
+		}
+
+		links.push({
+			href: '/cs',
+			label: t('nav.support', { defaultValue: t('Support') }),
+			icon: <Headset size={18} weight="fill" />,
+		});
+
+		return links;
+	}, [t, user?._id]);
 
 	const isActiveRoute = useCallback(
 		(href: string) => {
