@@ -95,7 +95,7 @@ export const GET_MEMBER = gql(`
 `);
 
 /**************************
- *        PROPERTY        *
+ *        CARS        *
  *************************/
 
 export const GET_CAR = gql`
@@ -438,186 +438,6 @@ export const GET_VISITED = gql`
 `;
 
 /**************************
- *        PROPERTY        *
- *************************/
-
-export const GET_PROPERTIES = gql`
-	query GetProperties($input: PropertiesInquiry!) {
-		getProperties(input: $input) {
-			list {
-				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyComments
-				propertyRank
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
-				memberId
-				soldAt
-				deletedAt
-				constructedAt
-				createdAt
-				updatedAt
-				meLiked {
-					memberId
-					likeRefId
-					myFavorite
-				}
-				memberData {
-					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
-					memberNick
-					memberFullName
-					memberImage
-					memberAddress
-					memberDesc
-					memberCars
-					memberArticles
-					memberFollowers
-					memberFollowings
-					memberPoints
-					memberLikes
-					memberViews
-					memberComments
-					memberRank
-					memberWarnings
-					memberBlocks
-					drivingLicenseNumber
-					drivingLicensePhoto
-					deletedAt
-					createdAt
-					updatedAt
-					accessToken
-				}
-			}
-			metaCounter {
-				total
-			}
-		}
-	}
-`;
-
-export const GET_PROPERTY = gql`
-	query GetProperty($input: String!) {
-		getProperty(propertyId: $input) {
-			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyComments
-			propertyRank
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
-			memberId
-			soldAt
-			deletedAt
-			constructedAt
-			createdAt
-			updatedAt
-			meLiked {
-				memberId
-				likeRefId
-				myFavorite
-			}
-			memberData {
-				_id
-				memberType
-				memberStatus
-				memberAuthType
-				memberPhone
-				memberNick
-				memberFullName
-				memberImage
-				memberAddress
-				memberDesc
-				memberCars
-				memberArticles
-				memberFollowers
-				memberFollowings
-				memberPoints
-				memberLikes
-				memberViews
-				memberComments
-				memberRank
-				memberWarnings
-				memberBlocks
-				drivingLicenseNumber
-				drivingLicensePhoto
-				deletedAt
-				createdAt
-				updatedAt
-				accessToken
-			}
-		}
-	}
-`;
-
-export const GET_AGENT_PROPERTIES = gql`
-	query GetAgentProperties($input: AgentPropertiesInquiry!) {
-		getAgentProperties(input: $input) {
-			list {
-				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyComments
-				propertyRank
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
-				memberId
-				soldAt
-				deletedAt
-				constructedAt
-				createdAt
-				updatedAt
-				meLiked {
-					memberId
-					likeRefId
-					myFavorite
-				}
-			}
-			metaCounter {
-				total
-			}
-		}
-	}
-`;
-
-/**************************
  *      BOARD-ARTICLE     *
  *************************/
 
@@ -894,6 +714,101 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 					likeRefId
 					myFavorite
 				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *         BOOKING        *
+ *************************/
+
+export const GET_BOOKING = gql`
+	query GetBooking($input: String!) {
+		getBooking(input: $input) {
+			_id
+			userId
+			agentId
+			carId
+			startDate
+			endDate
+			totalPrice
+			bookingStatus
+			paymentStatus
+			createdAt
+			updatedAt
+			deletedAt
+		}
+	}
+`;
+
+export const GET_MY_BOOKINGS = gql`
+	query GetMyBookings($input: BookingInquiry!) {
+		getMyBookings(input: $input) {
+			list {
+				_id
+				userId
+				agentId
+				carId
+				startDate
+				endDate
+				totalPrice
+				bookingStatus
+				paymentStatus
+				createdAt
+				updatedAt
+				deletedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_AGENT_BOOKINGS_BY_AGENT = gql`
+	query GetAgentBookingsByAGent($input: BookingInquiry!) {
+		getAgentBookingsByAGent(input: $input) {
+			list {
+				_id
+				userId
+				agentId
+				carId
+				startDate
+				endDate
+				totalPrice
+				bookingStatus
+				paymentStatus
+				createdAt
+				updatedAt
+				deletedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_ADMIN_BOOKINGS = gql`
+	query GetAdminBookingsByAdmin($input: BookingInquiry!) {
+		getAdminBookingsByAdmin(input: $input) {
+			list {
+				_id
+				userId
+				agentId
+				carId
+				startDate
+				endDate
+				totalPrice
+				bookingStatus
+				paymentStatus
+				createdAt
+				updatedAt
+				deletedAt
 			}
 			metaCounter {
 				total

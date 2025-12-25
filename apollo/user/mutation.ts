@@ -397,125 +397,6 @@ export const LIKE_TARGET_CAR = gql`
 `;
 
 /**************************
- *        PROPERTY        *
- *************************/
-
-export const CREATE_PROPERTY = gql`
-	mutation CreateProperty($input: PropertyInput!) {
-		createProperty(input: $input) {
-			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyComments
-			propertyRank
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
-			memberId
-			soldAt
-			deletedAt
-			constructedAt
-			createdAt
-			updatedAt
-			meLiked {
-				memberId
-				likeRefId
-				myFavorite
-			}
-			memberData {
-				_id
-				memberType
-				memberStatus
-				memberAuthType
-				memberPhone
-				memberNick
-				memberFullName
-				memberImage
-				memberAddress
-				memberDesc
-				memberCars
-				memberArticles
-				memberFollowers
-				memberFollowings
-				memberPoints
-				memberLikes
-				memberViews
-				memberComments
-				memberRank
-				memberWarnings
-				memberBlocks
-				drivingLicenseNumber
-				drivingLicensePhoto
-				deletedAt
-				createdAt
-				updatedAt
-				accessToken
-			}
-		}
-	}
-`;
-
-export const UPDATE_PROPERTY = gql`
-	mutation UpdateProperty($input: PropertyUpdate!) {
-		updateProperty(input: $input) {
-			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyComments
-			propertyRank
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
-			memberId
-			soldAt
-			deletedAt
-			constructedAt
-			createdAt
-			updatedAt
-			meLiked {
-				memberId
-				likeRefId
-				myFavorite
-			}
-		}
-	}
-`;
-
-export const LIKE_TARGET_PROPERTY = gql`
-	mutation LikeTargetProperty($input: String!) {
-		likeTargetProperty(propertyId: $input) {
-			_id
-			propertyLikes
-			meLiked {
-				memberId
-				likeRefId
-				myFavorite
-			}
-		}
-	}
-`;
-
-/**************************
  *      ARTICLE     *
  *************************/
 
@@ -833,6 +714,86 @@ export const UNSUBSCRIBE = gql`
 				updatedAt
 				accessToken
 			}
+		}
+	}
+`;
+
+/**************************
+ * 	   Booking        *
+ * *************************/
+
+export const CREATE_BOOKING = gql`
+	mutation CreateBooking($input: BookingInput!) {
+		createBooking(input: $input) {
+			_id
+			userId
+			agentId
+			carId
+			startDate
+			endDate
+			totalPrice
+			bookingStatus
+			paymentStatus
+			createdAt
+			updatedAt
+			deletedAt
+		}
+	}
+`;
+
+export const CANCELLE_BOOKING = gql`
+	mutation CancelBooking($input: String!) {
+		cancelBooking(input: $input) {
+			_id
+			userId
+			agentId
+			carId
+			startDate
+			endDate
+			totalPrice
+			bookingStatus
+			paymentStatus
+			createdAt
+			updatedAt
+			deletedAt
+		}
+	}
+`;
+
+export const UPDATE_BOOKING_BY_ADMIN = gql`
+	mutation UpdateBookingByAdmin($input: BookingUpdate!) {
+		updateBookingByAdmin(input: $input) {
+			_id
+			userId
+			agentId
+			carId
+			startDate
+			endDate
+			totalPrice
+			bookingStatus
+			paymentStatus
+			createdAt
+			updatedAt
+			deletedAt
+		}
+	}
+`;
+
+export const APPROVE_BOOKING_BY_AGENT = gql`
+	mutation ApproveBookingByAgent($input: String!) {
+		approveBookingByAgent(input: $input) {
+			_id
+			userId
+			agentId
+			carId
+			startDate
+			endDate
+			totalPrice
+			bookingStatus
+			paymentStatus
+			createdAt
+			updatedAt
+			deletedAt
 		}
 	}
 `;
