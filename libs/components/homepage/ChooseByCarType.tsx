@@ -2,6 +2,7 @@ import React from 'react';
 import { Stack, Button, IconButton } from '@mui/material';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import { CarType } from '../../enum/car.enum';
+import { useRouter } from 'next/router';
 
 type CarTypeCard = {
 	type: CarType;
@@ -23,6 +24,26 @@ const CAR_TYPE_CARDS: CarTypeCard[] = [
 ];
 
 const ChooseByCarType = () => {
+	const router = useRouter();
+
+	const handleTypeClick = (type: CarType) => {
+		const input = {
+			page: 1,
+			limit: 9,
+			sort: 'carLikes',
+			direction: 'DESC',
+			search: {
+				carType: [type],
+			},
+		};
+		const encoded = encodeURIComponent(JSON.stringify(input));
+		router.push(`/car?input=${encoded}`);
+	};
+
+	const handleViewMore = () => {
+		router.push('/car');
+	};
+
 	return (
 		<Stack className="choose-by-type">
 			<Stack className="container">
@@ -31,14 +52,20 @@ const ChooseByCarType = () => {
 						<h3>Browse by Type</h3>
 						<p>Find the perfect ride for any occasion</p>
 					</div>
-					<Button className="view-more" variant="contained" color="success" endIcon={<ArrowForwardIosRoundedIcon />}>
+					<Button
+						className="view-more"
+						variant="contained"
+						color="success"
+						endIcon={<ArrowForwardIosRoundedIcon />}
+						onClick={handleViewMore}
+					>
 						View More
 					</Button>
 				</Stack>
 
 				<div className="grid">
 					{CAR_TYPE_CARDS.map((item) => (
-						<div key={item.type} className="type-card">
+						<div key={item.type} className="type-card" role="button" onClick={() => handleTypeClick(item.type)}>
 							<div className="thumb" style={{ backgroundImage: item.thumb ? `url(${item.thumb})` : item.gradient }}>
 								{!item.thumb && <span className="thumb-badge">{item.label}</span>}
 							</div>
@@ -46,7 +73,15 @@ const ChooseByCarType = () => {
 								<div className="title">{item.label}</div>
 								<div className="card-footer">
 									<span className="count-pill">{item.count} Vehicles</span>
-									<IconButton size="small" className="arrow-btn" aria-label={`View ${item.label}`}>
+									<IconButton
+										size="small"
+										className="arrow-btn"
+										aria-label={`View ${item.label}`}
+										onClick={(e) => {
+											e.stopPropagation();
+											handleTypeClick(item.type);
+										}}
+									>
 										<ArrowForwardIosRoundedIcon fontSize="small" />
 									</IconButton>
 								</div>
