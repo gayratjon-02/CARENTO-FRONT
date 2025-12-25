@@ -33,7 +33,7 @@ import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
-import { CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/user/mutation';
+import { CREATE_BOOKING, CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/user/mutation';
 import { GET_CAR, GET_CARS, GET_COMMENTS } from '../../apollo/user/query';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
 import CarCard from '../../libs/components/car/CarCard';
@@ -65,6 +65,7 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 
 	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
 	const [createComment] = useMutation(CREATE_COMMENT);
+	const [createBooking] = useMutation(CREATE_BOOKING);
 
 	const {
 		loading: carLoading,
@@ -201,6 +202,32 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 		} catch (err: any) {
 			await sweetMixinErrorAlert(err.message);
 			throw err;
+		}
+	};
+
+	const handleBookOnline = async () => {
+		try {
+			if (!user?._id) throw new Error(Message.NOT_AUTHENTICATED);
+			if (!car?._id) throw new Error(Message.NO_DATA_FOUND);
+
+			const startDate = new Date();
+			const endDate = new Date();
+			endDate.setDate(startDate.getDate() + 1);
+
+			const input = {
+				userId: user._id,
+				agentId: (car as any)?.memberData?._id ?? (car as any)?.memberId ?? null,
+				carId: car._id,
+				startDate: startDate.toISOString(),
+				endDate: endDate.toISOString(),
+				totalPrice: Number((car as any)?.pricePerDay ?? 0),
+			};
+
+			await createBooking({ variables: { input } });
+			await sweetTopSmallSuccessAlert('Booked', 900);
+			await router.push(`/booking/booking?id=${car._id}`);
+		} catch (err: any) {
+			await sweetErrorHandling(err);
 		}
 	};
 
@@ -504,7 +531,7 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 							<Button className="cta" startIcon={<PhoneRoundedIcon />} href={car?.memberData?.memberPhone ? `tel:${car.memberData.memberPhone}` : undefined} disabled={!car?.memberData?.memberPhone}>
 								Call dealer
 							</Button>
-							<Button className="cta ghost" onClick={() => router.push(`/booking/booking?id=${car?._id}`)}>
+							<Button className="cta ghost" onClick={handleBookOnline}>
 								Book online
 							</Button>
 							<Button className="ghost" onClick={(e) => onLike(e as any)}>

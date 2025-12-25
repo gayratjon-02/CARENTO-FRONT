@@ -1,50 +1,124 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useLazyQuery, useQuery, useReactiveVar } from '@apollo/client';
+import { userVar } from '../../apollo/store';
+import { GET_CAR, GET_MY_BOOKINGS } from '../../apollo/user/query';
+import { Direction } from '../../libs/enums/common.enum';
+import { REACT_APP_API_URL } from '../../libs/config';
 
-type BookingItem = {
-	id: string;
-	title: string;
-	category: string;
-	image: string;
-	price: number;
-	specs: string[];
-	benefits: string[];
+type BookingRecord = {
+	_id: string;
+	carId: string;
+	agentId?: string | null;
+	userId?: string | null;
+	startDate?: string | null;
+	endDate?: string | null;
+	totalPrice?: number | null;
+	bookingStatus?: string | null;
+	paymentStatus?: string | null;
 };
 
-const cars: BookingItem[] = [
-	{
-		id: 'hyundai',
-		title: 'Hyundai i30',
-		category: 'Compact',
-		image: '/img/cars/hyundai-motor-group-DxysNzamx4g-unsplash.jpg',
-		price: 2500,
-		specs: ['5 seats', '2 bags', '5 doors', 'Manual', 'A/C'],
-		benefits: ['Mileage: 1400 miles per rental', 'Collision Damage Waiver', 'Airport surcharge', 'VAT (value added tax)'],
-	},
-	{
-		id: 'fiat',
-		title: 'Fiat 500',
-		category: 'Economy',
-		image: '/img/cars/josh-berquist-_4sWbzH5fp8-unsplash.jpg',
-		price: 1800,
-		specs: ['4 seats', '1 bag', '2 doors', 'Manual', 'A/C'],
-		benefits: ['Mileage: 665 miles per rental', 'Roadside Assistance', 'VAT included'],
-	},
-	{
-		id: 'skoda',
-		title: 'Skoda Octavia',
-		category: 'Standard',
-		image: '/img/cars/serjan-midili-Hjl6WPNNI_c-unsplash.jpg',
-		price: 3000,
-		specs: ['5 seats', '2 bags', '5 doors', 'Automatic', 'A/C'],
-		benefits: ['Unlimited mileage', 'Free cancellation', 'Online check-in available'],
-	},
-];
+type CarRecord = {
+	_id: string;
+	carTitle?: string;
+	carType?: string;
+	carImages?: string[];
+	seats?: number;
+	doors?: number;
+	brandType?: string;
+	transmission?: string;
+	fuelType?: string;
+	pricePerDay?: number;
+};
+
+const fmtDate = (v?: string | null) => {
+	if (!v) return '—';
+	const d = new Date(v);
+	if (Number.isNaN(d.getTime())) return '—';
+	return d.toLocaleDateString();
+};
 
 const Booking = () => {
 	const router = useRouter();
+	const user = useReactiveVar(userVar);
 	const { id } = router.query;
+	const [bookings, setBookings] = useState<BookingRecord[]>([]);
+	const [carsMap, setCarsMap] = useState<Record<string, CarRecord>>({});
+
+	const [fetchCar] = useLazyQuery(GET_CAR, { fetchPolicy: 'cache-first' });
+
+	const { loading: bookingsLoading } = useQuery(GET_MY_BOOKINGS, {
+		variables: {
+			input: {
+				page: 1,
+				limit: 30,
+				sort: 'createdAt',
+				direction: Direction.DESC,
+				search: {},
+			},
+		},
+		skip: !user?._id,
+		onCompleted: async (data) => {
+			const list = data?.getMyBookings?.list ?? [];
+			setBookings(list);
+			await hydrateCars(list);
+		},
+	});
+
+	const hydrateCars = async (list: BookingRecord[]) => {
+		const missingIds = list.map((b) => b.carId).filter((cid) => cid && !carsMap[cid]);
+		if (!missingIds.length) return;
+
+		const results = await Promise.all(
+			missingIds.map(async (cid) => {
+				try {
+					const res = await fetchCar({ variables: { input: cid }, fetchPolicy: 'network-only' });
+					const car = (res?.data as any)?.getCar as CarRecord | undefined;
+					return car?._id ? car : null;
+				} catch {
+					return null;
+				}
+			}),
+		);
+
+		const nextMap: Record<string, CarRecord> = {};
+		results.forEach((car) => {
+			if (car?._id) nextMap[car._id] = car;
+		});
+		if (Object.keys(nextMap).length) {
+			setCarsMap((prev) => ({ ...prev, ...nextMap }));
+		}
+	};
+
+	const cards = useMemo(() => {
+		if (!bookings.length) return [];
+		return bookings.map((b) => {
+			const car = carsMap[b.carId];
+			const firstImage = Array.isArray(car?.carImages) && car?.carImages[0] ? `${REACT_APP_API_URL}/${car!.carImages![0]}` : '/img/cars/hero-car.jpg';
+			const specs: string[] = [];
+			if (car?.seats) specs.push(`${car.seats} seats`);
+			if (car?.doors) specs.push(`${car.doors} doors`);
+			if (car?.transmission) specs.push(car.transmission);
+			if (car?.fuelType) specs.push(car.fuelType);
+
+			return {
+				id: b._id,
+				carId: b.carId,
+				title: car?.carTitle || 'Booked car',
+				category: car?.carType || '—',
+				image: firstImage,
+				price: b.totalPrice ?? car?.pricePerDay ?? 0,
+				specs: specs.length ? specs : ['Details pending'],
+				benefits: [
+					`Start: ${fmtDate(b.startDate)}`,
+					`End: ${fmtDate(b.endDate)}`,
+					`Status: ${b.bookingStatus ?? '—'}`,
+					`Payment: ${b.paymentStatus ?? '—'}`,
+				],
+			};
+		});
+	}, [bookings, carsMap]);
 
 	return (
 		<>
@@ -104,7 +178,10 @@ const Booking = () => {
 						</div>
 
 						<div className="cards">
-							{cars.map((car) => (
+							{!user?._id && <div className="empty">Please login to view your bookings.</div>}
+							{user?._id && bookingsLoading && <div className="empty">Loading bookings…</div>}
+							{user?._id && !bookingsLoading && !cards.length && <div className="empty">No bookings yet.</div>}
+							{cards.map((car) => (
 								<div className="card" key={car.id}>
 									<div className="card__media">
 										<img src={car.image} alt={car.title} />
@@ -116,7 +193,7 @@ const Booking = () => {
 												<span className="badge badge-muted">{car.category}</span>
 											</div>
 											<div className="price">
-												<span>${car.price.toLocaleString()}</span>
+												<span>${(car.price || 0).toLocaleString()}</span>
 												<small>Cost of rental</small>
 											</div>
 										</div>
@@ -143,7 +220,9 @@ const Booking = () => {
 												<span className="perk">Free cancellation</span>
 												<span className="perk">Online check-in</span>
 											</div>
-											<button className="book-btn">Book now</button>
+											<button className="book-btn" onClick={() => router.push(`/booking/booking?id=${car.carId || car.id}`)}>
+												View booking
+											</button>
 										</div>
 									</div>
 								</div>
