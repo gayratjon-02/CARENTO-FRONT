@@ -427,7 +427,7 @@ const AdminShell: React.FC<AdminShellProps> = ({
 								onClick={() => onRangeChange('30d')}
 							>
 								<CalendarMonthIcon fontSize="small" />
-								30d
+								3d
 							</button>
 						</div>
 

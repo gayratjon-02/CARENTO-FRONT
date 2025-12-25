@@ -1,32 +1,76 @@
 import Head from 'next/head';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminShell from '../../components/admin/AdminShell';
 
 type RangeKey = 'today' | '7d' | '30d';
 
+type PasswordPolicy = 'standard' | 'strict';
+
+type AdminSettingsState = {
+	companyName: string;
+	supportEmail: string;
+	timezone: string;
+	currency: string;
+	sessionTimeout: number;
+
+	enable2FA: boolean;
+	passwordPolicy: PasswordPolicy;
+
+	emailNotifs: boolean;
+	slackNotifs: boolean;
+
+	maintenanceMode: boolean;
+	maintenanceNote: string;
+};
+
 const AdminSettingsPage = () => {
 	const [range, setRange] = useState<RangeKey>('7d');
+	const [isMobile, setIsMobile] = useState(false);
 
-	// Mock settings state (keyinchalik API bilan ulaysiz)
-	const [companyName, setCompanyName] = useState('Carento Admin');
-	const [supportEmail, setSupportEmail] = useState('support@carento.com');
-	const [timezone, setTimezone] = useState('Asia/Seoul');
-	const [currency, setCurrency] = useState('USD');
-	const [sessionTimeout, setSessionTimeout] = useState(30); // minutes
+	useEffect(() => {
+		const onResize = () => setIsMobile(window.innerWidth < 920);
+		onResize();
+		window.addEventListener('resize', onResize);
+		return () => window.removeEventListener('resize', onResize);
+	}, []);
 
-	const [enable2FA, setEnable2FA] = useState(true);
-	const [passwordPolicy, setPasswordPolicy] = useState<'standard' | 'strict'>('strict');
+	// Initial state (keyinchalik API'dan keladi)
+	const initialState: AdminSettingsState = {
+		companyName: 'Carento Admin',
+		supportEmail: 'support@carento.com',
+		timezone: 'Asia/Seoul',
+		currency: 'USD',
+		sessionTimeout: 30,
 
-	const [emailNotifs, setEmailNotifs] = useState(true);
-	const [slackNotifs, setSlackNotifs] = useState(false);
+		enable2FA: true,
+		passwordPolicy: 'strict',
 
-	const [maintenanceMode, setMaintenanceMode] = useState(false);
+		emailNotifs: true,
+		slackNotifs: false,
+
+		maintenanceMode: false,
+		maintenanceNote: '',
+	};
+
+	const initialRef = useRef<AdminSettingsState>(initialState);
+
+	const [state, setState] = useState<AdminSettingsState>(initialState);
 
 	const rangeLabel = useMemo(() => {
 		if (range === 'today') return 'Today';
 		if (range === '7d') return 'Last 7 days';
 		return 'Last 30 days';
 	}, [range]);
+
+	const envLabel = useMemo(() => {
+		const v = process.env.NEXT_PUBLIC_APP_ENV || process.env.NODE_ENV || 'local';
+		return String(v).toUpperCase();
+	}, []);
+
+	const isDirty = useMemo(() => {
+		// Bu yerda hammasi primitive bo‘lgani uchun stringify yetarli
+		return JSON.stringify(state) !== JSON.stringify(initialRef.current);
+	}, [state]);
 
 	const styles: Record<string, React.CSSProperties> = {
 		page: { display: 'flex', flexDirection: 'column', gap: 12 },
@@ -76,6 +120,7 @@ const AdminSettingsPage = () => {
 			letterSpacing: -0.2,
 			cursor: 'pointer',
 			boxShadow: '0 10px 22px rgba(79,139,255,.18)',
+			opacity: isDirty ? 1 : 0.55,
 		},
 
 		grid: {
@@ -107,8 +152,7 @@ const AdminSettingsPage = () => {
 
 		cardBody: { padding: 14, display: 'flex', flexDirection: 'column', gap: 12 },
 
-		row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
-		rowSingle: { display: 'grid', gridTemplateColumns: '1fr', gap: 10 },
+		row: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 },
 
 		label: { fontSize: 12.5, fontWeight: 900, color: '#475467', marginBottom: 6 },
 		input: {
@@ -137,6 +181,21 @@ const AdminSettingsPage = () => {
 			color: '#0b1220',
 			boxShadow: '0 6px 16px rgba(16,24,40,.06)',
 			cursor: 'pointer',
+		},
+
+		textarea: {
+			width: '100%',
+			minHeight: 92,
+			padding: 12,
+			borderRadius: 14,
+			border: '1px solid rgba(16, 24, 40, 0.12)',
+			background: '#fff',
+			outline: 'none',
+			fontSize: 13.5,
+			fontWeight: 800,
+			color: '#0b1220',
+			boxShadow: '0 6px 16px rgba(16,24,40,.06)',
+			resize: 'vertical',
 		},
 
 		toggleRow: {
@@ -205,19 +264,22 @@ const AdminSettingsPage = () => {
 			alignSelf: 'flex-start',
 		},
 
-		// responsive feel
-		col6: { gridColumn: 'span 6 / span 6' },
+		col6: { gridColumn: isMobile ? 'span 12 / span 12' : 'span 6 / span 6' },
 		col12: { gridColumn: 'span 12 / span 12' },
 	};
 
-	const Switch = ({ on, setOn }: { on: boolean; setOn: (v: boolean) => void }) => (
+	const Switch = ({ on, setOn, label }: { on: boolean; setOn: (v: boolean) => void; label: string }) => (
 		<div
 			role="switch"
+			aria-label={label}
 			aria-checked={on}
 			tabIndex={0}
 			onClick={() => setOn(!on)}
 			onKeyDown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') setOn(!on);
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					setOn(!on);
+				}
 			}}
 			style={{ ...styles.switch, ...(on ? styles.switchOn : {}) }}
 		>
@@ -226,13 +288,21 @@ const AdminSettingsPage = () => {
 	);
 
 	const onSave = () => {
-		// keyinchalik API call qilasiz
+		// Keyinchalik: UPDATE_SETTINGS mutationga shu payload ketadi
+		const payload = {
+			...state,
+			// optional: range serverga kerak bo‘lsa:
+			range,
+		};
+
+		console.log('SETTINGS_PAYLOAD', payload);
 		alert('Saved (demo). Hook this up to your API.');
 	};
 
 	const onReset = () => {
-		const ok = confirm('Reset demo data? This cannot be undone.');
-		if (ok) alert('Demo data reset (demo). Hook up to your API.');
+		const ok = confirm('Reset settings to defaults?');
+		if (!ok) return;
+		setState(initialRef.current);
 	};
 
 	return (
@@ -249,7 +319,6 @@ const AdminSettingsPage = () => {
 				activePath="/_admin/settings"
 			>
 				<div style={styles.page}>
-					{/* Top actions */}
 					<div style={styles.topBar}>
 						<div style={styles.topLeft}>
 							<p style={styles.title}>Configuration</p>
@@ -257,8 +326,8 @@ const AdminSettingsPage = () => {
 						</div>
 
 						<div style={styles.topRight}>
-							<span style={styles.pill}>Environment: Local</span>
-							<button type="button" style={styles.btnPrimary} onClick={onSave}>
+							<span style={styles.pill}>Environment: {envLabel}</span>
+							<button type="button" style={styles.btnPrimary} onClick={onSave} disabled={!isDirty}>
 								Save changes
 							</button>
 						</div>
@@ -275,14 +344,18 @@ const AdminSettingsPage = () => {
 								<div style={styles.row}>
 									<div>
 										<div style={styles.label}>Company name</div>
-										<input style={styles.input} value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+										<input
+											style={styles.input}
+											value={state.companyName}
+											onChange={(e) => setState((p) => ({ ...p, companyName: e.target.value }))}
+										/>
 									</div>
 									<div>
 										<div style={styles.label}>Support email</div>
 										<input
 											style={styles.input}
-											value={supportEmail}
-											onChange={(e) => setSupportEmail(e.target.value)}
+											value={state.supportEmail}
+											onChange={(e) => setState((p) => ({ ...p, supportEmail: e.target.value }))}
 										/>
 									</div>
 								</div>
@@ -290,7 +363,11 @@ const AdminSettingsPage = () => {
 								<div style={styles.row}>
 									<div>
 										<div style={styles.label}>Timezone</div>
-										<select style={styles.select} value={timezone} onChange={(e) => setTimezone(e.target.value)}>
+										<select
+											style={styles.select}
+											value={state.timezone}
+											onChange={(e) => setState((p) => ({ ...p, timezone: e.target.value }))}
+										>
 											<option value="Asia/Seoul">Asia/Seoul</option>
 											<option value="UTC">UTC</option>
 											<option value="Europe/London">Europe/London</option>
@@ -299,7 +376,11 @@ const AdminSettingsPage = () => {
 									</div>
 									<div>
 										<div style={styles.label}>Currency</div>
-										<select style={styles.select} value={currency} onChange={(e) => setCurrency(e.target.value)}>
+										<select
+											style={styles.select}
+											value={state.currency}
+											onChange={(e) => setState((p) => ({ ...p, currency: e.target.value }))}
+										>
 											<option value="USD">USD</option>
 											<option value="KRW">KRW</option>
 											<option value="EUR">EUR</option>
@@ -322,7 +403,11 @@ const AdminSettingsPage = () => {
 										<p style={styles.toggleTitle}>Two-factor authentication</p>
 										<p style={styles.toggleSub}>Require 2FA for all admin accounts</p>
 									</div>
-									<Switch on={enable2FA} setOn={setEnable2FA} />
+									<Switch
+										label="Two-factor authentication"
+										on={state.enable2FA}
+										setOn={(v) => setState((p) => ({ ...p, enable2FA: v }))}
+									/>
 								</div>
 
 								<div style={styles.row}>
@@ -330,8 +415,8 @@ const AdminSettingsPage = () => {
 										<div style={styles.label}>Password policy</div>
 										<select
 											style={styles.select}
-											value={passwordPolicy}
-											onChange={(e) => setPasswordPolicy(e.target.value as any)}
+											value={state.passwordPolicy}
+											onChange={(e) => setState((p) => ({ ...p, passwordPolicy: e.target.value as PasswordPolicy }))}
 										>
 											<option value="standard">Standard</option>
 											<option value="strict">Strict</option>
@@ -344,8 +429,8 @@ const AdminSettingsPage = () => {
 											type="number"
 											min={5}
 											max={240}
-											value={sessionTimeout}
-											onChange={(e) => setSessionTimeout(Number(e.target.value))}
+											value={state.sessionTimeout}
+											onChange={(e) => setState((p) => ({ ...p, sessionTimeout: Number(e.target.value) }))}
 										/>
 									</div>
 								</div>
@@ -364,7 +449,11 @@ const AdminSettingsPage = () => {
 										<p style={styles.toggleTitle}>Email notifications</p>
 										<p style={styles.toggleSub}>Send booking/payment alerts to admins</p>
 									</div>
-									<Switch on={emailNotifs} setOn={setEmailNotifs} />
+									<Switch
+										label="Email notifications"
+										on={state.emailNotifs}
+										setOn={(v) => setState((p) => ({ ...p, emailNotifs: v }))}
+									/>
 								</div>
 
 								<div style={styles.toggleRow}>
@@ -372,12 +461,16 @@ const AdminSettingsPage = () => {
 										<p style={styles.toggleTitle}>Slack notifications</p>
 										<p style={styles.toggleSub}>Post critical events to Slack channel</p>
 									</div>
-									<Switch on={slackNotifs} setOn={setSlackNotifs} />
+									<Switch
+										label="Slack notifications"
+										on={state.slackNotifs}
+										setOn={(v) => setState((p) => ({ ...p, slackNotifs: v }))}
+									/>
 								</div>
 							</div>
 						</div>
 
-						{/* Maintenance */}
+						{/* Operations */}
 						<div style={{ ...styles.card, ...styles.col6 }}>
 							<div style={styles.cardHead}>
 								<h4 style={styles.cardTitle}>Operations</h4>
@@ -389,35 +482,55 @@ const AdminSettingsPage = () => {
 										<p style={styles.toggleTitle}>Maintenance mode</p>
 										<p style={styles.toggleSub}>Restrict access for non-admin users</p>
 									</div>
-									<Switch on={maintenanceMode} setOn={setMaintenanceMode} />
+									<Switch
+										label="Maintenance mode"
+										on={state.maintenanceMode}
+										setOn={(v) => setState((p) => ({ ...p, maintenanceMode: v }))}
+									/>
 								</div>
 
-								<div style={styles.rowSingle}>
-									<div>
-										<div style={styles.label}>Notes</div>
-										<input
-											style={styles.input}
-											placeholder="Optional: show message during maintenance"
-											defaultValue=""
-											onChange={() => void 0}
-										/>
-									</div>
+								<div>
+									<div style={styles.label}>Notes</div>
+									<textarea
+										style={styles.textarea}
+										placeholder="Optional: show message during maintenance"
+										value={state.maintenanceNote}
+										onChange={(e) => setState((p) => ({ ...p, maintenanceNote: e.target.value }))}
+									/>
 								</div>
 							</div>
 
-							{/* Danger zone */}
 							<div style={styles.dangerWrap}>
 								<p style={styles.dangerTitle}>Danger zone</p>
 								<p style={styles.dangerText}>
 									These actions are destructive. Use only in development or with explicit approval.
 								</p>
-								<button type="button" style={styles.btnDanger} onClick={onReset}>
-									Reset demo data
-								</button>
+
+								<div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+									<button type="button" style={styles.btnDanger} onClick={onReset}>
+										Reset to defaults
+									</button>
+
+									<button
+										type="button"
+										style={{
+											...styles.btnDanger,
+											background: 'linear-gradient(135deg, rgba(148,163,184,.95), rgba(71,85,105,.95))',
+											borderColor: 'rgba(148,163,184,.28)',
+											boxShadow: '0 10px 22px rgba(71,85,105,.12)',
+										}}
+										onClick={() => {
+											initialRef.current = state;
+											alert('Default snapshot updated (demo).');
+										}}
+									>
+										Set current as default
+									</button>
+								</div>
 							</div>
 						</div>
 
-						{/* Footer note */}
+						{/* Summary */}
 						<div style={{ ...styles.card, ...styles.col12 }}>
 							<div style={styles.cardHead}>
 								<h4 style={styles.cardTitle}>Summary</h4>
@@ -427,21 +540,21 @@ const AdminSettingsPage = () => {
 								<div style={styles.row}>
 									<div>
 										<div style={styles.label}>Company</div>
-										<input style={styles.input} value={companyName} readOnly />
+										<input style={styles.input} value={state.companyName} readOnly />
 									</div>
 									<div>
 										<div style={styles.label}>Support</div>
-										<input style={styles.input} value={supportEmail} readOnly />
+										<input style={styles.input} value={state.supportEmail} readOnly />
 									</div>
 								</div>
 								<div style={styles.row}>
 									<div>
 										<div style={styles.label}>Timezone</div>
-										<input style={styles.input} value={timezone} readOnly />
+										<input style={styles.input} value={state.timezone} readOnly />
 									</div>
 									<div>
 										<div style={styles.label}>Currency</div>
-										<input style={styles.input} value={currency} readOnly />
+										<input style={styles.input} value={state.currency} readOnly />
 									</div>
 								</div>
 							</div>

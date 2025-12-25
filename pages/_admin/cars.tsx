@@ -365,16 +365,6 @@ const AdminCarsPage = () => {
 
 						<div style={styles.right}>
 							<span style={styles.count}>{loading ? 'Loading…' : `${filtered.length} results`}</span>
-
-							<button
-								type="button"
-								style={styles.primaryBtn}
-								onClick={() => alert('Hook up to your create-car modal/page')}
-								disabled={loading}
-							>
-								<AddIcon fontSize="small" />
-								Add car
-							</button>
 						</div>
 					</div>
 
