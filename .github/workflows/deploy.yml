@@ -10,21 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ SSH keyni faylga tayyorlash (base64 -> file)
     - name: Prepare SSH key
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY_B64 }}" | base64 -d > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
+        echo "${{ secrets.SSH_KEY_B64 }}" | base64 -d > "${{ github.workspace }}/deploy_key"
+        chmod 600 "${{ github.workspace }}/deploy_key"
 
-    # 2️⃣ Serverga SSH orqali deploy
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
         port: ${{ secrets.SSH_PORT }}
-        key_path: ~/.ssh/deploy_key
+        key_path: ${{ github.workspace }}/deploy_key
         script: |
           set -e
           cd /home/carento-project/CARENTO-FRONT
