@@ -16,7 +16,7 @@ import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/user/mutation';
+import { CREATE_COMMENT, LIKE_TARGET_CAR, SUBSCRIBE, UNSUBSCRIBE } from '../../apollo/user/mutation';
 import { GET_CARS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import DealerCarCard from '../../libs/components/dealers/DealerCarCard';
@@ -45,11 +45,21 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 		commentContent: '',
 		commentRefId: '',
 	});
+	const [followingState, setFollowingState] = useState<boolean | null>(null);
 	const carsTotal = useMemo(() => Number((agent as any)?.memberCars ?? agent?.memberProperties ?? 0), [agent]);
+	const isFollowing = useMemo(() => {
+		const mf: any = (agent as any)?.meFollowed;
+		if (!mf) return false;
+		if (Array.isArray(mf)) return mf.some((m) => m?.myFollowing);
+		return Boolean(mf?.myFollowing);
+	}, [agent]);
+	const displayFollowing = followingState === null ? isFollowing : followingState;
 
 	/** APOLLO REQUESTS **/
 	const [createComment] = useMutation(CREATE_COMMENT);
 	const [likeTargetCar] = useMutation(LIKE_TARGET_CAR);
+	const [followMember] = useMutation(SUBSCRIBE);
+	const [unfollowMember] = useMutation(UNSUBSCRIBE);
 
 	const {
 		loading: getMemberLoading,
@@ -65,6 +75,13 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 			setSearchFilter((prev) => ({ ...prev, search: { ...prev.search, memberId: data?.getMember?._id } }));
 			setCommentInquiry((prev) => ({ ...prev, search: { ...prev.search, commentRefId: data?.getMember?._id } }));
 			setInsertCommentData((prev) => ({ ...prev, commentRefId: data?.getMember?._id }));
+			const nextFollow = (() => {
+				const mf: any = data?.getMember?.meFollowed;
+				if (!mf) return false;
+				if (Array.isArray(mf)) return mf.some((m) => m?.myFollowing);
+				return Boolean(mf?.myFollowing);
+			})();
+			setFollowingState(nextFollow);
 		},
 	});
 
@@ -172,6 +189,38 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
 			console.log('ERROR, likeCarHandler:', err.message);
+			sweetMixinErrorAlert(err.message).then();
+		}
+	};
+
+	const toggleFollowHandler = async () => {
+		try {
+			if (!agent?._id) return;
+			if (!user?._id) throw new Error(Messages.error2);
+			if (user?._id === agent?._id) throw new Error('You cannot follow yourself');
+
+			const nextFollow = !displayFollowing;
+
+			if (displayFollowing) {
+				await unfollowMember({ variables: { input: agent._id } });
+			} else {
+				await followMember({ variables: { input: agent._id } });
+			}
+
+			setFollowingState(nextFollow);
+			setAgent((prev) => {
+				if (!prev) return prev;
+				const mf: any = (prev as any).meFollowed;
+				const updated = Array.isArray(mf)
+					? mf.map((m) =>
+							m?.followerId === user?._id ? { ...m, myFollowing: nextFollow } : m,
+					  )
+					: { ...(mf || {}), myFollowing: nextFollow, followerId: user?._id, followingId: prev._id };
+				return { ...prev, meFollowed: updated };
+			});
+
+			await sweetTopSmallSuccessAlert(nextFollow ? 'Followed' : 'Unfollowed', 700);
+		} catch (err: any) {
 			sweetMixinErrorAlert(err.message).then();
 		}
 	};
@@ -346,8 +395,8 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 									<Button className="primary" href={`tel:${agent.memberPhone}`}>
 										Call
 									</Button>
-									<Button className="ghost" href={`tel:${agent.memberPhone}`}>
-										Save
+									<Button className="ghost" onClick={toggleFollowHandler}>
+										{displayFollowing ? 'Following' : 'Follow'}
 									</Button>
 								</Box>
 							)}
