@@ -111,7 +111,7 @@ const AdminUsersPage = () => {
 			>
 				<div className="users-filters users-filters--admin">
 					<input
-						placeholder="Search by name or phone"
+						placeholder="Search by name"
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);

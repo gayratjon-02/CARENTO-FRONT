@@ -29,7 +29,6 @@ const navItems: NavItem[] = [
 	{ label: 'Users', href: '/_admin/users', icon: <PeopleAltIcon /> },
 	{ label: 'Cars', href: '/_admin/cars', icon: <DirectionsCarFilledIcon /> },
 	{ label: 'Bookings', href: '/_admin/bookings', icon: <BookOnlineIcon /> },
-	{ label: 'Payments', href: '/_admin/payments', icon: <PaymentIcon /> },
 	{ label: 'Settings', href: '/_admin/settings', icon: <SettingsIcon /> },
 ];
 

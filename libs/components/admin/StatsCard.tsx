@@ -1,207 +1,104 @@
-import React, { CSSProperties, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 export type StatsCardProps = {
 	title: string;
 	value: string | number;
 	subtitle?: string;
-	delta?: string; // masalan: "+12.4%" yoki "-3.1%" yoki "12%"
+	delta?: string;
 	icon?: React.ReactNode;
 	loading?: boolean;
 	emptyText?: string;
 };
 
-const styles = {
-	card: {
-		display: 'flex',
-		gap: 12,
-		alignItems: 'stretch',
-		padding: 14,
-		borderRadius: 16,
-		background: '#ffffff',
-		border: '1px solid rgba(16, 24, 40, 0.10)',
-		boxShadow: '0 6px 18px rgba(16,24,40,.06)',
-		transition: 'transform .15s ease, box-shadow .15s ease, border-color .15s ease',
-		minHeight: 86,
-	} as CSSProperties,
-
-	iconWrap: {
-		flex: '0 0 auto',
-		width: 44,
-		height: 44,
-		borderRadius: 14,
-		display: 'grid',
-		placeItems: 'center',
-		background: 'linear-gradient(135deg, rgba(79,139,255,.18), rgba(127,107,255,.16))',
-		border: '1px solid rgba(79,139,255,.22)',
-		color: '#2b63ff',
-	} as CSSProperties,
-
-	body: {
-		minWidth: 0,
-		flex: 1,
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'center',
-		gap: 6,
-	} as CSSProperties,
-
-	topRow: {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		gap: 10,
-		minWidth: 0,
-	} as CSSProperties,
-
-	title: {
-		margin: 0,
-		fontSize: 12.5,
-		fontWeight: 900,
-		letterSpacing: -0.15,
-		color: '#0b1220',
-		whiteSpace: 'nowrap',
-		overflow: 'hidden',
-		textOverflow: 'ellipsis',
-	} as CSSProperties,
-
-	value: {
-		margin: 0,
-		fontSize: 22,
-		fontWeight: 950,
-		letterSpacing: -0.6,
-		color: '#0b1220',
-		lineHeight: 1.05,
-		fontVariantNumeric: 'tabular-nums',
-	} as CSSProperties,
-
-	subtitle: {
-		margin: 0,
-		fontSize: 12.5,
-		color: '#667085',
-		fontWeight: 650,
-		whiteSpace: 'nowrap',
-		overflow: 'hidden',
-		textOverflow: 'ellipsis',
-	} as CSSProperties,
-
-	deltaPillBase: {
-		flex: '0 0 auto',
-		display: 'inline-flex',
-		alignItems: 'center',
-		gap: 6,
-		padding: '4px 9px',
-		borderRadius: 999,
-		fontSize: 11.5,
-		fontWeight: 900,
-		letterSpacing: 0.2,
-		border: '1px solid rgba(16, 24, 40, 0.10)',
-		userSelect: 'none',
-		fontVariantNumeric: 'tabular-nums',
-	} as CSSProperties,
-
-	deltaDot: {
-		width: 7,
-		height: 7,
-		borderRadius: 999,
-	} as CSSProperties,
-};
-
-function normalizeValue(value: string | number, emptyText: string) {
+function normalizeValue(value: string | number | undefined, emptyText: string) {
 	if (value === null || value === undefined) return emptyText;
-	if (typeof value === 'string' && value.trim() === '') return emptyText;
+	if (typeof value === 'number') return value.toLocaleString();
 	return value;
 }
 
-function getDeltaMeta(delta?: string) {
-	if (!delta) return null;
+function getDeltaMeta(delta: string) {
+	const d = delta.trim();
+	const isPositive = d.startsWith('+');
+	const isNegative = d.startsWith('-');
 
-	const trimmed = delta.trim();
-	const isNegative = trimmed.startsWith('-') || trimmed.toLowerCase().includes('down') || trimmed.includes('▼');
-
-	const isPositive = trimmed.startsWith('+') || trimmed.toLowerCase().includes('up') || trimmed.includes('▲');
-
-	const arrow = isNegative ? '▼' : isPositive ? '▲' : '•';
-
-	if (isNegative) {
-		return {
-			pill: {
-				...styles.deltaPillBase,
-				background: 'rgba(239, 68, 68, 0.10)',
-				borderColor: 'rgba(239, 68, 68, 0.22)',
-				color: '#b42318',
-			} as CSSProperties,
-			dot: { ...styles.deltaDot, background: '#ef4444' } as CSSProperties,
-			text: `${arrow} ${trimmed.replace(/^[-+]\s*/, '')}`,
-		};
-	}
-
-	if (isPositive) {
-		return {
-			pill: {
-				...styles.deltaPillBase,
-				background: 'rgba(16, 185, 129, 0.10)',
-				borderColor: 'rgba(16, 185, 129, 0.22)',
-				color: '#067647',
-			} as CSSProperties,
-			dot: { ...styles.deltaDot, background: '#10b981' } as CSSProperties,
-			text: `${arrow} ${trimmed.replace(/^[-+]\s*/, '')}`,
-		};
-	}
-
-	// neytral
-	return {
-		pill: {
-			...styles.deltaPillBase,
-			background: 'rgba(79, 139, 255, 0.10)',
-			borderColor: 'rgba(79, 139, 255, 0.18)',
-			color: '#2b63ff',
-		} as CSSProperties,
-		dot: { ...styles.deltaDot, background: '#4f8bff' } as CSSProperties,
-		text: trimmed,
-	};
+	if (isPositive) return { bg: 'rgba(16,185,129,.12)', border: 'rgba(16,185,129,.22)', fg: '#067647' };
+	if (isNegative) return { bg: 'rgba(239,68,68,.12)', border: 'rgba(239,68,68,.22)', fg: '#b42318' };
+	return { bg: 'rgba(148,163,184,.16)', border: 'rgba(148,163,184,.26)', fg: '#334155' };
 }
 
-const StatsCard: React.FC<StatsCardProps> = ({ title, value }) => {
-	const deltaMeta = useMemo(() => getDeltaMeta(delta), [delta]);
-	const displayValue = useMemo(() => (loading ? '—' : normalizeValue(value, emptyText)), [loading, value, emptyText]);
+const StatsCard: React.FC<StatsCardProps> = ({
+	title,
+	value,
+	subtitle,
+	delta,
+	icon,
+	loading = false,
+	emptyText = 'No data',
+}) => {
+	const displayValue = useMemo(
+		() => (loading ? '—' : normalizeValue(value as any, emptyText)),
+		[loading, value, emptyText],
+	);
+
+	const deltaMeta = useMemo(() => (delta ? getDeltaMeta(delta) : null), [delta]);
+
+	const styles: Record<string, React.CSSProperties> = {
+		card: {
+			background: '#fff',
+			border: '1px solid rgba(16, 24, 40, 0.10)',
+			borderRadius: 18,
+			boxShadow: '0 10px 26px rgba(16,24,40,.08)',
+			padding: 14,
+			display: 'flex',
+			gap: 12,
+			alignItems: 'flex-start',
+			minHeight: 86,
+		},
+		iconWrap: {
+			width: 44,
+			height: 44,
+			borderRadius: 14,
+			border: '1px solid rgba(79, 139, 255, 0.18)',
+			background: 'rgba(79, 139, 255, 0.08)',
+			display: 'grid',
+			placeItems: 'center',
+			color: '#2b63ff',
+			flexShrink: 0,
+		},
+		body: { flex: 1, minWidth: 0 },
+		row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+		title: { margin: 0, fontSize: 12.5, fontWeight: 900, color: '#475467', letterSpacing: 0.2 },
+		value: { marginTop: 6, fontSize: 22, fontWeight: 950, letterSpacing: -0.6, color: '#0b1220' },
+		sub: { margin: '6px 0 0', fontSize: 12.5, fontWeight: 750, color: '#667085' },
+		delta: {
+			padding: '5px 10px',
+			borderRadius: 999,
+			border: '1px solid rgba(16, 24, 40, 0.10)',
+			fontSize: 12,
+			fontWeight: 900,
+			whiteSpace: 'nowrap',
+		},
+	};
 
 	return (
-		<div
-			style={styles.card}
-			onMouseEnter={(e) => {
-				(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-				(e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 26px rgba(16,24,40,.10)';
-				(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(79,139,255,.22)';
-			}}
-			onMouseLeave={(e) => {
-				(e.currentTarget as HTMLDivElement).style.transform = 'translateY(0px)';
-				(e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 18px rgba(16,24,40,.06)';
-				(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(16, 24, 40, 0.10)';
-			}}
-		>
-			<div style={styles.iconWrap}>{icon ?? <span style={{ fontWeight: 900 }}>•</span>}</div>
+		<div style={styles.card}>
+			{icon ? <div style={styles.iconWrap}>{icon}</div> : null}
 
 			<div style={styles.body}>
-				<div style={styles.topRow}>
-					<p style={styles.title} title={title}>
-						{title}
-					</p>
-
+				<div style={styles.row}>
+					<p style={styles.title}>{title}</p>
 					{deltaMeta && (
-						<span style={deltaMeta.pill} title={delta}>
-							<span style={deltaMeta.dot} />
-							{deltaMeta.text}
+						<span
+							style={{ ...styles.delta, background: deltaMeta.bg, borderColor: deltaMeta.border, color: deltaMeta.fg }}
+						>
+							{delta}
 						</span>
 					)}
 				</div>
 
-				<p style={styles.value}>{displayValue as any}</p>
+				<div style={styles.value}>{displayValue}</div>
 
-				{subtitle && (
-					<p style={styles.subtitle} title={subtitle}>
-						{subtitle}
-					</p>
-				)}
+				{subtitle ? <p style={styles.sub}>{subtitle}</p> : null}
 			</div>
 		</div>
 	);
