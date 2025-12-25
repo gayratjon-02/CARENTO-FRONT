@@ -504,6 +504,9 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 							<Button className="cta" startIcon={<PhoneRoundedIcon />} href={car?.memberData?.memberPhone ? `tel:${car.memberData.memberPhone}` : undefined} disabled={!car?.memberData?.memberPhone}>
 								Call dealer
 							</Button>
+							<Button className="cta ghost" onClick={() => router.push(`/car/booking?id=${car?._id}`)}>
+								Book online
+							</Button>
 							<Button className="ghost" onClick={(e) => onLike(e as any)}>
 								{liked ? 'Liked' : 'Like'}
 							</Button>
