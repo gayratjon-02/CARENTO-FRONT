@@ -79,7 +79,7 @@ const MyMenu = () => {
 
 			{user?.memberType === 'ADMIN' && (
 				<Box className="admin-link">
-					<Button onClick={() => window.open('/_admin/users', '_blank')} className="admin-btn">
+					<Button onClick={() => window.open('/_admin/', '_blank')} className="admin-btn">
 						Open Admin
 					</Button>
 				</Box>
