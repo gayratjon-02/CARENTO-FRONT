@@ -8,7 +8,6 @@ import { getJwtToken, updateStorage, updateUserInfo } from '../../auth';
 import { useMutation, useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { MemberUpdate } from '../../types/member/member.update';
-import { MemberType } from '../../enums/member.enum';
 import { UPDATE_MEMBER } from '../../../apollo/user/mutation';
 import { sweetErrorHandling, sweetMixinSuccessAlert } from '../../sweetAlert';
 
@@ -31,7 +30,6 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 			memberImage: user.memberImage ?? '',
 			memberFullName: user.memberFullName ?? '',
 			memberDesc: user.memberDesc ?? '',
-			memberType: user.memberType,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user.memberNick, user.memberPhone, user.memberAddress, user.memberImage]);
@@ -105,7 +103,6 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 			if (fullname) payload.memberFullName = fullname;
 			if (desc) payload.memberDesc = desc;
 			if (pwd) payload.memberPassword = pwd;
-			if (updateData.memberType) payload.memberType = updateData.memberType;
 
 			const result = await updateMember({
 				variables: {
@@ -250,6 +247,9 @@ MyProfile.defaultProps = {
 		memberNick: '',
 		memberPhone: '',
 		memberAddress: '',
+		memberFullName: '',
+		memberDesc: '',
+		memberPassword: '',
 	},
 };
 

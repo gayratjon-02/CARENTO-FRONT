@@ -35,6 +35,11 @@ export const GET_AGENTS = gql`
 				createdAt
 				updatedAt
 				accessToken
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
 			}
 			metaCounter {
 				total
