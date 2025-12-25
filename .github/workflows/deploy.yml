@@ -13,7 +13,7 @@ jobs:
     - name: Prepare SSH key
       run: |
         echo "${{ secrets.SSH_KEY_B64 }}" | base64 -d > "${{ github.workspace }}/deploy_key"
-        chmod 600 "${{ github.workspace }}/deploy_key"
+        chmod 644 "${{ github.workspace }}/deploy_key"
 
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
