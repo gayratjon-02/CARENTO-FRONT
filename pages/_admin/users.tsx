@@ -1,154 +1,100 @@
 import Head from 'next/head';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+
 import AdminShell from '../../components/admin/AdminShell';
 import UsersTable, { UserRow } from '../../components/admin/UsersTable';
+import { GET_ALL_MEMBERS_BY_ADMIN } from 'apollo/admin/query';
+import { UPDATE_MEMBER_BY_ADMIN } from 'apollo/admin/mutation';
+import { text } from 'stream/consumers';
 
-const mockUsers: UserRow[] = [
-	{
-		id: 'U-1001',
-		name: 'Olivia Wilde',
-		email: 'olivia@carento.com',
-		role: 'ADMIN',
-		status: 'ACTIVE',
-		createdAt: '2025-12-20',
-	},
-	{
-		id: 'U-1002',
-		name: 'James Park',
-		email: 'james@carento.com',
-		role: 'AGENT',
-		status: 'ACTIVE',
-		createdAt: '2025-12-19',
-	},
-	{
-		id: 'U-1003',
-		name: 'Sara Lee',
-		email: 'sara@carento.com',
-		role: 'USER',
-		status: 'BLOCKED',
-		createdAt: '2025-12-18',
-	},
-	{
-		id: 'U-1004',
-		name: 'Daniel Cho',
-		email: 'daniel@carento.com',
-		role: 'USER',
-		status: 'ACTIVE',
-		createdAt: '2025-12-17',
-	},
-	{
-		id: 'U-1005',
-		name: 'Emily Carter',
-		email: 'emily@carento.com',
-		role: 'AGENT',
-		status: 'ACTIVE',
-		createdAt: '2025-12-16',
-	},
-];
+type RangeKey = 'today' | '7d' | '30d';
+
+type Member = {
+	_id: string;
+	memberType?: string;
+	memberStatus?: string;
+	memberPhone?: string;
+	memberNick?: string;
+	memberFullName?: string;
+	createdAt?: string;
+};
 
 const AdminUsersPage = () => {
-	const [range, setRange] = useState<'today' | '7d' | '30d'>('7d');
+	const [range, setRange] = useState<RangeKey>('7d');
+
 	const [search, setSearch] = useState('');
 	const [role, setRole] = useState<'ALL' | 'ADMIN' | 'AGENT' | 'USER'>('ALL');
 	const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'BLOCKED'>('ALL');
 
-	const filtered = useMemo(() => {
-		return mockUsers.filter((u) => {
-			const matchesSearch = search
-				? u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-				: true;
-			const matchesRole = role === 'ALL' ? true : u.role === role;
-			const matchesStatus = status === 'ALL' ? true : u.status === status;
-			return matchesSearch && matchesRole && matchesStatus;
-		});
-	}, [search, role, status]);
+	const [page, setPage] = useState(1);
+	const limit = 20;
 
-	const styles: Record<string, React.CSSProperties> = {
-		section: {
-			display: 'flex',
-			flexDirection: 'column',
-			gap: 12,
+	const { data, loading, error, refetch } = useQuery(GET_ALL_MEMBERS_BY_ADMIN, {
+		variables: {
+			input: {
+				page: 1,
+				limit: 10,
+				search: {
+					text: search,
+					memberType: role === 'ALL' ? undefined : role,
+					memberStatus: status === 'ALL' ? undefined : status,
+				},
+			},
 		},
-		filtersCard: {
-			background: 'rgba(255,255,255,.92)',
-			border: '1px solid rgba(16, 24, 40, 0.10)',
-			borderRadius: 18,
-			boxShadow: '0 10px 26px rgba(16,24,40,.08)',
-			padding: 12,
-			display: 'flex',
-			flexWrap: 'wrap',
-			gap: 10,
-			alignItems: 'center',
-			justifyContent: 'space-between',
+		fetchPolicy: 'cache-and-network',
+	});
+
+	const [updateMemberByAdmin, updateState] = useMutation(UPDATE_MEMBER_BY_ADMIN);
+
+	const members: Member[] = data?.getAllMembersByAdmin?.list ?? [];
+	const total: number = data?.getAllMembersByAdmin?.metaCounter?.total ?? 0;
+
+	const rows: UserRow[] = useMemo(() => {
+		return members.map((m) => {
+			const name = m.memberFullName || m.memberNick || '-';
+			const emailLike = m.memberPhone || '-';
+
+			return {
+				id: m._id,
+				name,
+				email: emailLike,
+				role: (m.memberType || 'USER') as any,
+				status: (m.memberStatus || 'ACTIVE') as any,
+				createdAt: (m.createdAt || '').slice(0, 10),
+			};
+		});
+	}, [members]);
+
+	const onReset = useCallback(() => {
+		setSearch('');
+		setRole('ALL');
+		setStatus('ALL');
+		setPage(1);
+	}, []);
+
+	// ACTION: block/unblock
+	const onToggleBlock = useCallback(
+		async (row: UserRow) => {
+			const nextStatus = row.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE';
+
+			await updateMemberByAdmin({
+				variables: {
+					input: {
+						_id: row.id,
+						memberStatus: nextStatus,
+					} as any,
+				},
+			});
+
+			await refetch();
 		},
-		left: {
-			display: 'flex',
-			gap: 10,
-			flexWrap: 'wrap',
-			alignItems: 'center',
-			flex: 1,
-			minWidth: 260,
-		},
-		right: {
-			display: 'flex',
-			gap: 10,
-			flexWrap: 'wrap',
-			alignItems: 'center',
-			justifyContent: 'flex-end',
-		},
-		input: {
-			height: 40,
-			minWidth: 260,
-			flex: 1,
-			padding: '0 12px',
-			borderRadius: 14,
-			border: '1px solid rgba(16, 24, 40, 0.12)',
-			background: '#fff',
-			outline: 'none',
-			fontSize: 13.5,
-			fontWeight: 800,
-			color: '#0b1220',
-			boxShadow: '0 6px 16px rgba(16,24,40,.06)',
-		},
-		select: {
-			height: 40,
-			padding: '0 12px',
-			borderRadius: 14,
-			border: '1px solid rgba(16, 24, 40, 0.12)',
-			background: '#fff',
-			outline: 'none',
-			fontSize: 13.5,
-			fontWeight: 850,
-			color: '#0b1220',
-			boxShadow: '0 6px 16px rgba(16,24,40,.06)',
-			cursor: 'pointer',
-		},
-		ghostBtn: {
-			height: 40,
-			padding: '0 12px',
-			borderRadius: 14,
-			border: '1px solid rgba(16, 24, 40, 0.12)',
-			background: 'rgba(255,255,255,.75)',
-			fontSize: 13,
-			fontWeight: 900,
-			color: '#0b1220',
-			cursor: 'pointer',
-			boxShadow: '0 6px 16px rgba(16,24,40,.06)',
-		},
-		count: {
-			height: 40,
-			padding: '0 12px',
-			borderRadius: 14,
-			border: '1px solid rgba(79, 139, 255, 0.18)',
-			background: 'rgba(79, 139, 255, 0.08)',
-			fontSize: 13,
-			fontWeight: 950,
-			color: '#2b63ff',
-			display: 'inline-flex',
-			alignItems: 'center',
-			whiteSpace: 'nowrap',
-		},
-	};
+		[updateMemberByAdmin, refetch],
+	);
+
+	const onView = useCallback((row: UserRow) => {
+		console.log('view member', row.id);
+	}, []);
 
 	return (
 		<>
@@ -163,49 +109,63 @@ const AdminUsersPage = () => {
 				onRangeChange={setRange}
 				activePath="/_admin/users"
 			>
-				<div style={styles.section}>
-					<div style={styles.filtersCard}>
-						<div style={styles.left}>
-							<input
-								style={styles.input}
-								placeholder="Search by name or email"
-								value={search}
-								onChange={(e) => setSearch(e.target.value)}
-							/>
+				<div className="users-filters users-filters--admin">
+					<input
+						placeholder="Search by name or phone"
+						value={search}
+						onChange={(e) => {
+							setSearch(e.target.value);
+							setPage(1);
+						}}
+					/>
 
-							<select style={styles.select} value={role} onChange={(e) => setRole(e.target.value as any)}>
-								<option value="ALL">All roles</option>
-								<option value="ADMIN">Admin</option>
-								<option value="AGENT">Agent</option>
-								<option value="USER">User</option>
-							</select>
+					<select
+						value={role}
+						onChange={(e) => {
+							setRole(e.target.value as any);
+							setPage(1);
+						}}
+					>
+						<option value="ALL">All roles</option>
+						<option value="ADMIN">Admin</option>
+						<option value="AGENT">Agent</option>
+						<option value="USER">User</option>
+					</select>
 
-							<select style={styles.select} value={status} onChange={(e) => setStatus(e.target.value as any)}>
-								<option value="ALL">All status</option>
-								<option value="ACTIVE">Active</option>
-								<option value="BLOCKED">Blocked</option>
-							</select>
-						</div>
+					<select
+						value={status}
+						onChange={(e) => {
+							setStatus(e.target.value as any);
+							setPage(1);
+						}}
+					>
+						<option value="ALL">All status</option>
+						<option value="ACTIVE">Active</option>
+						<option value="BLOCKED">Blocked</option>
+					</select>
 
-						<div style={styles.right}>
-							<span style={styles.count}>{filtered.length} results</span>
-
-							<button
-								type="button"
-								style={styles.ghostBtn}
-								onClick={() => {
-									setSearch('');
-									setRole('ALL');
-									setStatus('ALL');
-								}}
-							>
-								Reset
-							</button>
-						</div>
-					</div>
-
-					<UsersTable rows={filtered} />
+					<button type="button" onClick={onReset}>
+						Reset
+					</button>
 				</div>
+
+				{error ? (
+					<div className="placeholder-card">
+						<b>Query error</b>
+						<div style={{ marginTop: 8 }}>{error.message}</div>
+					</div>
+				) : (
+					<UsersTable
+						rows={rows}
+						loading={loading || updateState.loading}
+						total={total}
+						page={page}
+						limit={limit}
+						onPageChange={setPage}
+						onView={onView}
+						onToggleBlock={onToggleBlock}
+					/>
+				)}
 			</AdminShell>
 		</>
 	);

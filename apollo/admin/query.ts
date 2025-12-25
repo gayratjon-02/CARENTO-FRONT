@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 /**************************
  *         MEMBER         *
  *************************/
-
+//done
 export const GET_ALL_MEMBERS_BY_ADMIN = gql`
 	query GetAllMembersByAdmin($input: MembersInquiry!) {
 		getAllMembersByAdmin(input: $input) {

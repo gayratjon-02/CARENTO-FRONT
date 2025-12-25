@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 export type UserRow = {
 	id: string;
@@ -15,11 +18,41 @@ export type UserRow = {
 type UsersTableProps = {
 	rows: UserRow[];
 	loading?: boolean;
+
+	// pagination (optional)
+	total?: number;
+	page?: number;
+	limit?: number;
+	onPageChange?: (page: number) => void;
+
+	// actions (optional)
+	onView?: (row: UserRow) => void;
+	onToggleBlock?: (row: UserRow) => void | Promise<void>;
 };
 
-const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
+type MenuState =
+	| {
+			open: true;
+			userId: string;
+			top: number;
+			left: number;
+	  }
+	| { open: false };
+
+const UsersTable: React.FC<UsersTableProps> = ({
+	rows,
+	loading = false,
+	total,
+	page = 1,
+	limit = 20,
+	onPageChange,
+	onView,
+	onToggleBlock,
+}) => {
 	const [hoverId, setHoverId] = useState<string | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
+	const [menu, setMenu] = useState<MenuState>({ open: false });
+	const menuRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		const onResize = () => setIsMobile(window.innerWidth < 720);
@@ -27,6 +60,28 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 		window.addEventListener('resize', onResize);
 		return () => window.removeEventListener('resize', onResize);
 	}, []);
+
+	// close menu on outside click / escape
+	useEffect(() => {
+		if (!menu.open) return;
+
+		const onDown = (e: MouseEvent) => {
+			const t = e.target as Node | null;
+			if (menuRef.current && t && menuRef.current.contains(t)) return;
+			setMenu({ open: false });
+		};
+
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') setMenu({ open: false });
+		};
+
+		document.addEventListener('mousedown', onDown);
+		document.addEventListener('keydown', onKey);
+		return () => {
+			document.removeEventListener('mousedown', onDown);
+			document.removeEventListener('keydown', onKey);
+		};
+	}, [menu.open]);
 
 	const styles = useMemo(() => {
 		const border = '1px solid rgba(16, 24, 40, 0.10)';
@@ -49,6 +104,12 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 				background: 'rgba(255,255,255,.92)',
 			} as React.CSSProperties,
 
+			headRight: {
+				display: 'flex',
+				alignItems: 'center',
+				gap: 10,
+			} as React.CSSProperties,
+
 			h4: {
 				margin: 0,
 				fontSize: 13.5,
@@ -61,6 +122,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 				fontSize: 12.5,
 				fontWeight: 800,
 				color: '#667085',
+				whiteSpace: 'nowrap',
 			} as React.CSSProperties,
 
 			wrap: {
@@ -149,6 +211,67 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 				color: '#667085',
 			} as React.CSSProperties,
 
+			// Pagination
+			pager: {
+				display: 'inline-flex',
+				alignItems: 'center',
+				gap: 6,
+			} as React.CSSProperties,
+
+			pagerBtn: {
+				height: 30,
+				padding: '0 10px',
+				borderRadius: 12,
+				border: '1px solid rgba(16, 24, 40, 0.10)',
+				background: '#fff',
+				cursor: 'pointer',
+				fontSize: 12.5,
+				fontWeight: 900,
+				color: '#0b1220',
+			} as React.CSSProperties,
+
+			pagerBtnDisabled: {
+				opacity: 0.45,
+				cursor: 'not-allowed',
+			} as React.CSSProperties,
+
+			// Menu
+			menu: {
+				position: 'fixed',
+				zIndex: 9999,
+				minWidth: 170,
+				borderRadius: 14,
+				border: '1px solid rgba(16, 24, 40, 0.10)',
+				background: '#fff',
+				boxShadow: '0 16px 40px rgba(16,24,40,.16)',
+				overflow: 'hidden',
+			} as React.CSSProperties,
+
+			menuItem: {
+				width: '100%',
+				display: 'flex',
+				alignItems: 'center',
+				gap: 10,
+				padding: '10px 12px',
+				border: 'none',
+				background: 'transparent',
+				cursor: 'pointer',
+				fontSize: 12.8,
+				fontWeight: 900,
+				color: '#0b1220',
+				textAlign: 'left',
+			} as React.CSSProperties,
+
+			menuItemMuted: {
+				color: '#475467',
+				fontWeight: 850,
+			} as React.CSSProperties,
+
+			menuDivider: {
+				height: 1,
+				background: 'rgba(16, 24, 40, 0.08)',
+			} as React.CSSProperties,
+
 			// Mobile cards
 			mobileList: {
 				display: 'flex',
@@ -226,6 +349,37 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 		return { bg: 'rgba(239,68,68,.12)', border: 'rgba(239,68,68,.22)', fg: '#b42318', dot: '#ef4444' };
 	};
 
+	const totalSafe = typeof total === 'number' ? total : rows?.length ?? 0;
+	const totalPages = Math.max(1, Math.ceil(totalSafe / Math.max(limit, 1)));
+	const canPrev = !!onPageChange && page > 1;
+	const canNext = !!onPageChange && page < totalPages;
+
+	const openMenuFor = (userId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+		const rect = e.currentTarget.getBoundingClientRect();
+		const top = rect.bottom + 8;
+		const left = Math.min(rect.left, window.innerWidth - 200);  
+
+		setMenu((prev) => {
+			if (prev.open && prev.userId === userId) return { open: false };
+			return { open: true, userId, top, left };
+		});
+	};
+
+	const currentMenuUser = useMemo(() => {
+		if (!menu.open) return null;
+		return rows.find((r) => r.id === menu.userId) || null;
+	}, [menu, rows]);
+
+	const handleView = async (u: UserRow) => {
+		setMenu({ open: false });
+		onView?.(u);
+	};
+
+	const handleToggleBlock = async (u: UserRow) => {
+		setMenu({ open: false });
+		await onToggleBlock?.(u);
+	};
+
 	if (loading) {
 		return (
 			<div style={styles.card}>
@@ -256,7 +410,33 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 			<div style={styles.card}>
 				<div style={styles.head}>
 					<h4 style={styles.h4}>Users</h4>
-					<span style={styles.hint}>{rows.length} items</span>
+					<div style={styles.headRight}>
+						<span style={styles.hint}>{totalSafe} items</span>
+
+						{!!onPageChange && totalPages > 1 && (
+							<div style={styles.pager}>
+								<button
+									type="button"
+									style={{ ...styles.pagerBtn, ...(canPrev ? {} : styles.pagerBtnDisabled) }}
+									onClick={() => canPrev && onPageChange(page - 1)}
+									disabled={!canPrev}
+								>
+									Prev
+								</button>
+								<span style={styles.hint}>
+									{page}/{totalPages}
+								</span>
+								<button
+									type="button"
+									style={{ ...styles.pagerBtn, ...(canNext ? {} : styles.pagerBtnDisabled) }}
+									onClick={() => canNext && onPageChange(page + 1)}
+									disabled={!canNext}
+								>
+									Next
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
 
 				<div style={styles.mobileList}>
@@ -278,7 +458,12 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 										</p>
 									</div>
 
-									<button type="button" style={styles.actionBtn} aria-label="Actions">
+									<button
+										type="button"
+										style={styles.actionBtn}
+										aria-label="Actions"
+										onClick={(e) => openMenuFor(u.id, e)}
+									>
 										<MoreHorizIcon />
 									</button>
 								</div>
@@ -302,6 +487,28 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 						);
 					})}
 				</div>
+
+				{menu.open && currentMenuUser && (
+					<div ref={menuRef} style={{ ...styles.menu, top: menu.top, left: menu.left }}>
+						<button type="button" style={styles.menuItem} onClick={() => handleView(currentMenuUser)}>
+							<VisibilityOutlinedIcon fontSize="small" />
+							View
+						</button>
+						<div style={styles.menuDivider} />
+						<button
+							type="button"
+							style={{ ...styles.menuItem, ...styles.menuItemMuted }}
+							onClick={() => handleToggleBlock(currentMenuUser)}
+						>
+							{currentMenuUser.status === 'ACTIVE' ? (
+								<BlockOutlinedIcon fontSize="small" />
+							) : (
+								<CheckCircleOutlineIcon fontSize="small" />
+							)}
+							{currentMenuUser.status === 'ACTIVE' ? 'Block' : 'Unblock'}
+						</button>
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -311,7 +518,34 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 		<div style={styles.card}>
 			<div style={styles.head}>
 				<h4 style={styles.h4}>Users</h4>
-				<span style={styles.hint}>{rows.length} items</span>
+
+				<div style={styles.headRight}>
+					<span style={styles.hint}>{totalSafe} items</span>
+
+					{!!onPageChange && totalPages > 1 && (
+						<div style={styles.pager}>
+							<button
+								type="button"
+								style={{ ...styles.pagerBtn, ...(canPrev ? {} : styles.pagerBtnDisabled) }}
+								onClick={() => canPrev && onPageChange(page - 1)}
+								disabled={!canPrev}
+							>
+								Prev
+							</button>
+							<span style={styles.hint}>
+								{page}/{totalPages}
+							</span>
+							<button
+								type="button"
+								style={{ ...styles.pagerBtn, ...(canNext ? {} : styles.pagerBtnDisabled) }}
+								onClick={() => canNext && onPageChange(page + 1)}
+								disabled={!canNext}
+							>
+								Next
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 
 			<div style={styles.wrap}>
@@ -372,6 +606,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 												transition: 'opacity .12s ease',
 											}}
 											aria-label="Actions"
+											onClick={(e) => openMenuFor(u.id, e)}
 										>
 											<MoreHorizIcon />
 										</button>
@@ -382,6 +617,28 @@ const UsersTable: React.FC<UsersTableProps> = ({ rows, loading = false }) => {
 					</tbody>
 				</table>
 			</div>
+
+			{menu.open && currentMenuUser && (
+				<div ref={menuRef} style={{ ...styles.menu, top: menu.top, left: menu.left }}>
+					<button type="button" style={styles.menuItem} onClick={() => handleView(currentMenuUser)}>
+						<VisibilityOutlinedIcon fontSize="small" />
+						View
+					</button>
+					<div style={styles.menuDivider} />
+					<button
+						type="button"
+						style={{ ...styles.menuItem, ...styles.menuItemMuted }}
+						onClick={() => handleToggleBlock(currentMenuUser)}
+					>
+						{currentMenuUser.status === 'ACTIVE' ? (
+							<BlockOutlinedIcon fontSize="small" />
+						) : (
+							<CheckCircleOutlineIcon fontSize="small" />
+						)}
+						{currentMenuUser.status === 'ACTIVE' ? 'Block' : 'Unblock'}
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };

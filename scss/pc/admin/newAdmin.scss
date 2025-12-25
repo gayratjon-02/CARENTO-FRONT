@@ -152,13 +152,19 @@
     }
   }
 
-  .admin-shell__body {
-    display: grid;
-    gap: 16px;
-    max-width: 1280px;
-    width: 100%;
-    margin: 0 auto;
-  }
+.admin-shell__body {
+  display: grid;
+  gap: 16px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 }
 
 .admin-stats-grid {
@@ -194,6 +200,22 @@
   display: grid;
   grid-template-columns: 1.4fr 0.6fr;
   gap: 12px;
+}
+
+.bounded {
+  background: #fff;
+  border: 1px solid #e7ecf5;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(15, 27, 45, 0.08);
+  padding: 10px 12px;
+}
+
+.h-300 {
+  height: 300px;
+}
+
+.h-220 {
+  height: 220px;
 }
 
 .admin-stats-card {
@@ -683,6 +705,11 @@
     td:nth-child(6) {
       width: 12%;
       text-align: right;
+    }
+    td:nth-child(2) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 

@@ -161,15 +161,7 @@ function getDeltaMeta(delta?: string) {
 	};
 }
 
-const StatsCard: React.FC<StatsCardProps> = ({
-	title,
-	value,
-	subtitle,
-	delta,
-	icon,
-	loading = false,
-	emptyText = 'No data',
-}) => {
+const StatsCard: React.FC<StatsCardProps> = ({ title, value }) => {
 	const deltaMeta = useMemo(() => getDeltaMeta(delta), [delta]);
 	const displayValue = useMemo(() => (loading ? '—' : normalizeValue(value, emptyText)), [loading, value, emptyText]);
 

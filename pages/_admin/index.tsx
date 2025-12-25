@@ -6,14 +6,31 @@ import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import PaymentIcon from '@mui/icons-material/Payment';
 import AdminShell from '../../components/admin/AdminShell';
 import StatsCard from '../../libs/components/admin/StatsCard';
-import { BarChartCard, DonutChartCard, LineChartCard, BarPoint, LinePoint, PieSlice } from '../../libs/components/admin/Charts';
+import {
+	BarChartCard,
+	DonutChartCard,
+	LineChartCard,
+	BarPoint,
+	LinePoint,
+	PieSlice,
+} from '../../libs/components/admin/Charts';
 import RecentBookingsTable, { BookingRow } from '../../libs/components/admin/RecentBookingsTable';
 import RecentUsersList, { RecentUser } from '../../components/admin/RecentUsersList';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_MEMBERS_BY_ADMIN } from 'apollo/admin/query';
+import { T } from 'libs/types/common';
+import { Member } from 'libs/types/member/member';
 
 const stats = [
 	{ title: 'Total Users', value: 12840, subtitle: 'All-time', delta: '+3.4% vs last week', icon: <PeopleAltIcon /> },
 	{ title: 'Active Bookings', value: 312, subtitle: 'Right now', delta: '+12', icon: <BookOnlineIcon /> },
-	{ title: 'Available Cars', value: 184, subtitle: 'Ready to rent', delta: '+6 new', icon: <DirectionsCarFilledIcon /> },
+	{
+		title: 'Available Cars',
+		value: 184,
+		subtitle: 'Ready to rent',
+		delta: '+6 new',
+		icon: <DirectionsCarFilledIcon />,
+	},
 	{ title: 'Total Revenue', value: '$4,820,300', subtitle: 'All-time', delta: '+5.2%', icon: <PaymentIcon /> },
 ];
 
@@ -44,7 +61,14 @@ const pieData: PieSlice[] = [
 ];
 
 const recentBookings: BookingRow[] = [
-	{ id: 'BK-2112', user: 'Olivia Wilde', car: 'Tesla Model 3', status: 'CONFIRMED', price: 180, createdAt: '2025-12-25' },
+	{
+		id: 'BK-2112',
+		user: 'Olivia Wilde',
+		car: 'Tesla Model 3',
+		status: 'CONFIRMED',
+		price: 180,
+		createdAt: '2025-12-25',
+	},
 	{ id: 'BK-2111', user: 'James Park', car: 'BMW M4', status: 'PENDING', price: 240, createdAt: '2025-12-24' },
 	{ id: 'BK-2110', user: 'Sara Lee', car: 'Audi A6', status: 'CANCELLED', price: 130, createdAt: '2025-12-24' },
 	{ id: 'BK-2109', user: 'Daniel Cho', car: 'Hyundai Ioniq', status: 'CONFIRMED', price: 95, createdAt: '2025-12-23' },
@@ -60,6 +84,18 @@ const recentUsers: RecentUser[] = [
 const AdminDashboardPage = () => {
 	const [range, setRange] = useState<'today' | '7d' | '30d'>('7d');
 
+	const [members, setMembers] = useState<Member[]>([]);
+	/** APOLLO REQUESTS **/
+	const {} = useQuery(GET_ALL_MEMBERS_BY_ADMIN, {
+		fetchPolicy: 'network-only',
+		variables: { input: { page: 10, search: {} } },
+		notifyOnNetworkStatusChange: true,
+
+		onCompleted: (data: T) => {
+			setMembers(data?.getAllMembersByAdmin?.list);
+		},
+	});
+
 	return (
 		<>
 			<Head>
@@ -73,8 +109,8 @@ const AdminDashboardPage = () => {
 				activePath="/_admin"
 			>
 				<section className="admin-stats-grid admin-stats-grid--row">
-					{stats.map((s) => (
-						<StatsCard key={s.title} title={s.title} value={s.value} subtitle={s.subtitle} delta={s.delta} icon={s.icon} />
+					{members.map((s) => (
+						<StatsCard key={s.memberNick} title={s.memberAddress} />
 					))}
 				</section>
 
