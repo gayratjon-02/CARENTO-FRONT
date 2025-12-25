@@ -1,0 +1,27 @@
+name: Deploy CARENTO Front
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            cd /home/carento-project/CARENTO-FRONT
+            git fetch --all
+            git reset --hard origin/master
+            sh deploy.sh
+            docker restart carento-front
+
