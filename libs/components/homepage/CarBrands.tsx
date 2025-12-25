@@ -1,4 +1,5 @@
 import { Stack } from '@mui/material';
+import { useRouter } from 'next/router';
 
 const BRANDS = [
 	{ name: 'BMW', logo: '/img/brands/bmw.png' },
@@ -16,6 +17,22 @@ const BRANDS = [
 ];
 
 const CarBrands = () => {
+	const router = useRouter();
+
+	const handleBrandClick = (brand: string) => {
+		const input = {
+			page: 1,
+			limit: 9,
+			sort: 'carLikes',
+			direction: 'DESC',
+			search: {
+				brandType: [brand],
+			},
+		};
+		const encoded = encodeURIComponent(JSON.stringify(input));
+		router.push(`/car?input=${encoded}`);
+	};
+
 	return (
 		<Stack className={'car-brands'}>
 			<Stack className={'container'}>
@@ -31,7 +48,12 @@ const CarBrands = () => {
 
 				<Stack className={'brand-grid'}>
 					{BRANDS.map((brand) => (
-						<Stack key={brand.name} className={'brand-card'}>
+						<Stack
+							key={brand.name}
+							className={'brand-card'}
+							role="button"
+							onClick={() => handleBrandClick(brand.name)}
+						>
 							<div className="ring"></div>
 							<img src={brand.logo} alt={`${brand.name} logo`} loading="lazy" />
 							<span className={'brand-name'}>{brand.name}</span>
