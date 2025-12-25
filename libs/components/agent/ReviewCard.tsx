@@ -4,6 +4,7 @@ import { Stack, Box, Typography } from '@mui/material';
 import { Comment } from '../../types/comment/comment';
 import Moment from 'react-moment';
 import { REACT_APP_API_URL } from '../../config';
+import { useMemo } from 'react';
 
 interface ReviewCardProps {
 	fromMyPage?: string;
@@ -12,9 +13,26 @@ interface ReviewCardProps {
 const ReviewCard = (props: ReviewCardProps) => {
 	const { fromMyPage, comment } = props;
 	const device = useDeviceDetect();
-	const imagePath: string = comment?.memberData?.memberImage
-		? `${REACT_APP_API_URL}/${comment?.memberData?.memberImage}`
-		: '/img/profile/defaultUser.svg';
+	const imagePath: string = useMemo(() => {
+		const raw = comment?.memberData?.memberImage || '';
+		if (!raw) return '/img/profile/defaultUser.svg';
+		if (/^https?:\/\//i.test(raw)) return raw;
+		const base = REACT_APP_API_URL || '';
+		// Ensure no duplicate slashes
+		const normalized = raw.startsWith('/') ? raw.slice(1) : raw;
+		const baseNormalized = base.endsWith('/') ? base.slice(0, -1) : base;
+		return `${baseNormalized}/${normalized}`;
+	}, [comment?.memberData?.memberImage]);
+
+	const safeContent = useMemo(() => {
+		if (!comment?.commentContent) return '';
+		// Basic strip of HTML tags/entities
+		const text = comment.commentContent.replace(/<[^>]*>/g, '');
+		const unescaped = text.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>');
+		return unescaped.trim();
+	}, [comment?.commentContent]);
+
+	const displayContent = safeContent || '';
 
 	if (device === 'mobile') {
 		return <div>REVIEW CARD</div>;
@@ -23,7 +41,15 @@ const ReviewCard = (props: ReviewCardProps) => {
 			<Box component={'div'} className={'review-card'}>
 				<div className={'info'}>
 					<div className={'left'}>
-						<img src={imagePath} alt="" />
+						<img
+							src={imagePath}
+							alt={comment?.memberData?.memberNick || 'User'}
+							onError={(e: any) => {
+								e.target.onerror = null;
+								e.target.src = '/img/profile/defaultUser.svg';
+							}}
+							loading="lazy"
+						/>
 						<div>
 							<strong>{comment.memberData?.memberNick}</strong>
 							<span>
@@ -32,7 +58,7 @@ const ReviewCard = (props: ReviewCardProps) => {
 						</div>
 					</div>
 				</div>
-				<p>{comment.commentContent}</p>
+				<p>{displayContent}</p>
 				{fromMyPage && (
 					<Stack className="reply-button-box">
 						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
