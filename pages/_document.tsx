@@ -5,7 +5,7 @@ export default function Document() {
 		<Html lang="en">
 			<Head>
 				<meta name="robots" content="index,follow" />
-				<link rel="icon" type="image/png" href="/img/logo/ll.png" />
+				<link rel="icon" type="image/png" href="/img/icons/main-logotip.svg" />
 
 				{/* SEO */}
 				<meta name="keyword" content={'nestar, nestar.uz, devex mern, mern nestjs fullstack'} />
