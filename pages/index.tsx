@@ -2,7 +2,6 @@ import { NextPage } from 'next';
 import useDeviceDetect from '../libs/hooks/useDeviceDetect';
 import withLayoutMain from '../libs/components/layout/LayoutHome';
 import CommunityBoards from '../libs/components/homepage/CommunityBoards';
-import PopularCars from '../libs/components/homepage/PopularCars';
 import TopAgents from '../libs/components/homepage/TopAgents';
 import Events from '../libs/components/homepage/Events';
 import { Stack } from '@mui/material';
@@ -31,7 +30,6 @@ const Home: NextPage = () => {
 				<InfoRent />
 				<ChooseByCarType />
 				<HowItWorks />
-				<PopularCars />
 				<CommunityBoards />
 				<TopCars />
 				<TopAgents />
@@ -45,7 +43,6 @@ const Home: NextPage = () => {
 				<InfoRent />
 				<ChooseByCarType />
 				<HowItWorks />
-				<PopularCars />
 				<CommunityBoards />
 				<TopCars />
 				<TopAgents />
