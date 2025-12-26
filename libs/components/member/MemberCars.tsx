@@ -2,20 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { NextPage } from 'next';
 import { Pagination, Stack, Typography } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { PropertyCard } from '../mypage/PropertyCard';
-import { Property } from '../../types/property/property';
 import { T } from '../../types/common';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
 import { GET_CARS } from 'apollo/user/query';
-import { CarsInquiry } from 'libs/types/property/cars.input';
+import { CarsInquiry } from 'libs/types/car/cars.input';
+import { Car } from 'libs/types/car/cars';
 
 const MemberCars: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const { memberId } = router.query;
 	const [searchFilter, setSearchFilter] = useState<CarsInquiry>({ ...initialInput });
-	const [agentProperties, setAgentProperties] = useState<Property[]>([]);
+	const [agentProperties, setAgentProperties] = useState<Car[]>([]);
 	const [total, setTotal] = useState<number>(0);
 
 	/** APOLLO REQUESTS **/
@@ -76,9 +75,6 @@ const MemberCars: NextPage = ({ initialInput, ...props }: any) => {
 								<p>No Car found!</p>
 							</div>
 						)}
-						{agentProperties?.map((property: Property) => {
-							return <PropertyCard property={property} memberPage={true} key={property?._id} />;
-						})}
 
 						{agentProperties.length !== 0 && (
 							<Stack className="pagination-config">

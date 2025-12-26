@@ -6,7 +6,6 @@ import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { useRouter } from 'next/router';
-import { Car } from '../../libs/types/property/cars';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Direction } from '../../libs/enums/common.enum';
 import { useMutation, useQuery } from '@apollo/client';
@@ -17,7 +16,8 @@ import { LIKE_TARGET_CAR } from '../../apollo/user/mutation';
 import { Message } from '../../libs/enums/common.enum';
 import CarCard from '../../libs/components/car/CarCard';
 import CarFilter from '../../libs/components/car/CarFilter';
-import { CarsInquiry } from 'libs/types/property/cars.input';
+import { CarsInquiry } from 'libs/types/car/cars.input';
+import { Car } from 'libs/types/car/cars';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {

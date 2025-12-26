@@ -5,15 +5,15 @@ import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper';
-import { CarsInquiry } from '../../types/property/property.input';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
-import { Car } from '../../types/property/cars';
 import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
 import TrendCarCard from './TrendCarCard';
+import { CarsInquiry } from 'libs/types/car/cars.input';
+import { Car } from 'libs/types/car/cars';
 
 interface TrendCarsProps {
 	initialInput: CarsInquiry;

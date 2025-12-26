@@ -4,7 +4,7 @@ import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { BrandType, CarLocation, CarType, FuelType, Transmission } from '../../enum/car.enum';
 import { formatEnumValue } from '../../utils';
-import { CarsInquiry } from '../../types/property/property.input';
+import { CarsInquiry } from 'libs/types/car/cars.input';
 
 type Search = CarsInquiry['search'] & {
 	carLocation?: CarLocation[];

@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Stack, Box, Pagination } from '@mui/material';
-import { CarsInquiry } from '../../types/property/property.input';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
 import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
-import { Car } from 'libs/types/property/cars';
 import TopCarCard from './TopCarCard';
 import { useRouter } from 'next/router';
+import { CarsInquiry } from 'libs/types/car/cars.input';
+import { Car } from 'libs/types/car/cars';
 
 interface TopCarsProps {
 	initialInput: CarsInquiry;

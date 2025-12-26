@@ -25,8 +25,6 @@ import { userVar } from '../../apollo/store';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { REACT_APP_API_URL } from '../../libs/config';
 import { formatEnumValue, formatterStr } from '../../libs/utils';
-import { Car } from '../../libs/types/property/cars';
-import { CarsInquiry } from '../../libs/types/property/property.input';
 import { Comment } from '../../libs/types/comment/comment';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
 import { CommentGroup } from '../../libs/enums/comment.enum';
@@ -37,6 +35,8 @@ import { CREATE_BOOKING, CREATE_COMMENT, LIKE_TARGET_CAR } from '../../apollo/us
 import { GET_CAR, GET_CARS, GET_COMMENTS } from '../../apollo/user/query';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
 import CarCard from '../../libs/components/car/CarCard';
+import { CarsInquiry } from 'libs/types/car/cars.input';
+import { Car } from 'libs/types/car/cars';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
