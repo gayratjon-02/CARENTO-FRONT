@@ -16,3 +16,8 @@ export enum MemberAuthType {
 	TELEGRAM = 'TELEGRAM',
 	GOOGLE = 'GOOGLE',
 }
+
+export enum Direction {
+	ASC = 1,
+	DESC = -1,
+}

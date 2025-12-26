@@ -1,238 +1,554 @@
-import React, { useMemo, useState } from 'react';
-import Head from 'next/head';
+import { useMemo, useState, useCallback } from 'react';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { useLazyQuery, useQuery, useReactiveVar } from '@apollo/client';
-import { userVar } from '../../apollo/store';
-import { GET_CAR, GET_MY_BOOKINGS } from '../../apollo/user/query';
-import { Direction } from '../../libs/enums/common.enum';
-import { REACT_APP_API_URL } from '../../libs/config';
 
-type BookingRecord = {
-	_id: string;
-	carId: string;
-	agentId?: string | null;
-	userId?: string | null;
-	startDate?: string | null;
-	endDate?: string | null;
-	totalPrice?: number | null;
-	bookingStatus?: string | null;
-	paymentStatus?: string | null;
-};
+import {
+	Alert,
+	Box,
+	Button,
+	Checkbox,
+	Chip,
+	Container,
+	Divider,
+	FormControlLabel,
+	Paper,
+	Radio,
+	RadioGroup,
+	Skeleton,
+	Stack,
+	TextField,
+	Typography,
+	Grid,
+} from '@mui/material';
 
-type CarRecord = {
-	_id: string;
-	carTitle?: string;
-	carType?: string;
-	carImages?: string[];
-	seats?: number;
-	doors?: number;
-	brandType?: string;
-	transmission?: string;
-	fuelType?: string;
-	pricePerDay?: number;
-};
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded';
+import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import LocalGasStationRoundedIcon from '@mui/icons-material/LocalGasStationRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
 
-const fmtDate = (v?: string | null) => {
-	if (!v) return '—';
-	const d = new Date(v);
-	if (Number.isNaN(d.getTime())) return '—';
-	return d.toLocaleDateString();
-};
+import { userVar } from 'apollo/store';
+import { GET_CAR, GET_MY_BOOKINGS } from 'apollo/user/query';
+import { Booking } from 'libs/types/booking/booking';
+import { Car } from 'libs/types/car/cars';
 
-const Booking = () => {
+function toStr(v: unknown) {
+	if (typeof v === 'string') return v;
+	if (Array.isArray(v)) return typeof v[0] === 'string' ? v[0] : '';
+	return '';
+}
+
+function formatMoney(amount?: number | null) {
+	if (amount === null || amount === undefined) return '-';
+	try {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'USD',
+			maximumFractionDigits: 0,
+		}).format(amount);
+	} catch {
+		return String(amount);
+	}
+}
+
+function formatDate(iso?: string | null) {
+	if (!iso) return '-';
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return iso;
+	return d.toLocaleString();
+}
+
+export default function CheckoutBookings() {
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
-	const { id } = router.query;
-	const [bookings, setBookings] = useState<BookingRecord[]>([]);
-	const [carsMap, setCarsMap] = useState<Record<string, CarRecord>>({});
 
-	const [fetchCar] = useLazyQuery(GET_CAR, { fetchPolicy: 'cache-first' });
+	const carId = useMemo(() => toStr(router.query.id), [router.query.id]);
 
-	const { loading: bookingsLoading } = useQuery(GET_MY_BOOKINGS, {
-		variables: {
-			input: {
-				page: 1,
-				limit: 30,
-				sort: 'createdAt',
-				direction: Direction.DESC,
-				search: {},
-			},
-		},
-		skip: !user?._id,
-		onCompleted: async (data) => {
-			const list = data?.getMyBookings?.list ?? [];
-			setBookings(list);
-			await hydrateCars(list);
-		},
+	// --- UI state (dummy payment) ---
+	const [agree, setAgree] = useState(false);
+	const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
+	const [paying, setPaying] = useState(false);
+
+	// Driver details (prefill minimal)
+	const [firstName, setFirstName] = useState<string>((user as any)?.memberNick || '');
+	const [lastName, setLastName] = useState<string>('');
+	const [email, setEmail] = useState<string>((user as any)?.memberEmail || '');
+	const [phone, setPhone] = useState<string>((user as any)?.memberPhone || '');
+	const [flightNo, setFlightNo] = useState<string>('');
+
+	// Card fields (dummy)
+	const [cardName, setCardName] = useState<string>('');
+	const [cardNumber, setCardNumber] = useState<string>('');
+	const [cardExp, setCardExp] = useState<string>('');
+	const [cardCvc, setCardCvc] = useState<string>('');
+
+	const {
+		data: carData,
+		loading: carLoading,
+		error: carError,
+	} = useQuery(GET_CAR, {
+		fetchPolicy: 'network-only',
+		skip: !carId,
+		variables: { input: carId },
 	});
 
-	const hydrateCars = async (list: BookingRecord[]) => {
-		const missingIds = list.map((b) => b.carId).filter((cid) => cid && !carsMap[cid]);
-		if (!missingIds.length) return;
+	const car: Car | undefined = carData?.getCar;
 
-		const results = await Promise.all(
-			missingIds.map(async (cid) => {
-				try {
-					const res = await fetchCar({ variables: { input: cid }, fetchPolicy: 'network-only' });
-					const car = (res?.data as any)?.getCar as CarRecord | undefined;
-					return car?._id ? car : null;
-				} catch {
-					return null;
-				}
-			}),
-		);
+	const {
+		data: bookingsData,
+		loading: bookingsLoading,
+		error: bookingsError,
+	} = useQuery(GET_MY_BOOKINGS, {
+		fetchPolicy: 'network-only',
+		variables: { input: { page: 1, limit: 50 } },
+		notifyOnNetworkStatusChange: true,
+	});
 
-		const nextMap: Record<string, CarRecord> = {};
-		results.forEach((car) => {
-			if (car?._id) nextMap[car._id] = car;
-		});
-		if (Object.keys(nextMap).length) {
-			setCarsMap((prev) => ({ ...prev, ...nextMap }));
+	const bookingForThisCar: Booking | undefined = useMemo(() => {
+		const list: Booking[] = bookingsData?.getMyBookings?.list ?? [];
+		if (!carId) return undefined;
+
+		const related = list.filter((b) => String(b?.carId) === String(carId));
+		if (related.length === 0) return undefined;
+
+		return related.sort((a, b) => {
+			const ta = new Date((a as any)?.createdAt).getTime() || 0;
+			const tb = new Date((b as any)?.createdAt).getTime() || 0;
+			return tb - ta;
+		})[0];
+	}, [bookingsData, carId]);
+
+	const rentalFee = (bookingForThisCar as any)?.totalPrice ?? 0;
+	const taxes = 0;
+	const discount = 0;
+	const total = Math.max(0, rentalFee + taxes - discount);
+
+	const carImage = useMemo(() => {
+		const imgs = (car as any)?.carImages;
+		if (Array.isArray(imgs) && imgs.length > 0) return imgs[0];
+		return '';
+	}, [car]);
+
+	const isReadyToPay = Boolean(
+		car?._id &&
+			bookingForThisCar?._id &&
+			agree &&
+			firstName.trim() &&
+			email.trim() &&
+			phone.trim() &&
+			(paymentMethod === 'paypal' ||
+				(paymentMethod === 'card' && cardNumber.trim() && cardExp.trim() && cardCvc.trim() && cardName.trim())),
+	);
+
+	const onPay = useCallback(async () => {
+		if (!isReadyToPay) return;
+
+		try {
+			setPaying(true);
+
+			// Dummy payment: keyinchalik shu joyni Stripe bilan almashtirasiz:
+			// 1) backend -> createPaymentIntent(total, bookingId)
+			// 2) Stripe Elements -> confirmCardPayment
+			await new Promise((r) => setTimeout(r, 900));
+
+			alert('Payment successful (dummy). Keyin Stripe integratsiya qilasiz.');
+		} finally {
+			setPaying(false);
 		}
-	};
-
-	const cards = useMemo(() => {
-		if (!bookings.length) return [];
-		return bookings.map((b) => {
-			const car = carsMap[b.carId];
-			const firstImage = Array.isArray(car?.carImages) && car?.carImages[0] ? `${REACT_APP_API_URL}/${car!.carImages![0]}` : '/img/cars/hero-car.jpg';
-			const specs: string[] = [];
-			if (car?.seats) specs.push(`${car.seats} seats`);
-			if (car?.doors) specs.push(`${car.doors} doors`);
-			if (car?.transmission) specs.push(car.transmission);
-			if (car?.fuelType) specs.push(car.fuelType);
-
-			return {
-				id: b._id,
-				carId: b.carId,
-				title: car?.carTitle || 'Booked car',
-				category: car?.carType || '—',
-				image: firstImage,
-				price: b.totalPrice ?? car?.pricePerDay ?? 0,
-				specs: specs.length ? specs : ['Details pending'],
-				benefits: [
-					`Start: ${fmtDate(b.startDate)}`,
-					`End: ${fmtDate(b.endDate)}`,
-					`Status: ${b.bookingStatus ?? '—'}`,
-					`Payment: ${b.paymentStatus ?? '—'}`,
-				],
-			};
-		});
-	}, [bookings, carsMap]);
+	}, [isReadyToPay]);
 
 	return (
-		<>
-			<Head>
-				<title>Carento | Booking</title>
-			</Head>
-			<div className="booking-page">
-				<div className="booking-hero">
-					<div className="hero-text">
-						<p className="eyebrow">Book a car / No advance payment</p>
-						<h2>Pick, compare, and drive.</h2>
-						<p className="sub">Tailored filters, transparent pricing, and quick online confirmation.</p>
-					</div>
-					<div className="hero-badge">Trip ID: {id ?? '—'}</div>
-				</div>
+		<Box sx={{ minHeight: '100vh', bgcolor: '#f6f7fb', py: 3 }}>
+			<Container maxWidth="lg">
+				{/* Header */}
+				<Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+					<Button
+						variant="text"
+						startIcon={<ArrowBackRoundedIcon />}
+						onClick={() => router.back()}
+						sx={{ textTransform: 'none', fontWeight: 700 }}
+					>
+						Orqaga
+					</Button>
 
-				<div className="booking-layout">
-					<aside className="filters">
-						<h4>Filter cars by</h4>
-						<ul>
-							<li>Car Type</li>
-							<li>Customer recommendation</li>
-							<li>Car Specifications</li>
-							<li>Weekly price</li>
-							<li>Number of seats</li>
-							<li>Supplier rating</li>
-							<li>Payment type</li>
-							<li>Mileage</li>
-						</ul>
-						<div className="map-placeholder">Map preview</div>
-					</aside>
+					<Typography variant="h6" sx={{ fontWeight: 900 }}>
+						Checkout
+					</Typography>
 
-					<section className="booking-content">
-						<div className="search-bar">
-							<div className="field">
-								<label>Car Brand</label>
-								<select>
-									<option>Any</option>
-									<option>BMW</option>
-									<option>Hyundai</option>
-									<option>Tesla</option>
-								</select>
-							</div>
-							<div className="field">
-								<label>Pick-up location</label>
-								<input placeholder="New York, USA" />
-							</div>
-							<div className="field">
-								<label>Pick-up date</label>
-								<input type="date" />
-							</div>
-							<div className="field">
-								<label>Drop-off date</label>
-								<input type="date" />
-							</div>
-							<button className="search-btn">Search car now</button>
-						</div>
+					<Box sx={{ width: 90 }} />
+				</Stack>
 
-						<div className="cards">
-							{!user?._id && <div className="empty">Please login to view your bookings.</div>}
-							{user?._id && bookingsLoading && <div className="empty">Loading bookings…</div>}
-							{user?._id && !bookingsLoading && !cards.length && <div className="empty">No bookings yet.</div>}
-							{cards.map((car) => (
-								<div className="card" key={car.id}>
-									<div className="card__media">
-										<img src={car.image} alt={car.title} />
-									</div>
-									<div className="card__body">
-										<div className="card__header">
-											<div>
-												<h3>{car.title}</h3>
-												<span className="badge badge-muted">{car.category}</span>
-											</div>
-											<div className="price">
-												<span>${(car.price || 0).toLocaleString()}</span>
-												<small>Cost of rental</small>
-											</div>
-										</div>
+				{/* Errors */}
+				{carError ? (
+					<Alert severity="error" sx={{ mb: 2 }}>
+						Mashina ma’lumotini olishda xatolik yuz berdi.
+					</Alert>
+				) : null}
+				{bookingsError ? (
+					<Alert severity="error" sx={{ mb: 2 }}>
+						Booking ma’lumotini olishda xatolik yuz berdi.
+					</Alert>
+				) : null}
 
-										<div className="card__specs">
-											{car.specs.map((s) => (
-												<span className="pill" key={s}>
-													{s}
-												</span>
-											))}
-										</div>
+				<Grid container spacing={2}>
+					{/* LEFT: Car + Driver + Payment */}
+					<Grid item xs={12} md={8}>
+						<Stack spacing={2}>
+							{/* Car Card (rasmga o‘xshashroq) */}
+							<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+								<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+									{/* Image */}
+									<Box
+										sx={{
+											width: { xs: '100%', sm: 220 },
+											height: 140,
+											borderRadius: 2.5,
+											bgcolor: 'action.hover',
+											overflow: 'hidden',
+											display: 'grid',
+											placeItems: 'center',
+										}}
+									>
+										{carLoading ? (
+											<Skeleton variant="rectangular" width="100%" height="100%" />
+										) : carImage ? (
+											<img src={carImage} alt="car" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+										) : (
+											<DirectionsCarRoundedIcon style={{ fontSize: 42, opacity: 0.6 }} />
+										)}
+									</Box>
 
-										<div className="card__benefits">
-											{car.benefits.map((b) => (
-												<div className="benefit" key={b}>
-													<span className="tick">✓</span>
-													{b}
-												</div>
-											))}
-										</div>
+									{/* Info */}
+									<Box sx={{ flex: 1, minWidth: 0 }}>
+										{carLoading ? (
+											<>
+												<Skeleton width="55%" />
+												<Skeleton width="35%" />
+											</>
+										) : (
+											<>
+												<Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+													<Typography variant="h6" sx={{ fontWeight: 900 }} noWrap>
+														{(car as any)?.carTitle || (car as any)?.brandType || 'Selected car'}
+													</Typography>
+													<Chip size="small" label={(car as any)?.carType || 'Economy'} />
+												</Stack>
 
-										<div className="card__footer">
-											<div className="perks">
-												<span className="perk">Free cancellation</span>
-												<span className="perk">Online check-in</span>
-											</div>
-											<button className="book-btn" onClick={() => router.push(`/booking/booking?id=${car.carId || car.id}`)}>
-												View booking
-											</button>
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-					</section>
-				</div>
-			</div>
-		</>
+												<Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 0.5 }}>
+													<PlaceRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+													<Typography variant="body2" color="text.secondary" noWrap>
+														{(car as any)?.carLocation || 'Location'}
+													</Typography>
+												</Stack>
+											</>
+										)}
+
+										<Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.5 }}>
+											<Chip
+												size="small"
+												icon={<SettingsRoundedIcon />}
+												label={(car as any)?.transmission || 'Automatic'}
+												variant="outlined"
+											/>
+											<Chip
+												size="small"
+												icon={<LocalGasStationRoundedIcon />}
+												label={(car as any)?.fuelType || 'Fuel'}
+												variant="outlined"
+											/>
+											<Chip
+												size="small"
+												icon={<PeopleAltRoundedIcon />}
+												label={(car as any)?.seats ? `${(car as any)?.seats} seats` : 'Seats'}
+												variant="outlined"
+											/>
+										</Stack>
+
+										{/* Included in price */}
+										<Stack spacing={0.6} sx={{ mt: 1.5 }}>
+											<Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
+												Included in the price
+											</Typography>
+
+											<Stack direction="row" spacing={1} alignItems="center">
+												<CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+												<Typography variant="body2" color="text.secondary">
+													Free cancellation (demo)
+												</Typography>
+											</Stack>
+
+											<Stack direction="row" spacing={1} alignItems="center">
+												<CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+												<Typography variant="body2" color="text.secondary">
+													Instant confirmation (demo)
+												</Typography>
+											</Stack>
+
+											<Stack direction="row" spacing={1} alignItems="center">
+												<CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+												<Typography variant="body2" color="text.secondary">
+													Theft protection (demo)
+												</Typography>
+											</Stack>
+										</Stack>
+									</Box>
+
+									{/* Price */}
+									<Box sx={{ textAlign: { xs: 'left', sm: 'right' }, minWidth: 110 }}>
+										{carLoading ? (
+											<Skeleton width={80} />
+										) : (
+											<Typography variant="h6" sx={{ fontWeight: 900 }}>
+												{formatMoney((car as any)?.pricePerDay ?? (car as any)?.pricePerHour)}
+											</Typography>
+										)}
+										<Typography variant="caption" color="text.secondary">
+											{(car as any)?.pricePerDay ? 'per day' : (car as any)?.pricePerHour ? 'per hour' : ''}
+										</Typography>
+									</Box>
+								</Stack>
+							</Paper>
+
+							<Alert severity="info" sx={{ borderRadius: 3 }}>
+								Instant Confirmation: This vehicle is available now. You will get your confirmation immediately.
+							</Alert>
+
+							{/* Driver Details */}
+							<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+								<Typography variant="h6" sx={{ fontWeight: 900, mb: 1.5 }}>
+									Driver Details
+								</Typography>
+
+								<Grid container spacing={1.5}>
+									<Grid item xs={12} sm={6}>
+										<TextField
+											fullWidth
+											label="First Name"
+											value={firstName}
+											onChange={(e) => setFirstName(e.target.value)}
+										/>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<TextField
+											fullWidth
+											label="Last Name"
+											value={lastName}
+											onChange={(e) => setLastName(e.target.value)}
+										/>
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<TextField fullWidth label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+									</Grid>
+									<Grid item xs={12} sm={6}>
+										<TextField
+											fullWidth
+											label="Mobile Number"
+											value={phone}
+											onChange={(e) => setPhone(e.target.value)}
+										/>
+									</Grid>
+									<Grid item xs={12}>
+										<TextField
+											fullWidth
+											label="Flight Number (optional)"
+											value={flightNo}
+											onChange={(e) => setFlightNo(e.target.value)}
+											helperText="This can help ensure your vehicle is available if your flight is delayed."
+										/>
+									</Grid>
+								</Grid>
+							</Paper>
+
+							{/* Payment Details */}
+							<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+								<Typography variant="h6" sx={{ fontWeight: 900, mb: 1.5 }}>
+									Payment Details
+								</Typography>
+
+								<RadioGroup row value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as any)}>
+									<FormControlLabel value="card" control={<Radio />} label="Credit / Debit Card" />
+									<FormControlLabel value="paypal" control={<Radio />} label="PayPal (demo)" />
+								</RadioGroup>
+
+								<Divider sx={{ my: 1.5 }} />
+
+								{paymentMethod === 'card' ? (
+									<Grid container spacing={1.5}>
+										<Grid item xs={12}>
+											<TextField
+												fullWidth
+												label="Name on card"
+												value={cardName}
+												onChange={(e) => setCardName(e.target.value)}
+											/>
+										</Grid>
+										<Grid item xs={12}>
+											<TextField
+												fullWidth
+												label="Card number"
+												placeholder="4242 4242 4242 4242"
+												value={cardNumber}
+												onChange={(e) => setCardNumber(e.target.value)}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={6}>
+											<TextField
+												fullWidth
+												label="Expiry"
+												placeholder="MM/YY"
+												value={cardExp}
+												onChange={(e) => setCardExp(e.target.value)}
+											/>
+										</Grid>
+										<Grid item xs={12} sm={6}>
+											<TextField
+												fullWidth
+												label="CVC"
+												placeholder="123"
+												value={cardCvc}
+												onChange={(e) => setCardCvc(e.target.value)}
+											/>
+										</Grid>
+									</Grid>
+								) : (
+									<Alert severity="warning" sx={{ borderRadius: 2 }}>
+										PayPal demo holatida. Keyin Stripe/PayPal integratsiya qilasiz.
+									</Alert>
+								)}
+							</Paper>
+						</Stack>
+					</Grid>
+
+					{/* RIGHT: Summary (sticky) */}
+					<Grid item xs={12} md={4}>
+						<Box sx={{ position: { md: 'sticky' }, top: { md: 90 } }}>
+							<Stack spacing={2}>
+								{/* Pick-up / Drop-off */}
+								<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+									<Stack spacing={1.5}>
+										<Box>
+											<Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
+												Pick-up
+											</Typography>
+											<Typography variant="body2" color="text.secondary">
+												{bookingsLoading ? 'Loading...' : formatDate((bookingForThisCar as any)?.startDate)}
+											</Typography>
+											<Typography variant="body2" sx={{ mt: 0.25 }}>
+												{(car as any)?.carLocation || 'Location'}
+											</Typography>
+										</Box>
+
+										<Divider />
+
+										<Box>
+											<Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
+												Drop-off
+											</Typography>
+											<Typography variant="body2" color="text.secondary">
+												{bookingsLoading ? 'Loading...' : formatDate((bookingForThisCar as any)?.endDate)}
+											</Typography>
+											<Typography variant="body2" sx={{ mt: 0.25 }}>
+												{(car as any)?.carLocation || 'Location'}
+											</Typography>
+										</Box>
+
+										<Button
+											variant="text"
+											onClick={() => router.back()}
+											sx={{ textTransform: 'none', justifyContent: 'flex-start', px: 0, fontWeight: 800 }}
+										>
+											Modify search
+										</Button>
+									</Stack>
+								</Paper>
+
+								{/* Price Summary */}
+								<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+									<Typography variant="h6" sx={{ fontWeight: 900, mb: 1.5 }}>
+										Price Summary
+									</Typography>
+
+									<Stack spacing={1}>
+										<Stack direction="row" justifyContent="space-between">
+											<Typography variant="body2" color="text.secondary"></Typography>
+											<Typography variant="body2" sx={{ fontWeight: 800 }}>
+												{bookingsLoading ? '...' : formatMoney(rentalFee)}
+											</Typography>
+										</Stack>
+
+										<Stack direction="row" justifyContent="space-between">
+											<Typography variant="body2" color="text.secondary">
+												Taxes
+											</Typography>
+											<Typography variant="body2" sx={{ fontWeight: 800 }}>
+												{formatMoney(taxes)}
+											</Typography>
+										</Stack>
+
+										<Stack direction="row" justifyContent="space-between">
+											<Typography variant="body2" color="text.secondary">
+												Discount
+											</Typography>
+											<Typography variant="body2" sx={{ fontWeight: 800 }}>
+												-{formatMoney(discount)}
+											</Typography>
+										</Stack>
+
+										<Divider sx={{ my: 0.5 }} />
+
+										<Stack direction="row" justifyContent="space-between" alignItems="baseline">
+											<Typography variant="subtitle1" sx={{ fontWeight: 900 }}>
+												Total Amount
+											</Typography>
+											<Typography variant="h5" sx={{ fontWeight: 900 }}>
+												{bookingsLoading ? '...' : formatMoney(total)}
+											</Typography>
+										</Stack>
+
+										<FormControlLabel
+											control={<Checkbox checked={agree} onChange={(e) => setAgree(e.target.checked)} />}
+											label={
+												<Typography variant="body2">
+													I understand & agree with the <b>Terms & Conditions</b>
+												</Typography>
+											}
+											sx={{ mt: 0.5, alignItems: 'flex-start' }}
+										/>
+
+										<Button
+											fullWidth
+											variant="contained"
+											size="large"
+											disabled={!isReadyToPay || carLoading || bookingsLoading || paying}
+											onClick={onPay}
+											sx={{
+												mt: 1,
+												borderRadius: 2.5,
+												textTransform: 'none',
+												fontWeight: 900,
+												height: 48,
+											}}
+										>
+											{paying ? 'Processing...' : 'Book Now'}
+										</Button>
+									</Stack>
+								</Paper>
+
+								{/* Small fallback loaders */}
+								{(carLoading || bookingsLoading) && (
+									<Paper sx={{ p: 2.25, borderRadius: 3 }}>
+										<Skeleton width="60%" />
+										<Skeleton />
+										<Skeleton />
+									</Paper>
+								)}
+							</Stack>
+						</Box>
+					</Grid>
+				</Grid>
+			</Container>
+		</Box>
 	);
-};
-
-export default Booking;
+}
