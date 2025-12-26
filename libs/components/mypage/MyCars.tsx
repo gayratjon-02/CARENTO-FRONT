@@ -3,7 +3,6 @@ import { NextPage } from 'next';
 import { Box, Button, Pagination, Skeleton, Stack, Typography } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
-import { Car } from '../../types/property/cars';
 import { T } from '../../types/common';
 import { userVar } from '../../../apollo/store';
 import { useRouter } from 'next/router';
@@ -17,6 +16,7 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import { CarStatus } from '../../enum/car.enum';
+import { Car } from 'libs/types/car/cars';
 
 const MyCars: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();

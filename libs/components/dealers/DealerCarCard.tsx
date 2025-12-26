@@ -7,10 +7,10 @@ import EventSeatIcon from '@mui/icons-material/EventSeat';
 import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import SpeedIcon from '@mui/icons-material/Speed';
 import { useRouter } from 'next/router';
-import { Car } from '../../types/property/cars';
 import { REACT_APP_API_URL } from '../../config';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from 'apollo/store';
+import { Car } from 'libs/types/car/cars';
 
 interface DealerCarCardProps {
 	car: Car;

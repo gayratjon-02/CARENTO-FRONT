@@ -9,7 +9,7 @@ import { REACT_APP_API_URL } from '../../config';
 import { useRouter } from 'next/router';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
-import { Car } from 'libs/types/property/cars';
+import { Car } from 'libs/types/car/cars';
 
 interface TopCarCardProps {
 	car: Car;

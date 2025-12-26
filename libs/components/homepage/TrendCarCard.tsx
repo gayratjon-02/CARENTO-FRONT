@@ -1,6 +1,5 @@
 import React, { CSSProperties, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Car } from '../../types/property/cars';
 import { REACT_APP_API_URL } from '../../config';
 
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
@@ -17,6 +16,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Stack, Button, ButtonBase } from '@mui/material';
 import { userVar } from 'apollo/store';
 import { useReactiveVar } from '@apollo/client';
+import { Car } from 'libs/types/car/cars';
 
 interface TrendCarCardProps {
 	car: Car;

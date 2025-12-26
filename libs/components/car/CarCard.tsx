@@ -8,11 +8,11 @@ import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import SpeedIcon from '@mui/icons-material/Speed';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import { useRouter } from 'next/router';
-import { Car } from '../../types/property/cars';
 import { REACT_APP_API_URL } from '../../config';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from 'apollo/store';
 import { formatEnumValue } from '../../utils';
+import { Car } from 'libs/types/car/cars';
 
 interface CarCardProps {
 	car: Car;

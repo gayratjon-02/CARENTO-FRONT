@@ -11,9 +11,9 @@ import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
 import { GET_FAVORITES } from '../../../apollo/user/query';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Messages, REACT_APP_API_URL } from '../../config';
-import { Car } from '../../types/property/cars';
 import { formatEnumValue } from '../../utils';
 import { getJwtToken } from '../../auth';
+import { Car } from 'libs/types/car/cars';
 
 const MyFavorites: NextPage = () => {
 	const device = useDeviceDetect();

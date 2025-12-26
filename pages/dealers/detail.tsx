@@ -7,7 +7,6 @@ import { Box, Button, Pagination, Stack, Tabs, Tab, Typography } from '@mui/mate
 import StarIcon from '@mui/icons-material/Star';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { Car } from '../../libs/types/property/cars';
 import { Member } from '../../libs/types/member/member';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 import { userVar } from '../../apollo/store';
@@ -20,6 +19,7 @@ import { CREATE_COMMENT, LIKE_TARGET_CAR, SUBSCRIBE, UNSUBSCRIBE } from '../../a
 import { GET_CARS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import DealerCarCard from '../../libs/components/dealers/DealerCarCard';
+import { Car } from 'libs/types/car/cars';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -212,9 +212,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 				if (!prev) return prev;
 				const mf: any = (prev as any).meFollowed;
 				const updated = Array.isArray(mf)
-					? mf.map((m) =>
-							m?.followerId === user?._id ? { ...m, myFollowing: nextFollow } : m,
-					  )
+					? mf.map((m) => (m?.followerId === user?._id ? { ...m, myFollowing: nextFollow } : m))
 					: { ...(mf || {}), myFollowing: nextFollow, followerId: user?._id, followingId: prev._id };
 				return { ...prev, meFollowed: updated };
 			});
@@ -420,17 +418,17 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 						<Stack className="dealer-content">
 							<Stack className="dealer-panels">
 								<Box className="dealer-tabs">
-							<Tabs
-								value={activeTab}
-								onChange={(_, v) => setActiveTab(v)}
-								variant="fullWidth"
-								textColor="primary"
-								indicatorColor="primary"
-							>
-								<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
-								<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
-							</Tabs>
-						</Box>
+									<Tabs
+										value={activeTab}
+										onChange={(_, v) => setActiveTab(v)}
+										variant="fullWidth"
+										textColor="primary"
+										indicatorColor="primary"
+									>
+										<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
+										<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
+									</Tabs>
+								</Box>
 
 								{activeTab === 'cars' && (
 									<Stack className="dealer-panel">
