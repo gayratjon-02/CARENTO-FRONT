@@ -11,6 +11,8 @@ import Chat from '../Chat';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import VideoCarousel from '../common/VideoCarousel';
+import HeroSection from '../homepage/HeroSection';
 
 const withLayoutMain = (Component: any) => {
 	return (props: any) => {
@@ -59,7 +61,10 @@ const withLayoutMain = (Component: any) => {
 							<Top />
 						</Stack>
 
-						<Stack className={'header-main'}></Stack>
+						<Stack className={'header-main'}>
+							<VideoCarousel />
+							<HeroSection />
+						</Stack>
 
 						<Stack id={'main'}>
 							<Component {...props} />
