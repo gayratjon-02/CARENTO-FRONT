@@ -6,7 +6,6 @@ import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { useRouter } from 'next/router';
-import { CarsInquiry } from '../../libs/types/property/property.input';
 import { Car } from '../../libs/types/property/cars';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Direction } from '../../libs/enums/common.enum';
@@ -18,6 +17,7 @@ import { LIKE_TARGET_CAR } from '../../apollo/user/mutation';
 import { Message } from '../../libs/enums/common.enum';
 import CarCard from '../../libs/components/car/CarCard';
 import CarFilter from '../../libs/components/car/CarFilter';
+import { CarsInquiry } from 'libs/types/property/cars.input';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -54,7 +54,7 @@ const sanitizeCarsInquiry = (input: any, fallback: CarsInquiry): CarsInquiry => 
 		limit: Number.isFinite(Number(input?.limit)) ? Math.max(1, Number(input.limit)) : fallback.limit,
 		sort: typeof input?.sort === 'string' ? input.sort : fallback.sort,
 		direction: Object.values(Direction).includes(input?.direction) ? input.direction : fallback.direction,
-		search: typeof input?.search === 'object' && input.search ? input.search : (fallback.search ?? {}),
+		search: typeof input?.search === 'object' && input.search ? input.search : fallback.search ?? {},
 	};
 
 	const allowedSorts = new Set(['createdAt', 'carLikes', 'carViews', 'carRank']);
@@ -369,40 +369,39 @@ const CarList: NextPage = ({ initialInput }: any) => {
 					</Box>
 				</Box>
 
-					<CarFilter
-						value={searchFilter}
-						onChange={async (next) => {
-							await applyAndRefetch(next);
-						}}
-						onReset={resetFilters}
-					/>
+				<CarFilter
+					value={searchFilter}
+					onChange={async (next) => {
+						await applyAndRefetch(next);
+					}}
+					onReset={resetFilters}
+				/>
 
-					<Box className="car-grid">
-						{cars.length === 0 ? (
-							<div className={'no-data'}>
-								<img src="/img/icons/icoAlert.svg" alt="" />
-								<p>No Cars found!</p>
-							</div>
-						) : (
-							cars.map((car: Car) => <CarCard car={car} likeCarHandler={likeCarHandler} key={car._id} />)
-						)}
-					</Box>
+				<Box className="car-grid">
+					{cars.length === 0 ? (
+						<div className={'no-data'}>
+							<img src="/img/icons/icoAlert.svg" alt="" />
+							<p>No Cars found!</p>
+						</div>
+					) : (
+						cars.map((car: Car) => <CarCard car={car} likeCarHandler={likeCarHandler} key={car._id} />)
+					)}
+				</Box>
 
-					<Stack className="car-pagination">
-						{cars.length !== 0 && totalPages > 1 && (
-							<Stack className="pagination-box">
-								<Pagination
-									page={currentPage}
-									count={totalPages}
-									onChange={handlePaginationChange}
-									shape="circular"
-									color="primary"
-								/>
-							</Stack>
-						)}
-						{cars.length !== 0 && <span>Total {(total ?? 0).toLocaleString()} cars available</span>}
-					</Stack>
-
+				<Stack className="car-pagination">
+					{cars.length !== 0 && totalPages > 1 && (
+						<Stack className="pagination-box">
+							<Pagination
+								page={currentPage}
+								count={totalPages}
+								onChange={handlePaginationChange}
+								shape="circular"
+								color="primary"
+							/>
+						</Stack>
+					)}
+					{cars.length !== 0 && <span>Total {(total ?? 0).toLocaleString()} cars available</span>}
+				</Stack>
 			</Stack>
 
 			<Menu anchorEl={anchorEl} open={sortingOpen} onClose={sortingCloseHandler} sx={{ paddingTop: '5px' }}>

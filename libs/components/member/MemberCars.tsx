@@ -4,17 +4,17 @@ import { Pagination, Stack, Typography } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { PropertyCard } from '../mypage/PropertyCard';
 import { Property } from '../../types/property/property';
-import { PropertiesInquiry } from '../../types/property/property.input';
 import { T } from '../../types/common';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
 import { GET_CARS } from 'apollo/user/query';
+import { CarsInquiry } from 'libs/types/property/cars.input';
 
 const MemberCars: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const { memberId } = router.query;
-	const [searchFilter, setSearchFilter] = useState<PropertiesInquiry>({ ...initialInput });
+	const [searchFilter, setSearchFilter] = useState<CarsInquiry>({ ...initialInput });
 	const [agentProperties, setAgentProperties] = useState<Property[]>([]);
 	const [total, setTotal] = useState<number>(0);
 
