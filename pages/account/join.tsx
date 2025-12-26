@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import {
@@ -42,15 +42,8 @@ const Join: NextPage = () => {
 	const handleInput = useCallback((name: any, value: any) => {
 		setInput((prev) => ({ ...prev, [name]: value }));
 	}, []);
-
-	const handleKeyDown = useCallback(
-		(event: React.KeyboardEvent<HTMLInputElement>) => {
-			if (event.key === 'Enter') {
-				loginView ? doLogin() : doSignUp();
-			}
-		},
-		[loginView],
-	);
+	const passwordRef = useRef<HTMLInputElement>(null);
+	const phoneRef = useRef<HTMLInputElement>(null);
 
 	const doLogin = useCallback(async () => {
 		try {
@@ -69,6 +62,34 @@ const Join: NextPage = () => {
 			await sweetMixinErrorAlert(err.message);
 		}
 	}, [input, router]);
+
+	const handleEmailKeyDown = useCallback(
+		(event: React.KeyboardEvent<HTMLInputElement>) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				if (isSignup) phoneRef.current?.focus();
+				else passwordRef.current?.focus();
+			}
+		},
+		[isSignup],
+	);
+
+	const handlePhoneKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			passwordRef.current?.focus();
+		}
+	}, []);
+
+	const handleAuthKeyDown = useCallback(
+		(event: React.KeyboardEvent<HTMLInputElement>) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				loginView ? doLogin() : doSignUp();
+			}
+		},
+		[loginView, doLogin, doSignUp],
+	);
 
 	const ink = '#0b1f3b';
 	const subtle = '#5a6175';
@@ -163,7 +184,6 @@ const Join: NextPage = () => {
 						<Stack direction="row" spacing={1} alignItems="center">
 							{heroAvatars.map((src, idx) => (
 								<Avatar
-									// eslint-disable-next-line react/no-array-index-key
 									key={idx}
 									src={src}
 									sx={{
@@ -194,7 +214,6 @@ const Join: NextPage = () => {
 					>
 						{Array.from({ length: 21 }).map((_, idx) => (
 							<Box
-								// eslint-disable-next-line react/no-array-index-key
 								key={idx}
 								sx={{
 									width: 10,
@@ -290,7 +309,7 @@ const Join: NextPage = () => {
 								fullWidth
 								value={input.nick}
 								onChange={(e) => handleInput('nick', e.target.value)}
-								onKeyDown={handleKeyDown}
+								onKeyDown={handleEmailKeyDown}
 								InputLabelProps={{ shrink: true }}
 								variant="outlined"
 								sx={inputStyle}
@@ -310,7 +329,8 @@ const Join: NextPage = () => {
 									fullWidth
 									value={input.phone}
 									onChange={(e) => handleInput('phone', e.target.value)}
-									onKeyDown={handleKeyDown}
+									onKeyDown={handlePhoneKeyDown}
+									inputRef={phoneRef}
 									InputLabelProps={{ shrink: true }}
 									variant="outlined"
 									sx={inputStyle}
@@ -331,7 +351,8 @@ const Join: NextPage = () => {
 								type="password"
 								value={input.password}
 								onChange={(e) => handleInput('password', e.target.value)}
-								onKeyDown={handleKeyDown}
+								onKeyDown={handleAuthKeyDown}
+								inputRef={passwordRef}
 								InputLabelProps={{ shrink: true }}
 								variant="outlined"
 								sx={inputStyle}

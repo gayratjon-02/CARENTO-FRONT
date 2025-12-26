@@ -15,7 +15,6 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const CS: NextPage = () => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 
 	/** HANDLERS **/
@@ -31,46 +30,72 @@ const CS: NextPage = () => {
 	};
 	const tab = router.query.tab ?? 'notice';
 
-	if (device === 'mobile') {
-		return <h1>CS PAGE MOBILE</h1>;
-	} else {
-		return (
-			<Stack className={'cs-page'}>
-				<Stack className={'container'}>
-					<Box component={'div'} className={'cs-main-info'}>
-						<Box component={'div'} className={'info'}>
-							<span>Cs center</span>
-							<p>I will answer your questions</p>
-						</Box>
-						<Box component={'div'} className={'btns'}>
-							<div
-								className={tab == 'notice' ? 'active' : ''}
-								onClick={() => {
-									changeTabHandler('notice');
-								}}
-							>
-								Notice
-							</div>
-							<div
-								className={tab == 'faq' ? 'active' : ''}
-								onClick={() => {
-									changeTabHandler('faq');
-								}}
-							>
+	return (
+		<Stack className={'cs-page'}>
+			<Stack className={'container'}>
+				<Box className="cs-hero">
+					<div className="cs-hero__text">
+						<p className="eyebrow">Support Center</p>
+						<h1>We’re here to help Carento drivers and dealers.</h1>
+						<p className="sub">
+							Find answers fast, explore notices, or reach out to our team. Average response time under 1 hour.
+						</p>
+						<div className="cs-hero__actions">
+							<button className={tab === 'notice' ? 'active' : ''} onClick={() => changeTabHandler('notice')}>
+								Notices
+							</button>
+							<button className={tab === 'faq' ? 'active ghost' : 'ghost'} onClick={() => changeTabHandler('faq')}>
 								FAQ
-							</div>
-						</Box>
-					</Box>
+							</button>
+						</div>
+					</div>
+					<div className="cs-hero__card">
+						<div className="card-title">Need direct assistance?</div>
+						<div className="card-row">
+							<span>Call us</span>
+							<strong>+82 10 8336 2002</strong>
+						</div>
+						<div className="card-row">
+							<span>Email</span>
+							<strong>support@carento.tech</strong>
+						</div>
+						<div className="card-row muted">Response time: under 1 hour · 24/7</div>
+					</div>
+				</Box>
 
-					<Box component={'div'} className={'cs-content'}>
-						{tab === 'notice' && <Notice />}
+				<Box className="cs-highlights">
+					<div className="highlight">
+						<strong>24/7</strong>
+						<span>Support availability</span>
+					</div>
+					<div className="divider" />
+					<div className="highlight">
+						<strong>Notice</strong>
+						<span>Platform updates & maintenance</span>
+					</div>
+					<div className="divider" />
+					<div className="highlight">
+						<strong>FAQ</strong>
+						<span>Top answers for renters & dealers</span>
+					</div>
+				</Box>
 
-						{tab === 'faq' && <Faq />}
-					</Box>
-				</Stack>
+				<Box className={'cs-content'}>
+					<div className="cs-tabs">
+						<button className={tab === 'notice' ? 'active' : ''} onClick={() => changeTabHandler('notice')}>
+							Notices
+						</button>
+						<button className={tab === 'faq' ? 'active' : ''} onClick={() => changeTabHandler('faq')}>
+							FAQ
+						</button>
+					</div>
+
+					{tab === 'notice' && <Notice />}
+					{tab === 'faq' && <Faq />}
+				</Box>
 			</Stack>
-		);
-	}
+		</Stack>
+	);
 };
 
 export default withLayoutBasic(CS);
