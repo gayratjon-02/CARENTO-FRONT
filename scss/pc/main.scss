@@ -4,7 +4,6 @@
 
 @import '/scss/pc/homepage/homepage';
 
-@import '/scss/pc/property/property';
 @import '/scss/pc/property/detail.scss';
 
 @import '/scss/pc/car/car.scss';
@@ -52,24 +51,24 @@ body::-webkit-scrollbar {
 
 #pc-wrap {
 	#top {
-			.navbar {
-				.navbar-main {
-					position: fixed;
-					padding: 22px 0px;
-					width: 100%;
-					height: 87px;
-					display: flex;
-					flex-direction: column;
-					box-sizing: border-box;
-					z-index: 99;
-					align-items: center;
-					border-top: 1px solid rgba(255, 255, 255, 0.07);
-					background: linear-gradient(135deg, rgba(12, 16, 34, 0.9) 0%, rgba(15, 23, 42, 0.82) 100%);
-					box-shadow: 0 24px 50px rgba(5, 10, 25, 0.35);
-					&.transparent {
-						background-color: #181a209e;
-					}
-					// background-color: rgba(255, 0, 0, 0.207);
+		.navbar {
+			.navbar-main {
+				position: fixed;
+				padding: 22px 0px;
+				width: 100%;
+				height: 87px;
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				z-index: 99;
+				align-items: center;
+				border-top: 1px solid rgba(255, 255, 255, 0.07);
+				background: linear-gradient(135deg, rgba(12, 16, 34, 0.9) 0%, rgba(15, 23, 42, 0.82) 100%);
+				box-shadow: 0 24px 50px rgba(5, 10, 25, 0.35);
+				&.transparent {
+					background-color: #181a209e;
+				}
+				// background-color: rgba(255, 0, 0, 0.207);
 
 				.top-container {
 					position: relative;
@@ -196,7 +195,7 @@ body::-webkit-scrollbar {
 						backdrop-filter: blur(10px);
 						white-space: nowrap;
 						z-index: 1;
-						
+
 						&:hover {
 							border-color: rgba(99, 102, 241, 0.6);
 							background: linear-gradient(135deg, rgba(99, 102, 241, 0.32) 0%, rgba(14, 165, 233, 0.28) 100%);
@@ -204,7 +203,7 @@ body::-webkit-scrollbar {
 							transform: translate(-50%, -51%);
 						}
 					}
-					
+
 					.toggle-arrow {
 						color: rgba(90, 156, 214, 0.827);
 						position: absolute;
@@ -219,7 +218,7 @@ body::-webkit-scrollbar {
 						z-index: 2;
 						width: 16px;
 						height: 16px;
-						
+
 						&:hover {
 							transform: translateX(-50%) scale(1.2);
 						}
@@ -242,7 +241,7 @@ body::-webkit-scrollbar {
 							backdrop-filter: blur(10px);
 							cursor: pointer;
 							transition: all 0.3s ease;
-							
+
 							&:hover {
 								border-color: rgba(14, 165, 233, 0.6);
 								background: rgba(79, 70, 229, 0.16);
@@ -380,9 +379,7 @@ body::-webkit-scrollbar {
 					background: linear-gradient(135deg, rgba(24, 26, 32, 0.9) 0%, rgba(40, 42, 50, 0.85) 100%);
 					backdrop-filter: blur(20px);
 					border: 2px solid rgba(99, 102, 241, 0.28);
-					box-shadow: 
-						0 8px 32px rgba(0, 0, 0, 0.4),
-						0 0 40px rgba(99, 102, 241, 0.15),
+					box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 40px rgba(99, 102, 241, 0.15),
 						inset 0 2px 10px rgba(255, 255, 255, 0.05);
 					transition: all 0.5s ease-in-out;
 					overflow: hidden;
@@ -392,7 +389,7 @@ body::-webkit-scrollbar {
 					margin-top: 0;
 					padding-top: 0;
 					padding-bottom: 0;
-					
+
 					&.visible {
 						max-height: 2000px;
 						opacity: 1;
@@ -401,7 +398,7 @@ body::-webkit-scrollbar {
 						padding-top: 20px;
 						padding-bottom: 20px;
 					}
-					
+
 					&.hidden {
 						max-height: 0;
 						opacity: 0;
@@ -414,14 +411,14 @@ body::-webkit-scrollbar {
 						display: flex;
 						align-items: center;
 						justify-content: flex-start;
-						
+
 						img {
 							width: 40px;
 							height: 40px;
 							cursor: pointer;
 							object-fit: contain;
 						}
-						
+
 						.logo-text {
 							color: #fff;
 							font-family: $font;
@@ -492,17 +489,17 @@ body::-webkit-scrollbar {
 							background: transparent;
 							cursor: pointer;
 							transition: all 0.3s ease;
-							
+
 							&:hover {
 								border-color: rgba(255, 255, 255, 0.4);
 								background: rgba(255, 255, 255, 0.05);
 							}
-							
+
 							svg {
 								color: #ffffff;
 								font-size: 20px;
 							}
-							
+
 							span {
 								font-family: $font;
 								font-size: 14px;
@@ -558,7 +555,7 @@ body::-webkit-scrollbar {
 		align-items: center;
 		justify-content: center;
 		z-index: 1;
-		
+
 		.header-video {
 			position: absolute;
 			top: 0;
@@ -568,7 +565,7 @@ body::-webkit-scrollbar {
 			object-fit: cover;
 			z-index: 0;
 		}
-		
+
 		.hero-section {
 			position: relative;
 			z-index: 2;
@@ -587,7 +584,7 @@ body::-webkit-scrollbar {
 			border: none;
 			box-shadow: none;
 			backdrop-filter: none;
-			
+
 			.hero-label {
 				font-family: $font;
 				font-size: 13px;
@@ -601,7 +598,7 @@ body::-webkit-scrollbar {
 				background: linear-gradient(120deg, #a78bfa 0%, #22d3ee 50%, #34d399 100%);
 				box-shadow: 0 10px 30px rgba(79, 70, 229, 0.35);
 			}
-			
+
 			.hero-title {
 				font-family: $font;
 				font-size: 56px;
@@ -624,7 +621,7 @@ body::-webkit-scrollbar {
 				line-height: 1.6;
 				max-width: 620px;
 			}
-			
+
 			.hero-features {
 				display: flex;
 				flex-direction: row;
@@ -632,7 +629,7 @@ body::-webkit-scrollbar {
 				flex-wrap: wrap;
 				gap: 32px;
 				margin-top: 24px;
-				
+
 				.feature-item {
 					display: flex;
 					align-items: center;
@@ -644,20 +641,20 @@ body::-webkit-scrollbar {
 					border: 1px solid rgba(255, 255, 255, 0.2);
 					box-shadow: 0 12px 32px rgba(5, 10, 25, 0.28);
 					transition: all 0.25s ease;
-					
+
 					&:hover {
 						background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(34, 197, 94, 0.24));
 						border-color: rgba(79, 70, 229, 0.45);
 						transform: translateY(-2px) scale(1.01);
 						box-shadow: 0 14px 36px rgba(79, 70, 229, 0.25);
 					}
-					
+
 					.check-icon {
 						color: #a78bfa;
 						font-size: 22px;
 						filter: drop-shadow(0 2px 6px rgba(167, 139, 250, 0.45));
 					}
-					
+
 					span {
 						font-family: $font;
 						font-size: 16px;
@@ -668,45 +665,45 @@ body::-webkit-scrollbar {
 					}
 				}
 			}
-			
+
 			@media (max-width: 768px) {
 				max-width: 100%;
 				padding: 0 16px;
 				gap: 20px;
-				
+
 				.hero-label {
 					font-size: 12px;
 					letter-spacing: 1.5px;
 				}
-				
+
 				.hero-title {
 					font-size: 32px;
 				}
-				
+
 				.hero-features {
 					gap: 16px;
-					
+
 					.feature-item {
 						padding: 6px 12px;
-						
+
 						.check-icon {
 							font-size: 18px;
 						}
-						
+
 						span {
 							font-size: 14px;
 						}
 					}
 				}
 			}
-			
+
 			@media (max-width: 480px) {
 				gap: 16px;
-				
+
 				.hero-title {
 					font-size: 24px;
 				}
-				
+
 				.hero-features {
 					flex-direction: column;
 					align-items: center;
@@ -1110,9 +1107,7 @@ body::-webkit-scrollbar {
 			justify-content: center;
 			border-radius: 20px;
 			background: linear-gradient(145deg, #4f46e5, #06b6d4);
-			box-shadow:
-				0 18px 40px rgba(12, 23, 54, 0.45),
-				0 0 0 8px rgba(79, 70, 229, 0.18);
+			box-shadow: 0 18px 40px rgba(12, 23, 54, 0.45), 0 0 0 8px rgba(79, 70, 229, 0.18);
 			transition: all 0.3s ease;
 			z-index: 999;
 			overflow: hidden;
@@ -1137,18 +1132,14 @@ body::-webkit-scrollbar {
 			&:hover {
 				cursor: pointer;
 				transform: translateY(-3px) scale(1.02);
-				box-shadow:
-					0 22px 50px rgba(12, 23, 54, 0.55),
-					0 0 0 10px rgba(79, 70, 229, 0.2);
+				box-shadow: 0 22px 50px rgba(12, 23, 54, 0.55), 0 0 0 10px rgba(79, 70, 229, 0.2);
 			}
 			&:active {
 				scale: 0.97;
 			}
 			&.open {
 				background: linear-gradient(145deg, #0f172a, #111827);
-				box-shadow:
-					0 18px 40px rgba(12, 23, 54, 0.45),
-					0 0 0 6px rgba(15, 23, 42, 0.25);
+				box-shadow: 0 18px 40px rgba(12, 23, 54, 0.45), 0 0 0 6px rgba(15, 23, 42, 0.25);
 			}
 		}
 		.chat-frame {
@@ -1162,9 +1153,7 @@ body::-webkit-scrollbar {
 			background: rgba(12, 17, 29, 0.92);
 			border-radius: 20px;
 			border: 1px solid rgba(255, 255, 255, 0.08);
-			box-shadow:
-				0 25px 60px rgba(7, 14, 30, 0.55),
-				0 0 0 10px rgba(79, 70, 229, 0.08);
+			box-shadow: 0 25px 60px rgba(7, 14, 30, 0.55), 0 0 0 10px rgba(79, 70, 229, 0.08);
 			z-index: 100;
 			transition: all 0.25s ease, transform 0.3s ease, opacity 0.3s ease;
 			transform: translateY(12px);
@@ -1188,32 +1177,32 @@ body::-webkit-scrollbar {
 				line-height: 54px;
 				color: #ffffff;
 				background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(14, 165, 233, 0.18));
-			.chat-title {
-				display: inline-flex;
-				align-items: center;
-				gap: 8px;
-				font-weight: 800;
-				letter-spacing: 0.4px;
-				svg {
-					color: #22d3ee;
+				.chat-title {
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					font-weight: 800;
+					letter-spacing: 0.4px;
+					svg {
+						color: #22d3ee;
+					}
+				}
+				.chat-stats {
+					display: inline-flex;
+					align-items: center;
+					gap: 8px;
+					small {
+						color: #cbd5e1;
+						font-size: 11px;
+						font-weight: 700;
+						letter-spacing: 0.2px;
+					}
+					.chat-stats__icon {
+						color: #22d3ee;
+						font-size: 18px;
+					}
 				}
 			}
-			.chat-stats {
-				display: inline-flex;
-				align-items: center;
-				gap: 8px;
-				small {
-					color: #cbd5e1;
-					font-size: 11px;
-					font-weight: 700;
-					letter-spacing: 0.2px;
-				}
-				.chat-stats__icon {
-					color: #22d3ee;
-					font-size: 18px;
-				}
-			}
-		}
 			.chat-content {
 				position: relative;
 				padding: 12px 16px;
@@ -1860,7 +1849,12 @@ body::-webkit-scrollbar {
 				gap: 14px;
 				border-radius: 999px;
 				border: 1px solid rgba(255, 255, 255, 0.28);
-				background: linear-gradient(135deg, rgba(14, 22, 40, 0.9) 0%, rgba(30, 48, 86, 0.88) 50%, rgba(14, 22, 40, 0.9) 100%);
+				background: linear-gradient(
+					135deg,
+					rgba(14, 22, 40, 0.9) 0%,
+					rgba(30, 48, 86, 0.88) 50%,
+					rgba(14, 22, 40, 0.9) 100%
+				);
 				box-shadow: 0 16px 36px rgba(7, 12, 30, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 				backdrop-filter: blur(14px);
 			}
