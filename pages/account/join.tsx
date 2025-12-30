@@ -37,7 +37,19 @@ const Join: NextPage = () => {
 	const router = useRouter();
 	const [input, setInput] = useState({ nick: '', password: '', phone: '', type: 'USER' });
 	const [loginView, setLoginView] = useState<boolean>(true);
+	const MIN_NICK_LENGTH = 3;
+	const MIN_PASSWORD_LENGTH = 5;
+	const MIN_PHONE_LENGTH = 3;
+
 	const isSignup = useMemo(() => !loginView, [loginView]);
+	const isLoginValid = useMemo(
+		() => input.nick.trim().length >= MIN_NICK_LENGTH && input.password.trim().length >= MIN_PASSWORD_LENGTH,
+		[input],
+	);
+	const isSignupValid = useMemo(
+		() => isLoginValid && input.phone.trim().length >= MIN_PHONE_LENGTH && input.type !== '',
+		[input, isLoginValid],
+	);
 
 	const handleInput = useCallback((name: any, value: any) => {
 		setInput((prev) => ({ ...prev, [name]: value }));
@@ -46,22 +58,34 @@ const Join: NextPage = () => {
 	const phoneRef = useRef<HTMLInputElement>(null);
 
 	const doLogin = useCallback(async () => {
+		if (!isLoginValid) {
+			await sweetMixinErrorAlert(
+				`Username must be at least ${MIN_NICK_LENGTH} characters and password at least ${MIN_PASSWORD_LENGTH} characters.`,
+			);
+			return;
+		}
 		try {
 			await logIn(input.nick, input.password);
 			await router.push(`${router.query.referrer ?? '/'}`);
 		} catch (err: any) {
 			await sweetMixinErrorAlert(err.message);
 		}
-	}, [input, router]);
+	}, [input, router, isLoginValid]);
 
 	const doSignUp = useCallback(async () => {
+		if (!isSignupValid) {
+			await sweetMixinErrorAlert(
+				`Please complete all required fields (username ${MIN_NICK_LENGTH}+ chars, password ${MIN_PASSWORD_LENGTH}+ chars, phone number).`,
+			);
+			return;
+		}
 		try {
 			await signUp(input.nick, input.password, input.phone, input.type);
 			await router.push(`${router.query.referrer ?? '/'}`);
 		} catch (err: any) {
 			await sweetMixinErrorAlert(err.message);
 		}
-	}, [input, router]);
+	}, [input, router, isSignupValid]);
 
 	const handleEmailKeyDown = useCallback(
 		(event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -346,7 +370,7 @@ const Join: NextPage = () => {
 
 							<TextField
 								label="Password"
-								placeholder="min 8 chars"
+								placeholder={`min ${MIN_PASSWORD_LENGTH} chars`}
 								fullWidth
 								type="password"
 								value={input.password}
@@ -437,9 +461,7 @@ const Join: NextPage = () => {
 							}}
 							endIcon={<ArrowForwardIcon />}
 							onClick={loginView ? doLogin : doSignUp}
-							disabled={
-								input.nick === '' || input.password === '' || (isSignup && (input.phone === '' || input.type === ''))
-							}
+							disabled={loginView ? !isLoginValid : !isSignupValid}
 						>
 							{loginView ? 'Sign in' : 'Sign up'}
 						</Button>
