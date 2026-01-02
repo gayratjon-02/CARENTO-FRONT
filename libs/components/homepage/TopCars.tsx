@@ -10,6 +10,7 @@ import TopCarCard from './TopCarCard';
 import { useRouter } from 'next/router';
 import { CarsInquiry } from 'libs/types/car/cars.input';
 import { Car } from 'libs/types/car/cars';
+import { useTranslation } from 'next-i18next';
 
 interface TopCarsProps {
 	initialInput: CarsInquiry;
@@ -20,6 +21,7 @@ const PAGE_SIZE = 4;
 const TopCars = (props: TopCarsProps) => {
 	const { initialInput } = props;
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const [topCars, setTopCars] = useState<Car[]>([]);
 	const [page, setPage] = useState(1);
 
@@ -49,16 +51,19 @@ const TopCars = (props: TopCarsProps) => {
 	}, [topCars.length]);
 
 	const curatedLabel = useMemo(() => {
-		if (!topCars.length) return 'Curating new rides for you';
-		return `${topCars.length} curated rides, updated hourly`;
-	}, [topCars]);
+		if (!topCars.length) return t('Curating new rides for you', { defaultValue: 'Curating new rides for you' });
+		return t('{{count}} curated rides, updated hourly', {
+			count: topCars.length,
+			defaultValue: '{{count}} curated rides, updated hourly',
+		});
+	}, [topCars, t]);
 
 	const heroStats = useMemo(() => {
 		if (!topCars.length) {
 			return [
-				{ label: 'Avg. daily rate', value: '$—' },
-				{ label: 'Community likes', value: '—' },
-				{ label: 'Seats this week', value: '—' },
+				{ label: t('Avg. daily rate', { defaultValue: 'Avg. daily rate' }), value: '$—' },
+				{ label: t('Community likes', { defaultValue: 'Community likes' }), value: '—' },
+				{ label: t('Seats this week', { defaultValue: 'Seats this week' }), value: '—' },
 			];
 		}
 		const totalPrice = topCars.reduce((acc, car) => acc + (Number(car?.pricePerDay) || 0), 0);
@@ -67,11 +72,11 @@ const TopCars = (props: TopCarsProps) => {
 		const avgPrice = totalPrice && topCars.length ? Math.round(totalPrice / topCars.length) : 0;
 
 		return [
-			{ label: 'Avg. daily rate', value: avgPrice ? `$${avgPrice}` : '$—' },
-			{ label: 'Community likes', value: totalLikes.toLocaleString() },
-			{ label: 'Seats this week', value: `${totalSeats}+` },
+			{ label: t('Avg. daily rate', { defaultValue: 'Avg. daily rate' }), value: avgPrice ? `$${avgPrice}` : '$—' },
+			{ label: t('Community likes', { defaultValue: 'Community likes' }), value: totalLikes.toLocaleString() },
+			{ label: t('Seats this week', { defaultValue: 'Seats this week' }), value: `${totalSeats}+` },
 		];
-	}, [topCars]);
+	}, [topCars, t]);
 
 	const handleViewAllCars = () => {
 		router.push('/car');
@@ -96,11 +101,16 @@ const TopCars = (props: TopCarsProps) => {
 
 	const showPagination = !isEmptyState && totalPages > 1;
 	const showingLabel = useMemo(() => {
-		if (!topCars.length) return '0 cars';
+		if (!topCars.length) return t('0 cars', { defaultValue: '0 cars' });
 		const start = (page - 1) * PAGE_SIZE + 1;
 		const end = Math.min(page * PAGE_SIZE, topCars.length);
-		return `${start}–${end} / ${topCars.length}`;
-	}, [page, topCars]);
+		return t('{{start}}–{{end}} / {{total}}', {
+			start,
+			end,
+			total: topCars.length,
+			defaultValue: '{{start}}–{{end}} / {{total}}',
+		});
+	}, [page, topCars, t]);
 
 	/** HANDLERS **/
 
@@ -129,11 +139,22 @@ const TopCars = (props: TopCarsProps) => {
 			<Stack className={'container'}>
 				<Box className="top-hero">
 					<Box className="top-hero__copy">
-						<span className="eyebrow-pill live">Garage spotlight</span>
-						<h2 className="hero-title">Weekend-worthy rides, curated by real trips</h2>
+						<span className="eyebrow-pill live">
+							{t('Garage spotlight', { defaultValue: 'Garage spotlight' })}
+						</span>
+						<h2 className="hero-title">
+							{t('Weekend-worthy rides, curated by real trips', {
+								defaultValue: 'Weekend-worthy rides, curated by real trips',
+							})}
+						</h2>
 						<p className="hero-desc">
-							We mine community likes, uptime, and host response times to surface rides that feel effortless from key
-							handoff to drop-off.
+							{t(
+								'We mine community likes, uptime, and host response times to surface rides that feel effortless from key handoff to drop-off.',
+								{
+									defaultValue:
+										'We mine community likes, uptime, and host response times to surface rides that feel effortless from key handoff to drop-off.',
+								},
+							)}
 						</p>
 						<Box className="hero-meta">
 							<span className="pulse" />
@@ -141,10 +162,10 @@ const TopCars = (props: TopCarsProps) => {
 						</Box>
 						<Box className="cta-row">
 							<button className="primary-cta" onClick={handleViewAllCars}>
-								Browse all cars
+								{t('Browse all cars', { defaultValue: 'Browse all cars' })}
 							</button>
 							<button className="ghost-cta" onClick={handleWhyCurated}>
-								How we rank
+								{t('How we rank', { defaultValue: 'How we rank' })}
 							</button>
 						</Box>
 						<Box className="stat-grid">
@@ -152,7 +173,7 @@ const TopCars = (props: TopCarsProps) => {
 								<Box key={item.label} className="stat-card">
 									<span>{item.label}</span>
 									<strong>{item.value}</strong>
-									<p>Based on live garage data</p>
+									<p>{t('Based on live garage data', { defaultValue: 'Based on live garage data' })}</p>
 								</Box>
 							))}
 						</Box>
@@ -160,12 +181,12 @@ const TopCars = (props: TopCarsProps) => {
 					<Box className="top-hero__badge">
 						<div className="glow" />
 						<div className="badge-card">
-							<p>Confidence score</p>
+							<p>{t('Confidence score', { defaultValue: 'Confidence score' })}</p>
 							<strong>96%</strong>
-							<span>Hosts respond under 15m</span>
+							<span>{t('Hosts respond under 15m', { defaultValue: 'Hosts respond under 15m' })}</span>
 							<div className="badge-row">
 								<span className="dot live" />
-								<span>Realtime refresh</span>
+								<span>{t('Realtime refresh', { defaultValue: 'Realtime refresh' })}</span>
 							</div>
 						</div>
 						<div className="badge-chip">{curatedLabel}</div>
@@ -175,10 +196,13 @@ const TopCars = (props: TopCarsProps) => {
 				<Stack className={'card-box top-grid-shell'}>
 					<Box className="grid-shell">
 						{getCarsLoading && !topCars.length ? (
-							<Box className="empty-top-cars">Loading top cars...</Box>
+							<Box className="empty-top-cars">{t('Loading top cars...', { defaultValue: 'Loading top cars...' })}</Box>
 						) : isEmptyState ? (
 							<Box className="empty-top-cars">
-								{getCarsError?.message || 'We are refreshing the garage. Check back soon!'}
+								{getCarsError?.message ||
+									t('We are refreshing the garage. Check back soon!', {
+										defaultValue: 'We are refreshing the garage. Check back soon!',
+									})}
 							</Box>
 						) : (
 							<Box className="top-grid">
