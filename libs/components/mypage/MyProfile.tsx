@@ -10,12 +10,14 @@ import { userVar } from '../../../apollo/store';
 import { MemberUpdate } from '../../types/member/member.update';
 import { UPDATE_MEMBER } from '../../../apollo/user/mutation';
 import { sweetErrorHandling, sweetMixinSuccessAlert } from '../../sweetAlert';
+import { useTranslation } from 'next-i18next';
 
 const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	const device = useDeviceDetect();
 	const token = getJwtToken();
 	const user = useReactiveVar(userVar);
 	const [updateData, setUpdateData] = useState<MemberUpdate>(initialValues);
+	const { t } = useTranslation('common');
 
 	/** APOLLO REQUESTS **/
 	const [updateMember] = useMutation(UPDATE_MEMBER);
@@ -114,11 +116,11 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 			const jwtToken = result.data.updateMember?.accessToken;
 			await updateStorage({ jwtToken });
 			updateUserInfo(result.data.updateMember?.accessToken);
-			await sweetMixinSuccessAlert('information updated successfully.');
+			await sweetMixinSuccessAlert(t('Information updated successfully.', { defaultValue: 'Information updated successfully.' }));
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
-	}, [updateData, updateMember, user._id]);
+	}, [updateData, updateMember, user._id, t]);
 
 	console.log('+updateData', updateData);
 
@@ -129,13 +131,15 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 			<div id="my-profile-page">
 				<Stack className="main-title-box">
 					<Stack className="right-box">
-						<Typography className="main-title">My Profile</Typography>
-						<Typography className="sub-title">We are glad to see you again!</Typography>
+						<Typography className="main-title">{t('My Profile', { defaultValue: 'My Profile' })}</Typography>
+						<Typography className="sub-title">
+							{t('We are glad to see you again!', { defaultValue: 'We are glad to see you again!' })}
+						</Typography>
 					</Stack>
 				</Stack>
 				<Stack className="top-box">
 					<Stack className="photo-box">
-						<Typography className="title">Photo</Typography>
+						<Typography className="title">{t('Photo', { defaultValue: 'Photo' })}</Typography>
 						<Stack className="image-big-box">
 							<Stack className="image-box">
 								<img
@@ -156,27 +160,31 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 									accept="image/jpg, image/jpeg, image/png"
 								/>
 								<label htmlFor="hidden-input" className="labeler">
-									<Typography>Upload Profile Image</Typography>
+									<Typography>{t('Upload Profile Image', { defaultValue: 'Upload Profile Image' })}</Typography>
 								</label>
-								<Typography className="upload-text">A photo must be in JPG, JPEG or PNG format!</Typography>
+								<Typography className="upload-text">
+									{t('A photo must be in JPG, JPEG or PNG format!', {
+										defaultValue: 'A photo must be in JPG, JPEG or PNG format!',
+									})}
+								</Typography>
 							</Stack>
 						</Stack>
 					</Stack>
 					<Stack className="small-input-box">
 						<Stack className="input-box">
-							<Typography className="title">Username</Typography>
+							<Typography className="title">{t('Username', { defaultValue: 'Username' })}</Typography>
 							<input
 								type="text"
-								placeholder="Your username"
+								placeholder={t('Your username', { defaultValue: 'Your username' })}
 								value={updateData.memberNick}
 								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberNick: value })}
 							/>
 						</Stack>
 						<Stack className="input-box">
-							<Typography className="title">Phone</Typography>
+							<Typography className="title">{t('Phone', { defaultValue: 'Phone' })}</Typography>
 							<input
 								type="text"
-								placeholder="Your Phone"
+								placeholder={t('Your Phone', { defaultValue: 'Your Phone' })}
 								value={updateData.memberPhone}
 								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberPhone: value })}
 							/>
@@ -184,42 +192,42 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 					</Stack>
 					<Stack className="small-input-box">
 						<Stack className="input-box">
-							<Typography className="title">Full Name</Typography>
+							<Typography className="title">{t('Full Name', { defaultValue: 'Full Name' })}</Typography>
 							<input
 								type="text"
-								placeholder="Your full name"
+								placeholder={t('Your full name', { defaultValue: 'Your full name' })}
 								value={updateData.memberFullName}
 								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberFullName: value })}
 							/>
 						</Stack>
 						<Stack className="input-box">
-							<Typography className="title">Password</Typography>
+							<Typography className="title">{t('Password', { defaultValue: 'Password' })}</Typography>
 							<input
 								type="password"
-								placeholder="New password"
+								placeholder={t('New password', { defaultValue: 'New password' })}
 								value={updateData.memberPassword ?? ''}
 								onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberPassword: value })}
 							/>
 						</Stack>
 					</Stack>
 					<Stack className="input-box">
-						<Typography className="title">Address</Typography>
+						<Typography className="title">{t('Address', { defaultValue: 'Address' })}</Typography>
 						<input
 							type="text"
-							placeholder="Your address"
+							placeholder={t('Your address', { defaultValue: 'Your address' })}
 							value={updateData.memberAddress}
 							onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberAddress: value })}
 						/>
 					</Stack>
 					<Stack className="about-me-box">
-						<Typography className="title">About</Typography>
+						<Typography className="title">{t('About', { defaultValue: 'About' })}</Typography>
 						<textarea
-							placeholder="Tell about yourself"
+							placeholder={t('Tell about yourself', { defaultValue: 'Tell about yourself' })}
 							value={updateData.memberDesc ?? ''}
 							onChange={({ target: { value } }) => setUpdateData({ ...updateData, memberDesc: value })}
 						/>
 						<Button className="update-button" onClick={updatePropertyHandler}>
-							<Typography>Update Profile</Typography>
+							<Typography>{t('Update Profile', { defaultValue: 'Update Profile' })}</Typography>
 							<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none">
 								<g clipPath="url(#clip0_7065_6985)">
 									<path
