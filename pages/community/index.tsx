@@ -15,6 +15,7 @@ import { LIKE_TARGET_BOARD_ARTICLE } from '../../apollo/user/mutation';
 import { GET_ARTICLES } from '../../apollo/user/query';
 import { Messages } from '../../libs/config';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
+import { useTranslation } from 'next-i18next';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -26,16 +27,17 @@ const Community: NextPage = ({ initialInput }: T) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const { query } = router;
+	const { t } = useTranslation('common');
 	const articleCategory = query?.articleCategory as string;
 	const [searchCommunity, setSearchCommunity] = useState<BoardArticlesInquiry>(initialInput);
 	const [boardArticles, setBoardArticles] = useState<Article[]>([]);
 	const [totalCount, setTotalCount] = useState<number>(0);
 
 	const categories = [
-		{ key: 'FREE', label: 'Free Board', desc: 'Open chat about anything' },
-		{ key: 'RECOMMEND', label: 'Recommend', desc: 'Best spots & services' },
-		{ key: 'NEWS', label: 'News', desc: 'Auto industry updates' },
-		{ key: 'HUMOR', label: 'Humor', desc: 'Memes & fun' },
+		{ key: 'FREE', label: t('Free Board', { defaultValue: 'Free Board' }), desc: t('Open chat about anything', { defaultValue: 'Open chat about anything' }) },
+		{ key: 'RECOMMEND', label: t('Recommend', { defaultValue: 'Recommend' }), desc: t('Best spots & services', { defaultValue: 'Best spots & services' }) },
+		{ key: 'NEWS', label: t('News', { defaultValue: 'News' }), desc: t('Auto industry updates', { defaultValue: 'Auto industry updates' }) },
+		{ key: 'HUMOR', label: t('Humor', { defaultValue: 'Humor' }), desc: t('Memes & fun', { defaultValue: 'Memes & fun' }) },
 	];
 
 	/** APOLLO REQUESTS **/
@@ -117,10 +119,12 @@ const Community: NextPage = ({ initialInput }: T) => {
 			<div className="container">
 				<Stack className="community-hero">
 					<Stack className="hero-text" spacing={1.2}>
-						<Typography className="eyebrow">Community</Typography>
-						<Typography className="hero-title">Drive the conversation.</Typography>
+						<Typography className="eyebrow">{t('Community', { defaultValue: 'Community' })}</Typography>
+						<Typography className="hero-title">{t('Drive the conversation.', { defaultValue: 'Drive the conversation.' })}</Typography>
 						<Typography className="hero-sub">
-							Learn, share, and laugh with enthusiasts. Pick a lane and dive into the latest posts.
+							{t('Learn, share, and laugh with enthusiasts. Pick a lane and dive into the latest posts.', {
+								defaultValue: 'Learn, share, and laugh with enthusiasts. Pick a lane and dive into the latest posts.',
+							})}
 						</Typography>
 						<Stack direction="row" spacing={1.2} className="hero-actions">
 							<Button
@@ -132,28 +136,28 @@ const Community: NextPage = ({ initialInput }: T) => {
 									})
 								}
 							>
-								Write an article
+								{t('Write an article', { defaultValue: 'Write an article' })}
 							</Button>
 							<Button sx={{color:'red'}}  variant="outlined" onClick={() => tabChangeHandler(searchCommunity.search.articleCategory)}>
-								Refresh
+								{t('Refresh', { defaultValue: 'Refresh' })}
 							</Button>
 						</Stack>
 					</Stack>
 					<Stack className="hero-stats">
 						<Box className="stat-card">
 							<Typography className="stat-number">{totalCount?.toLocaleString?.() || 0}</Typography>
-							<Typography className="stat-label">Articles</Typography>
+							<Typography className="stat-label">{t('Articles', { defaultValue: 'Articles' })}</Typography>
 						</Box>
 						<Box className="stat-card">
 							<Typography className="stat-number">{searchCommunity.search.articleCategory}</Typography>
-							<Typography className="stat-label">Category</Typography>
+							<Typography className="stat-label">{t('Category', { defaultValue: 'Category' })}</Typography>
 						</Box>
 					</Stack>
 				</Stack>
 
 				<Stack className="community-layout">
 					<Stack className="sidebar">
-						<Typography className="side-title">Boards</Typography>
+						<Typography className="side-title">{t('Boards', { defaultValue: 'Boards' })}</Typography>
 						<Stack className="side-list">
 							{categories.map((cat) => (
 								<Button
@@ -169,7 +173,7 @@ const Community: NextPage = ({ initialInput }: T) => {
 							))}
 						</Stack>
 						<Box className="side-meta">
-							<Typography className="meta-title">Showing</Typography>
+							<Typography className="meta-title">{t('Showing', { defaultValue: 'Showing' })}</Typography>
 							<Typography className="meta-value">
 								{boardArticles?.length || 0} / {totalCount?.toLocaleString?.() || 0}
 							</Typography>
@@ -178,9 +182,10 @@ const Community: NextPage = ({ initialInput }: T) => {
 
 					<Stack className="content">
 						<Stack className="content-header">
-							<Typography className="content-title">Latest posts</Typography>
+							<Typography className="content-title">{t('Latest posts', { defaultValue: 'Latest posts' })}</Typography>
 							<Typography className="content-sub">
-								Sorted by newest • {searchCommunity.search.articleCategory} board
+								{t('Sorted by newest', { defaultValue: 'Sorted by newest' })} • {searchCommunity.search.articleCategory}{' '}
+								{t('board', { defaultValue: 'board' })}
 							</Typography>
 						</Stack>
 
@@ -210,8 +215,14 @@ const Community: NextPage = ({ initialInput }: T) => {
 								!boardArticlesLoading && (
 									<Box className="empty-state">
 										<img src="/img/icons/icoAlert.svg" alt="" />
-										<Typography className="empty-title">No article found</Typography>
-										<Typography className="empty-desc">Be the first to write in this category.</Typography>
+										<Typography className="empty-title">
+											{t('No article found', { defaultValue: 'No article found' })}
+										</Typography>
+										<Typography className="empty-desc">
+											{t('Be the first to write in this category.', {
+												defaultValue: 'Be the first to write in this category.',
+											})}
+										</Typography>
 										<Button
 											variant="contained"
 											onClick={() =>
@@ -221,7 +232,7 @@ const Community: NextPage = ({ initialInput }: T) => {
 												})
 											}
 										>
-											Write now
+											{t('Write now', { defaultValue: 'Write now' })}
 										</Button>
 									</Box>
 								)
