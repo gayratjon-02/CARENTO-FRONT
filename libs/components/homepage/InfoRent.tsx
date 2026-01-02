@@ -4,6 +4,7 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import { NextPage } from 'next';
+import { useTranslation } from 'next-i18next';
 
 const CHECKPOINTS = [
 	'Expert Certified Mechanics',
@@ -15,6 +16,7 @@ const CHECKPOINTS = [
 ];
 
 const InfoRent: NextPage = () => {
+	const { t } = useTranslation('common');
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 
@@ -51,21 +53,26 @@ const InfoRent: NextPage = () => {
 					</div>
 				</Stack>
 				<Stack className={'content'}>
-					<div className="badge">Best Car Rental System</div>
+					<div className="badge">{t('Best Car Rental System', { defaultValue: 'Best Car Rental System' })}</div>
 					<h3>
-						Receive a Competitive Offer
+						{t('Receive a Competitive Offer', { defaultValue: 'Receive a Competitive Offer' })}
 						<br />
-						Sell Your Car to Us Today.
+						{t('Sell Your Car to Us Today.', { defaultValue: 'Sell Your Car to Us Today.' })}
 					</h3>
 					<p>
-						We are committed to delivering exceptional service, competitive pricing, and a diverse selection of options for
-						our customers.
+						{t(
+							'We are committed to delivering exceptional service, competitive pricing, and a diverse selection of options for our customers.',
+							{
+								defaultValue:
+									'We are committed to delivering exceptional service, competitive pricing, and a diverse selection of options for our customers.',
+							},
+						)}
 					</p>
 					<Stack className="checks">
 						{CHECKPOINTS.map((item) => (
 							<div key={item} className="check-item">
 								<CheckCircleRoundedIcon />
-								<span>{item}</span>
+								<span>{t(item, { defaultValue: item })}</span>
 							</div>
 						))}
 					</Stack>
