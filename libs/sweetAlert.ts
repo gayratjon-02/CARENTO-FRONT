@@ -22,7 +22,8 @@ const applyVividStyles = (
 	popup.style.background = baseBackground;
 	popup.style.borderRadius = '18px';
 	popup.style.border = '1px solid rgba(255,255,255,0.55)';
-	popup.style.backdropFilter = 'blur(14px)';
+	popup.style.setProperty('backdrop-filter', 'blur(14px)');
+	popup.style.setProperty('-webkit-backdrop-filter', 'blur(14px)');
 	popup.style.boxShadow = '0 22px 60px rgba(15, 23, 42, 0.25)';
 	popup.style.padding = '28px 24px';
 	popup.style.transformOrigin = 'center';
