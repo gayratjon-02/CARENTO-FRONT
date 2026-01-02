@@ -8,6 +8,7 @@ import { REACT_APP_API_URL } from '../../config';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
+import { useTranslation } from 'next-i18next';
 
 interface TopAgentProps {
 	agent: Member;
@@ -17,6 +18,7 @@ const TopAgentCard = (props: TopAgentProps) => {
 	const { agent, likeMemberHandler } = props;
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 	const agentId = agent?._id ? String(agent._id) : '';
 
 	const agentImage = agent?.memberImage ? `${REACT_APP_API_URL}/${agent.memberImage}` : '/img/profile/defaultUser.svg';
@@ -72,8 +74,8 @@ const TopAgentCard = (props: TopAgentProps) => {
 			<div className="card-shell">
 				<div className="card-header">
 					<div className="header-left">
-						<span className="pill">Featured</span>
-						<span className="pill accent">Fast reply</span>
+						<span className="pill">{t('Featured', { defaultValue: 'Featured' })}</span>
+						<span className="pill accent">{t('Fast reply', { defaultValue: 'Fast reply' })}</span>
 					</div>
 					<ButtonBase className={`like-pill ${liked ? 'active' : ''}`} onClick={handleLikeClick}>
 						{liked ? <FavoriteRoundedIcon /> : <FavoriteBorderRoundedIcon />}
@@ -87,10 +89,10 @@ const TopAgentCard = (props: TopAgentProps) => {
 				</div>
 				<div className="card-body">
 					<strong>{agent?.memberNick}</strong>
-					<span>Agent</span>
+					<span>{t('Agent', { defaultValue: 'Agent' })}</span>
 					<div className="tags">
-						<span className="tag">Verified</span>
-						<span className="tag">Flexible hours</span>
+						<span className="tag">{t('Verified', { defaultValue: 'Verified' })}</span>
+						<span className="tag">{t('Flexible hours', { defaultValue: 'Flexible hours' })}</span>
 					</div>
 				</div>
 				<div className="card-footer">
