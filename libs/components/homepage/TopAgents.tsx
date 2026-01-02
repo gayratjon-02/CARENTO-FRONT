@@ -14,6 +14,7 @@ import { T } from '../../types/common';
 import { LIKE_TARGET_MEMBER } from 'apollo/user/mutation';
 import { Message } from 'libs/enums/common.enum';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from 'libs/sweetAlert';
+import { useTranslation } from 'next-i18next';
 
 interface TopAgentsProps {
 	
@@ -25,6 +26,7 @@ const TopAgents = (props: TopAgentsProps) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const [topAgents, setTopAgents] = useState<Member[]>([]);
+	const { t } = useTranslation('common');
 
 	/** APOLLO REQUESTS **/
 
@@ -72,8 +74,8 @@ const TopAgents = (props: TopAgentsProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<div className={'eyebrow'}>Community Picks</div>
-						<span>Top Dealers</span>
-						<p>Verified partners with quick response time.</p>
+						<span>{t('Top Dealers', { defaultValue: 'Top Dealers' })}</span>
+						<p>{t('Verified partners with quick response time.', { defaultValue: 'Verified partners with quick response time.' })}</p>
 					</Stack>
 					<Stack className={'wrapper'}>
 						<Swiper
@@ -104,22 +106,26 @@ const TopAgents = (props: TopAgentsProps) => {
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
 							<div className={'eyebrow'}>Trusted partners</div>
-							<span>Top Dealers</span>
-							<p>Handpicked professionals ready to serve you any time.</p>
+							<span>{t('Top Dealers', { defaultValue: 'Top Dealers' })}</span>
+							<p>
+								{t('Handpicked professionals ready to serve you any time.', {
+									defaultValue: 'Handpicked professionals ready to serve you any time.',
+								})}
+							</p>
 							<Box component={'div'} className={'stats'}>
 								<div className={'stat'}>
 									<strong>{topAgents?.length || 0}</strong>
-									<small>verified experts</small>
+									<small>{t('verified experts', { defaultValue: 'verified experts' })}</small>
 								</div>
 								<div className={'stat'}>
 									<strong>24/7</strong>
-									<small>support on call</small>
+									<small>{t('support on call', { defaultValue: 'support on call' })}</small>
 								</div>
 							</Box>
 						</Box>
 						<Box component={'div'} className={'right'}>
 							<div className={'more-box'} onClick={() => router.push('/dealers')} role="button">
-								<span>See All Dealers</span>
+								<span>{t('See All Dealers', { defaultValue: 'See All Dealers' })}</span>
 								<img src="/img/icons/rightup.svg" alt="" />
 							</div>
 						</Box>
