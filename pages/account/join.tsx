@@ -26,6 +26,7 @@ import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { logIn, signUp } from '../../libs/auth';
 import { sweetMixinErrorAlert } from '../../libs/sweetAlert';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -35,6 +36,7 @@ export const getStaticProps = async ({ locale }: any) => ({
 
 const Join: NextPage = () => {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const [input, setInput] = useState({ nick: '', password: '', phone: '', type: 'USER' });
 	const [loginView, setLoginView] = useState<boolean>(true);
 	const MIN_NICK_LENGTH = 3;
@@ -60,7 +62,11 @@ const Join: NextPage = () => {
 	const doLogin = useCallback(async () => {
 		if (!isLoginValid) {
 			await sweetMixinErrorAlert(
-				`Username must be at least ${MIN_NICK_LENGTH} characters and password at least ${MIN_PASSWORD_LENGTH} characters.`,
+				t('Username must be at least {{nick}} characters and password at least {{pwd}} characters.', {
+					nick: MIN_NICK_LENGTH,
+					pwd: MIN_PASSWORD_LENGTH,
+					defaultValue: `Username must be at least ${MIN_NICK_LENGTH} characters and password at least ${MIN_PASSWORD_LENGTH} characters.`,
+				}),
 			);
 			return;
 		}
@@ -75,7 +81,11 @@ const Join: NextPage = () => {
 	const doSignUp = useCallback(async () => {
 		if (!isSignupValid) {
 			await sweetMixinErrorAlert(
-				`Please complete all required fields (username ${MIN_NICK_LENGTH}+ chars, password ${MIN_PASSWORD_LENGTH}+ chars, phone number).`,
+				t('Please complete all required fields (username {{nick}}+ chars, password {{pwd}}+ chars, phone number).', {
+					nick: MIN_NICK_LENGTH,
+					pwd: MIN_PASSWORD_LENGTH,
+					defaultValue: `Please complete all required fields (username ${MIN_NICK_LENGTH}+ chars, password ${MIN_PASSWORD_LENGTH}+ chars, phone number).`,
+				}),
 			);
 			return;
 		}
@@ -200,10 +210,13 @@ const Join: NextPage = () => {
 							}}
 						/>
 						<Typography sx={{ fontWeight: 800, fontSize: 22 }}>
-							Smooth sign-up, premium drives.
+							{t('Smooth sign-up, premium drives.', { defaultValue: 'Smooth sign-up, premium drives.' })}
 						</Typography>
 						<Typography sx={{ opacity: 0.92, maxWidth: 420 }}>
-							Join Carento to unlock premium rides, verified hosts, and concierge support — all from a single account.
+							{t('Join Carento to unlock premium rides, verified hosts, and concierge support — all from a single account.', {
+								defaultValue:
+									'Join Carento to unlock premium rides, verified hosts, and concierge support — all from a single account.',
+							})}
 						</Typography>
 						<Stack direction="row" spacing={1} alignItems="center">
 							{heroAvatars.map((src, idx) => (
@@ -220,8 +233,12 @@ const Join: NextPage = () => {
 								/>
 							))}
 							<Box sx={{ ml: 1 }}>
-								<Typography sx={{ fontWeight: 700 }}>Trusted hosts</Typography>
-								<Typography sx={{ fontSize: 13, opacity: 0.85 }}>4.8/5 average rating</Typography>
+								<Typography sx={{ fontWeight: 700 }}>
+									{t('Trusted hosts', { defaultValue: 'Trusted hosts' })}
+								</Typography>
+								<Typography sx={{ fontSize: 13, opacity: 0.85 }}>
+									{t('4.8/5 average rating', { defaultValue: '4.8/5 average rating' })}
+								</Typography>
 							</Box>
 						</Stack>
 					</Stack>
@@ -263,10 +280,16 @@ const Join: NextPage = () => {
 						<Stack direction="row" alignItems="center" justifyContent="space-between">
 							<Box>
 								<Typography sx={{ fontWeight: 900, fontSize: 26, color: ink }}>
-									{loginView ? 'Welcome back' : 'Create your account'}
+									{loginView
+										? t('Welcome back', { defaultValue: 'Welcome back' })
+										: t('Create your account', { defaultValue: 'Create your account' })}
 								</Typography>
 								<Typography sx={{ color: subtle, mt: 0.6 }}>
-									{loginView ? 'Sign in to keep your trips in sync.' : 'Let’s get started with a quick setup.'}
+									{loginView
+										? t('Sign in to keep your trips in sync.', { defaultValue: 'Sign in to keep your trips in sync.' })
+										: t('Let’s get started with a quick setup.', {
+												defaultValue: 'Let’s get started with a quick setup.',
+										  })}
 								</Typography>
 							</Box>
 							<ToggleButtonGroup
@@ -288,8 +311,8 @@ const Join: NextPage = () => {
 									},
 								}}
 							>
-								<ToggleButton value="signin">Sign in</ToggleButton>
-								<ToggleButton value="signup">Sign up</ToggleButton>
+								<ToggleButton value="signin">{t('Sign in', { defaultValue: 'Sign in' })}</ToggleButton>
+								<ToggleButton value="signup">{t('Sign up', { defaultValue: 'Sign up' })}</ToggleButton>
 							</ToggleButtonGroup>
 						</Stack>
 
@@ -306,7 +329,7 @@ const Join: NextPage = () => {
 									color: '#0f172a',
 								}}
 							>
-								Continue with Google
+								{t('Continue with Google', { defaultValue: 'Continue with Google' })}
 							</Button>
 							<Button
 								fullWidth
@@ -320,16 +343,16 @@ const Join: NextPage = () => {
 									color: '#0f172a',
 								}}
 							>
-								Continue with Apple
+								{t('Continue with Apple', { defaultValue: 'Continue with Apple' })}
 							</Button>
 						</Stack>
 
-						<Divider>or</Divider>
+						<Divider>{t('or', { defaultValue: 'or' })}</Divider>
 
 						<Stack spacing={1.6}>
 							<TextField
-								label="Email / Username"
-								placeholder="Enter email or username"
+								label={t('Email / Username', { defaultValue: 'Email / Username' })}
+								placeholder={t('Enter email or username', { defaultValue: 'Enter email or username' })}
 								fullWidth
 								value={input.nick}
 								onChange={(e) => handleInput('nick', e.target.value)}
@@ -348,8 +371,8 @@ const Join: NextPage = () => {
 
 							{isSignup && (
 								<TextField
-									label="Phone"
-									placeholder="Enter phone"
+									label={t('Phone', { defaultValue: 'Phone' })}
+									placeholder={t('Enter phone', { defaultValue: 'Enter phone' })}
 									fullWidth
 									value={input.phone}
 									onChange={(e) => handleInput('phone', e.target.value)}
@@ -369,8 +392,11 @@ const Join: NextPage = () => {
 							)}
 
 							<TextField
-								label="Password"
-								placeholder={`min ${MIN_PASSWORD_LENGTH} chars`}
+								label={t('Password', { defaultValue: 'Password' })}
+								placeholder={t('min {{min}} chars', {
+									min: MIN_PASSWORD_LENGTH,
+									defaultValue: `min ${MIN_PASSWORD_LENGTH} chars`,
+								})}
 								fullWidth
 								type="password"
 								value={input.password}
@@ -426,8 +452,8 @@ const Join: NextPage = () => {
 											},
 										}}
 									>
-										<ToggleButton value="USER">User</ToggleButton>
-										<ToggleButton value="AGENT">Dealer</ToggleButton>
+										<ToggleButton value="USER">{t('User', { defaultValue: 'User' })}</ToggleButton>
+										<ToggleButton value="AGENT">{t('Dealer', { defaultValue: 'Dealer' })}</ToggleButton>
 									</ToggleButtonGroup>
 								</Box>
 							)}
@@ -436,11 +462,15 @@ const Join: NextPage = () => {
 								<FormGroup>
 									<FormControlLabel
 										control={<Checkbox defaultChecked size="small" />}
-										label={<Typography sx={{ color: subtle, fontSize: 13 }}>Remember me</Typography>}
+										label={
+											<Typography sx={{ color: subtle, fontSize: 13 }}>
+												{t('Remember me', { defaultValue: 'Remember me' })}
+											</Typography>
+										}
 									/>
 								</FormGroup>
 								<Button variant="text" sx={{ color: subtle, textTransform: 'none', fontSize: 13 }}>
-									Forgot password?
+									{t('Forgot password?', { defaultValue: 'Forgot password?' })}
 								</Button>
 							</Stack>
 						</Stack>
@@ -463,18 +493,22 @@ const Join: NextPage = () => {
 							onClick={loginView ? doLogin : doSignUp}
 							disabled={loginView ? !isLoginValid : !isSignupValid}
 						>
-							{loginView ? 'Sign in' : 'Sign up'}
+							{loginView ? t('Sign in', { defaultValue: 'Sign in' }) : t('Sign up', { defaultValue: 'Sign up' })}
 						</Button>
 
 						<Stack direction="row" spacing={1} justifyContent="center" sx={{ color: subtle }}>
-							<Typography>{loginView ? "Don't have an account?" : 'Already have an account?'}</Typography>
+							<Typography>
+								{loginView
+									? t("Don't have an account?", { defaultValue: "Don't have an account?" })
+									: t('Already have an account?', { defaultValue: 'Already have an account?' })}
+							</Typography>
 							<Button
 								size="small"
 								variant="text"
 								sx={{ color: ink, textTransform: 'none', fontWeight: 800 }}
 								onClick={() => setLoginView(!loginView)}
 							>
-								{loginView ? 'Register' : 'Login'}
+								{loginView ? t('Register', { defaultValue: 'Register' }) : t('Login', { defaultValue: 'Login' })}
 							</Button>
 						</Stack>
 					</Stack>
