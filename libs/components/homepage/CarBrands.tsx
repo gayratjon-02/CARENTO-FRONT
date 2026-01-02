@@ -13,7 +13,7 @@ const BRANDS = [
 	{ name: 'HYUNDAI', logo: '/img/brands/HYUNDAI.png' },
 	{ name: 'TESLA', logo: '/img/brands/TESLA.jpg' },
 	{ name: 'CHEVROLET', logo: '/img/brands/CHEVROLET.png' },
-	{ name: 'GENESIS', logo: '/img/brands/GENESIS.avif' },
+	{ name: 'GENESIS', logo: '/img/brands/genesiss.jpg' },
 ];
 
 const CarBrands = () => {
