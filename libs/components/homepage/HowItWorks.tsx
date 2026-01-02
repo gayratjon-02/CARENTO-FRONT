@@ -1,5 +1,6 @@
 import { Stack } from '@mui/material';
 import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
 
 const STEPS = [
 	{
@@ -25,15 +26,17 @@ const STEPS = [
 ];
 
 const HowItWorks = () => {
+	const { t } = useTranslation('common');
+
 	return (
 		<Stack className="how-works">
 			<Stack className="container">
 				<Stack className="hw-heading">
-					<span className="eyebrow">How It Works</span>
+					<span className="eyebrow">{t('How It Works', { defaultValue: 'How It Works' })}</span>
 					<h3>
-						Presenting Your New
+						{t('Presenting Your New', { defaultValue: 'Presenting Your New' })}
 						<br />
-						Go-To Car Rental Experience
+						{t('Go-To Car Rental Experience', { defaultValue: 'Go-To Car Rental Experience' })}
 					</h3>
 				</Stack>
 
@@ -41,10 +44,10 @@ const HowItWorks = () => {
 					{STEPS.map((step) => (
 						<Stack key={step.title} className="hw-step">
 							<div className="icon-wrap">
-								<Image src={step.icon} alt={step.title} width={60} height={60} />
+								<Image src={step.icon} alt={t(step.title, { defaultValue: step.title })} width={60} height={60} />
 							</div>
-							<div className="step-title">{step.title}</div>
-							<div className="step-desc">{step.desc}</div>
+							<div className="step-title">{t(step.title, { defaultValue: step.title })}</div>
+							<div className="step-desc">{t(step.desc, { defaultValue: step.desc })}</div>
 						</Stack>
 					))}
 				</Stack>
