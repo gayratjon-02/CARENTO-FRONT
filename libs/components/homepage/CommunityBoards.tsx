@@ -12,6 +12,7 @@ import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAler
 import { userVar } from '../../../apollo/store';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import { REACT_APP_API_URL } from '../../config';
 
 const CommunityBoards = () => {
 	const device = useDeviceDetect();
@@ -93,6 +94,16 @@ const CommunityBoards = () => {
 			return typeof v === 'number' ? v : Number(v) || 0;
 		}, [article]);
 
+		const avatarSrc = useMemo(() => {
+			const raw = article?.memberData?.memberImage || '';
+			if (!raw) return '/img/profile/defaultUser.svg';
+			if (/^https?:\/\//i.test(raw)) return raw;
+			const normalized = raw.startsWith('/') ? raw.slice(1) : raw;
+			const base = REACT_APP_API_URL || '';
+			const baseNormalized = base.endsWith('/') ? base.slice(0, -1) : base;
+			return `${baseNormalized}/${normalized}`;
+		}, [article?.memberData?.memberImage]);
+
 		const handleLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {
 			e.stopPropagation();
 			e.preventDefault();
@@ -119,7 +130,17 @@ const CommunityBoards = () => {
 				</Typography>
 				<Box className="review-footer">
 					<Box className="reviewer">
-						<Box className="avatar" aria-hidden="true"></Box>
+						<Box className="avatar" aria-hidden="true">
+							<img
+								src={avatarSrc}
+								alt={article.memberData?.memberNick || 'User'}
+								onError={(e: any) => {
+									e.target.onerror = null;
+									e.target.src = '/img/profile/defaultUser.svg';
+								}}
+								loading="lazy"
+							/>
+						</Box>
 						<Box className="reviewer-meta">
 							<strong>{article.memberData?.memberNick || 'Guest user'}</strong>
 							<span>{article.memberData?.memberAddress || 'Unknown location'}</span>
