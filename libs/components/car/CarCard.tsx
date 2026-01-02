@@ -13,6 +13,7 @@ import { useReactiveVar } from '@apollo/client';
 import { userVar } from 'apollo/store';
 import { formatEnumValue } from '../../utils';
 import { Car } from 'libs/types/car/cars';
+import { useTranslation } from 'next-i18next';
 
 interface CarCardProps {
 	car: Car;
@@ -23,6 +24,7 @@ const CarCard = (props: CarCardProps) => {
 	const { car, likeCarHandler } = props;
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 
 	const carId = car?._id ? String(car._id) : '';
 	const hasImage = Array.isArray(car?.carImages) && car.carImages.length > 0;
@@ -83,12 +85,12 @@ const CarCard = (props: CarCardProps) => {
 		<Stack className="car-card" onClick={openCarDetail} role="button">
 			<Box className={`car-card__media ${hasImage ? '' : 'no-image'}`} style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}>
 				<Box className="car-card__tag">
-					<span>{car?.carType ? formatEnumValue(car.carType) : 'Car'}</span>
+					<span>{car?.carType ? formatEnumValue(car.carType) : t('Car', { defaultValue: 'Car' })}</span>
 				</Box>
 				<Box className="car-card__price">
-					<span>From</span>
+					<span>{t('From', { defaultValue: 'From' })}</span>
 					<strong>${car?.pricePerDay ?? 0}</strong>
-					<small>/day</small>
+					<small>{t('/day', { defaultValue: '/day' })}</small>
 				</Box>
 
 				<Box className="car-card__stats">
@@ -115,7 +117,9 @@ const CarCard = (props: CarCardProps) => {
 					)}
 				</Box>
 
-				<Box className="car-card__desc">{car?.carDescription ? car.carDescription : 'Clean ride, ready for your next trip.'}</Box>
+				<Box className="car-card__desc">
+					{car?.carDescription ? car.carDescription : t('Clean ride, ready for your next trip.', { defaultValue: 'Clean ride, ready for your next trip.' })}
+				</Box>
 
 				<Box className="car-card__specs">
 					<Box className="chip">

@@ -183,6 +183,9 @@
 	"Agent": "Agent",
 	"Verified": "Verified",
 	"Flexible hours": "Flexible hours",
+	"Car": "Car",
+	"/day": "/day",
+	"Clean ride, ready for your next trip.": "Clean ride, ready for your next trip.",
 	"nav": {
 		"home": "Home",
 		"car": "Cars",

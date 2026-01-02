@@ -182,6 +182,9 @@
 	"Agent": "에이전트",
 	"Verified": "인증됨",
 	"Flexible hours": "유연한 시간",
+	"Car": "차량",
+	"/day": "/일",
+	"Clean ride, ready for your next trip.": "깨끗한 차량, 다음 여행을 준비하세요.",
 	"nav": {
 		"home": "홈",
 		"car": "차량",
