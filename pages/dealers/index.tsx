@@ -16,6 +16,7 @@ import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/swee
 import { Messages } from '../../libs/config';
 import DealerCard from '../../libs/components/dealers/DealerCard';
 import { userVar } from 'apollo/store';
+import { useTranslation } from 'next-i18next';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -27,6 +28,7 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 	const user = useReactiveVar(userVar);
 	const device = useDeviceDetect();
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const isReload = useMemo(() => {
 		if (typeof window === 'undefined') return false;
 		try {
@@ -235,15 +237,15 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 				<Stack className={'container'}>
 					<Stack className="dealer-header">
 						<Box className="title">
-							<strong>Dealers</strong>
-							<span>Browse verified dealers and their listings</span>
+							<strong>{t('Dealers', { defaultValue: 'Dealers' })}</strong>
+							<span>{t('Browse verified dealers and their listings', { defaultValue: 'Browse verified dealers and their listings' })}</span>
 						</Box>
 					</Stack>
 					<Stack className={'dealer-grid'}>
 						{dealers?.length === 0 ? (
 							<div className={'no-data'}>
 								<img src="/img/icons/icoAlert.svg" alt="" />
-								<p>No Dealers found!</p>
+								<p>{t('No Dealers found!', { defaultValue: 'No Dealers found!' })}</p>
 							</div>
 						) : (
 							dealers.map((dealer: Member) => (
@@ -265,18 +267,18 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 								<Box className="dealer-toolbar__left">
 									<Box className="pill">
 									<strong>{(total ?? 0).toLocaleString()}</strong>
-									<small>dealers</small>
+									<small>{t('dealers', { defaultValue: 'dealers' })}</small>
 								</Box>
 								<Box className="pill">
-									<strong>{filterSortName}</strong>
-									<small>sorting</small>
+									<strong>{t(filterSortName, { defaultValue: filterSortName })}</strong>
+									<small>{t('sorting', { defaultValue: 'sorting' })}</small>
 								</Box>
 							</Box>
 
 							<Box component={'div'} className={'search'}>
 								<input
 									type="text"
-									placeholder={'Search for a dealer'}
+									placeholder={t('Search for a dealer', { defaultValue: 'Search for a dealer' })}
 									value={searchText}
 									onChange={(e: any) => setSearchText(e.target.value)}
 								/>
@@ -286,20 +288,20 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 								<span className="label">Sort by</span>
 								<div className="select">
 									<Button onClick={sortingClickHandler} endIcon={<KeyboardArrowDownRoundedIcon />}>
-										{filterSortName}
+										{t(filterSortName, { defaultValue: filterSortName })}
 									</Button>
 									<Menu anchorEl={anchorEl} open={sortingOpen} onClose={sortingCloseHandler} sx={{ paddingTop: '5px' }}>
 										<MenuItem onClick={sortingHandler} id={'recent'} disableRipple>
-											Recent
+											{t('Recent', { defaultValue: 'Recent' })}
 										</MenuItem>
 										<MenuItem onClick={sortingHandler} id={'old'} disableRipple>
-											Oldest
+											{t('Oldest', { defaultValue: 'Oldest' })}
 										</MenuItem>
 										<MenuItem onClick={sortingHandler} id={'likes'} disableRipple>
-											Likes
+											{t('Likes', { defaultValue: 'Likes' })}
 										</MenuItem>
 										<MenuItem onClick={sortingHandler} id={'views'} disableRipple>
-											Views
+											{t('Views', { defaultValue: 'Views' })}
 										</MenuItem>
 									</Menu>
 								</div>
@@ -310,7 +312,7 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 						{dealers?.length === 0 ? (
 							<div className={'no-data'}>
 								<img src="/img/icons/icoAlert.svg" alt="" />
-								<p>No Dealers found!</p>
+								<p>{t('No Dealers found!', { defaultValue: 'No Dealers found!' })}</p>
 							</div>
 						) : (
 							dealers.map((dealer: Member) => {
@@ -330,7 +332,14 @@ const DealerList: NextPage = ({ initialInput, ...props }: any) => {
 								/>
 							</Stack>
 						)}
-						{dealers.length !== 0 && <span>Total {(total ?? 0).toLocaleString()} dealers available</span>}
+						{dealers.length !== 0 && (
+							<span>
+								{t('Total {{count}} dealers available', {
+									count: total ?? 0,
+									defaultValue: `Total ${(total ?? 0).toLocaleString()} dealers available`,
+								})}
+							</span>
+						)}
 					</Stack>
 				</Stack>
 			</Stack>

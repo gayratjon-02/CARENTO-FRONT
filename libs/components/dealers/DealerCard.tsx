@@ -12,6 +12,7 @@ import { useReactiveVar } from '@apollo/client';
 import { userVar } from 'apollo/store';
 import { Member } from '../../types/member/member';
 import { REACT_APP_API_URL } from '../../config';
+import { useTranslation } from 'next-i18next';
 
 interface DealerCardProps {
 	dealer: Member;
@@ -22,6 +23,7 @@ const DealerCard = (props: DealerCardProps) => {
 	const { dealer, likeMemberHandler } = props;
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 
 	const dealerId = dealer?._id ? String(dealer._id) : '';
 	const imageUrl = dealer?.memberImage ? `${REACT_APP_API_URL}/${dealer.memberImage}` : '/img/profile/defaultUser.svg';
@@ -108,7 +110,7 @@ const DealerCard = (props: DealerCardProps) => {
 					<Box className="dealer-head">
 						<Box className="dealer-name-row">
 							<strong className="dealer-name">{dealer?.memberFullName ?? dealer?.memberNick}</strong>
-							<span className="dealer-role">Dealer</span>
+							<span className="dealer-role">{t('Dealer', { defaultValue: 'Dealer' })}</span>
 						</Box>
 
 						{addressValue ? (
@@ -119,7 +121,7 @@ const DealerCard = (props: DealerCardProps) => {
 						) : (
 							<Box className="dealer-subrow muted">
 								<LocationOnOutlinedIcon />
-								<span>Unknown location</span>
+								<span>{t('Unknown location', { defaultValue: 'Unknown location' })}</span>
 							</Box>
 						)}
 
@@ -145,14 +147,14 @@ const DealerCard = (props: DealerCardProps) => {
 						<DirectionsCarOutlinedIcon />
 						<div>
 							<strong>{carsCount.toLocaleString()}</strong>
-							<span>Cars</span>
+							<span>{t('Cars', { defaultValue: 'Cars' })}</span>
 						</div>
 					</Box>
 					<Box className="dealer-stat">
 						<VisibilityOutlinedIcon />
 						<div>
 							<strong>{viewsCount.toLocaleString()}</strong>
-							<span>Views</span>
+							<span>{t('Views', { defaultValue: 'Views' })}</span>
 						</div>
 					</Box>
 					<Box className="dealer-stat">
@@ -163,14 +165,14 @@ const DealerCard = (props: DealerCardProps) => {
 						)}
 						<div>
 							<strong>{likesCount.toLocaleString()}</strong>
-							<span>Likes</span>
+							<span>{t('Likes', { defaultValue: 'Likes' })}</span>
 						</div>
 					</Box>
 					<Box className="dealer-stat">
 						<StarRoundedIcon />
 						<div>
 							<strong>{rankValue ? rankValue.toFixed(1) : '0.0'}</strong>
-							<span>Rating</span>
+							<span>{t('Rating', { defaultValue: 'Rating' })}</span>
 						</div>
 					</Box>
 				</Box>

@@ -5,6 +5,7 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import { BrandType, CarLocation, CarType, FuelType, Transmission } from '../../enum/car.enum';
 import { formatEnumValue } from '../../utils';
 import { CarsInquiry } from 'libs/types/car/cars.input';
+import { useTranslation } from 'next-i18next';
 
 type Search = CarsInquiry['search'] & {
 	carLocation?: CarLocation[];
@@ -54,6 +55,7 @@ type FilterKey = keyof Pick<
 const CarFilter = (props: CarFilterProps) => {
 	const { value, onChange, onReset } = props;
 	const search = (value?.search ?? {}) as Search;
+	const { t } = useTranslation('common');
 
 	const [openKey, setOpenKey] = useState<FilterKey | null>(null);
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -122,14 +124,14 @@ const CarFilter = (props: CarFilterProps) => {
 	};
 
 	const labels: Record<FilterKey, string> = {
-		brandType: 'Brand',
-		carType: 'Type',
-		fuelType: 'Fuel',
-		transmission: 'Transmission',
-		seats: 'Seats',
-		carLocation: 'Location',
-		year: 'Year',
-		pricePerDay: 'Price/day',
+		brandType: t('Brand', { defaultValue: 'Brand' }),
+		carType: t('Type', { defaultValue: 'Type' }),
+		fuelType: t('Fuel', { defaultValue: 'Fuel' }),
+		transmission: t('Transmission', { defaultValue: 'Transmission' }),
+		seats: t('Seats', { defaultValue: 'Seats' }),
+		carLocation: t('Location', { defaultValue: 'Location' }),
+		year: t('Year', { defaultValue: 'Year' }),
+		pricePerDay: t('Price/day', { defaultValue: 'Price/day' }),
 	};
 
 	const options: Record<FilterKey, any[]> = {
@@ -197,9 +199,13 @@ const CarFilter = (props: CarFilterProps) => {
 				</Box>
 
 				<Box className="car-filterbar__right">
-					{activeCount > 0 && <span className="active-count">{activeCount} selected</span>}
+					{activeCount > 0 && (
+						<span className="active-count">
+							{t('{{count}} selected', { count: activeCount, defaultValue: `${activeCount} selected` })}
+						</span>
+					)}
 					<Button className="reset" onClick={onReset} startIcon={<RestartAltRoundedIcon />}>
-						Reset
+						{t('Reset', { defaultValue: 'Reset' })}
 					</Button>
 				</Box>
 			</Box>
@@ -213,7 +219,11 @@ const CarFilter = (props: CarFilterProps) => {
 				{openKey && (
 					<Box className="menu-head">
 						<strong>{labels[openKey]}</strong>
-						<span>{openKey === 'pricePerDay' ? 'Set a range' : 'Select one or multiple'}</span>
+						<span>
+							{openKey === 'pricePerDay'
+								? t('Set a range', { defaultValue: 'Set a range' })
+								: t('Select one or multiple', { defaultValue: 'Select one or multiple' })}
+						</span>
 					</Box>
 				)}
 				<Divider />
@@ -234,14 +244,14 @@ const CarFilter = (props: CarFilterProps) => {
 										closeMenu();
 									}}
 								>
-									{p.label}
+									{t(p.label, { defaultValue: p.label })}
 								</Button>
 							))}
 						</Box>
 
 						<Box className="price-grid">
 							<Box className="field">
-								<label>Min</label>
+								<label>{t('Min', { defaultValue: 'Min' })}</label>
 								<OutlinedInput
 									value={priceDraft.start}
 									onChange={(e) => setPriceDraft((prev) => ({ ...prev, start: e.target.value }))}
@@ -250,7 +260,7 @@ const CarFilter = (props: CarFilterProps) => {
 								/>
 							</Box>
 							<Box className="field">
-								<label>Max</label>
+								<label>{t('Max', { defaultValue: 'Max' })}</label>
 								<OutlinedInput
 									value={priceDraft.end}
 									onChange={(e) => setPriceDraft((prev) => ({ ...prev, end: e.target.value }))}
@@ -261,7 +271,7 @@ const CarFilter = (props: CarFilterProps) => {
 						</Box>
 						<Box className="price-actions">
 							<Button className="apply" onClick={applyPriceRange}>
-								Apply
+								{t('Apply', { defaultValue: 'Apply' })}
 							</Button>
 						</Box>
 					</Box>
