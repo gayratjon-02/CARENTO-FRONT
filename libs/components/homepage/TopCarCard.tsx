@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { Car } from 'libs/types/car/cars';
+import { useTranslation } from 'next-i18next';
 
 interface TopCarCardProps {
 	car: Car;
@@ -21,6 +22,7 @@ const TopCarCard = (props: TopCarCardProps) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 
 	/** HANDLERS **/
 	const pushDetailHandler = async (carId: string) => {
@@ -47,23 +49,29 @@ const TopCarCard = (props: TopCarCardProps) => {
 					<div className={'options'}>
 						<div>
 							<img src="/img/icons/bed.svg" alt="" />
-							<span>{car?.seats} seats</span>
+							<span>
+								{car?.seats} {t('seats', { defaultValue: 'seats' })}
+							</span>
 						</div>
 						<div>
 							<img src="/img/icons/room.svg" alt="" />
-							<span>{car?.doors} doors</span>
+							<span>
+								{car?.doors} {t('doors', { defaultValue: 'doors' })}
+							</span>
 						</div>
 						<div>
 							<img src="/img/icons/expand.svg" alt="" />
-							<span>{car?.mileage} km</span>
+							<span>
+								{car?.mileage} {t('km', { defaultValue: 'km' })}
+							</span>
 						</div>
 					</div>
 					<Divider sx={{ mt: '15px', mb: '17px' }} />
 					<div className={'bott'}>
 						<p>
 							{' '}
-							{car?.pricePerDay ? 'Rent' : ''} {car?.pricePerDay && car?.pricePerHour && '/'}{' '}
-							{car?.pricePerHour ? 'Hour' : ''}
+							{car?.pricePerDay ? t('Rent', { defaultValue: 'Rent' }) : ''}{' '}
+							{car?.pricePerDay && car?.pricePerHour && '/'} {car?.pricePerHour ? t('Hour', { defaultValue: 'Hour' }) : ''}
 						</p>
 						<div className="view-like-box">
 							<IconButton color={'default'} sx={{ color: 'rgba(229, 231, 235, 0.78)' }}>
@@ -106,23 +114,29 @@ const TopCarCard = (props: TopCarCardProps) => {
 					<div className={'options'}>
 						<div>
 							<img src="/img/icons/bed.svg" alt="" />
-							<span>{car?.seats} seats</span>
+							<span>
+								{car?.seats} {t('seats', { defaultValue: 'seats' })}
+							</span>
 						</div>
 						<div>
 							<img src="/img/icons/room.svg" alt="" />
-							<span>{car?.doors} doors</span>
+							<span>
+								{car?.doors} {t('doors', { defaultValue: 'doors' })}
+							</span>
 						</div>
 						<div>
 							<img src="/img/icons/expand.svg" alt="" />
-							<span>{car?.mileage} km</span>
+							<span>
+								{car?.mileage} {t('km', { defaultValue: 'km' })}
+							</span>
 						</div>
 					</div>
 					<Divider sx={{ mt: '15px', mb: '17px' }} />
 					<div className={'bott'}>
 						<p>
 							{' '}
-							{car?.pricePerDay ? 'Rent' : ''} {car?.pricePerDay && car?.pricePerHour && '/'}{' '}
-							{car?.pricePerHour ? 'Hour' : ''}
+							{car?.pricePerDay ? t('Rent', { defaultValue: 'Rent' }) : ''}{' '}
+							{car?.pricePerDay && car?.pricePerHour && '/'} {car?.pricePerHour ? t('Hour', { defaultValue: 'Hour' }) : ''}
 						</p>
 						<div className="view-like-box">
 							<IconButton color={'default'} sx={{ color: 'rgba(229, 231, 235, 0.78)' }}>

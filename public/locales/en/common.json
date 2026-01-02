@@ -150,6 +150,8 @@
 	"Realtime refresh": "Realtime refresh",
 	"Loading top cars...": "Loading top cars...",
 	"We are refreshing the garage. Check back soon!": "We are refreshing the garage. Check back soon!",
+	"doors": "doors",
+	"km": "km",
 	"nav": {
 		"home": "Home",
 		"car": "Cars",

@@ -149,6 +149,8 @@
   "Realtime refresh": "Обновление в реальном времени",
   "Loading top cars...": "Загружаем топ авто...",
   "We are refreshing the garage. Check back soon!": "Обновляем гараж. Загляните позже!",
+  "doors": "двери",
+  "km": "км",
   "nav": {
     "home": "Главная",
     "car": "Автомобили",
