@@ -7,6 +7,7 @@ import { userVar } from '../../../apollo/store';
 import { REACT_APP_API_URL } from '../../config';
 import { logOut } from '../../auth';
 import { sweetConfirmAlert } from '../../sweetAlert';
+import { useTranslation } from 'next-i18next';
 
 const MyMenu = () => {
 	const device = useDeviceDetect();
@@ -14,6 +15,7 @@ const MyMenu = () => {
 	const category: any = router.query?.category ?? 'myProfile';
 	const user = useReactiveVar(userVar);
 	const isAgent = user?.memberType === 'AGENT';
+	const { t } = useTranslation('common');
 
 	const apiBase = REACT_APP_API_URL && REACT_APP_API_URL !== 'undefined' ? REACT_APP_API_URL : '';
 	const avatarSrc = (() => {
@@ -33,7 +35,7 @@ const MyMenu = () => {
 	};
 
 	const logoutHandler = async () => {
-		if (await sweetConfirmAlert('Do you want to logout?')) logOut();
+		if (await sweetConfirmAlert(t('Do you want to logout?', { defaultValue: 'Do you want to logout?' }))) logOut();
 	};
 
 	const menuGroups: Array<{
@@ -41,26 +43,26 @@ const MyMenu = () => {
 		items: Array<{ key: string; label: string; agentOnly?: boolean }>;
 	}> = [
 		{
-			title: 'Manage',
+			title: t('Manage', { defaultValue: 'Manage' }),
 			items: [
-				{ key: 'addCar', label: 'Add Car', agentOnly: true },
-				{ key: 'myCars', label: 'My Cars', agentOnly: true },
-				{ key: 'myFavorites', label: 'Favorites' },
-				{ key: 'recentlyVisited', label: 'Recently Visited' },
-				{ key: 'followers', label: 'Followers' },
-				{ key: 'followings', label: 'Followings' },
+				{ key: 'addCar', label: t('Add Car', { defaultValue: 'Add Car' }), agentOnly: true },
+				{ key: 'myCars', label: t('My Cars', { defaultValue: 'My Cars' }), agentOnly: true },
+				{ key: 'myFavorites', label: t('Favorites', { defaultValue: 'Favorites' }) },
+				{ key: 'recentlyVisited', label: t('Recently Visited', { defaultValue: 'Recently Visited' }) },
+				{ key: 'followers', label: t('Followers', { defaultValue: 'Followers' }) },
+				{ key: 'followings', label: t('Followings', { defaultValue: 'Followings' }) },
 			],
 		},
 		{
-			title: 'Community',
+			title: t('Community', { defaultValue: 'Community' }),
 			items: [
-				{ key: 'myArticles', label: 'Articles' },
-				{ key: 'writeArticle', label: 'Write Article' },
+				{ key: 'myArticles', label: t('Articles', { defaultValue: 'Articles' }) },
+				{ key: 'writeArticle', label: t('Write Article', { defaultValue: 'Write Article' }) },
 			],
 		},
 		{
-			title: 'Account',
-			items: [{ key: 'myProfile', label: 'My Profile' }],
+			title: t('Account', { defaultValue: 'Account' }),
+			items: [{ key: 'myProfile', label: t('My Profile', { defaultValue: 'My Profile' }) }],
 		},
 	];
 
@@ -71,7 +73,7 @@ const MyMenu = () => {
 			<Stack className="menu-header" direction="row" alignItems="center" spacing={1.6}>
 				<Avatar src={avatarSrc} className="avatar" />
 				<Stack className="info" spacing={0.2}>
-					<Typography className="name">{user?.memberNick || user?.memberFullName || 'User'}</Typography>
+					<Typography className="name">{user?.memberNick || user?.memberFullName || t('User', { defaultValue: 'User' })}</Typography>
 					<Typography className="phone">{user?.memberPhone || ''}</Typography>
 				</Stack>
 				<Chip className="role" label={user?.memberType || 'USER'} />
@@ -111,7 +113,7 @@ const MyMenu = () => {
 
 			<Box className="menu-footer">
 				<Button className="logout" onClick={logoutHandler}>
-					Logout
+					{t('Logout', { defaultValue: 'Logout' })}
 				</Button>
 			</Box>
 		</Stack>
