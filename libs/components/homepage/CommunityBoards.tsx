@@ -13,8 +13,10 @@ import { userVar } from '../../../apollo/store';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import { REACT_APP_API_URL } from '../../config';
+import { useTranslation } from 'next-i18next';
 
 const CommunityBoards = () => {
+	const { t } = useTranslation('common');
 	const device = useDeviceDetect();
 	const isDesktop = device !== 'mobile';
 	const [newsArticles, setNewsArticles] = useState<Article[]>([]);
@@ -187,9 +189,9 @@ const CommunityBoards = () => {
 	};
 
 	const categoryButtons = [
-		{ value: BoardArticleCategory.FREE, label: 'Free' },
-		{ value: BoardArticleCategory.RECOMMEND, label: 'Recommend' },
-		{ value: BoardArticleCategory.NEWS, label: 'News' },
+		{ value: BoardArticleCategory.FREE, label: t('Free', { defaultValue: 'Free' }) },
+		{ value: BoardArticleCategory.RECOMMEND, label: t('Recommend', { defaultValue: 'Recommend' }) },
+		{ value: BoardArticleCategory.NEWS, label: t('News', { defaultValue: 'News' }) },
 	];
 
 	const handleCategoryChange = (category: BoardArticleCategory) => {
@@ -200,9 +202,11 @@ const CommunityBoards = () => {
 		<Stack className={'user-reviews'}>
 			<Stack className={'container'}>
 				<Stack className="reviews-header">
-					<Typography component="h2">Users review</Typography>
+					<Typography component="h2">{t('Users review', { defaultValue: 'Users review' })}</Typography>
 					<Typography component="p">
-						Honest words from travelers who trusted our service. Real experiences, genuine satisfaction.
+						{t('Honest words from travelers who trusted our service. Real experiences, genuine satisfaction.', {
+							defaultValue: 'Honest words from travelers who trusted our service. Real experiences, genuine satisfaction.',
+						})}
 					</Typography>
 					<Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'center' }}>
 						{categoryButtons.map((button) => (
