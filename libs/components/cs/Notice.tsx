@@ -1,9 +1,11 @@
 import React from 'react';
 import { Stack, Box, Chip, Typography, Button } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
+import { useTranslation } from 'next-i18next';
 
 const Notice = () => {
 	const device = useDeviceDetect();
+	const { t } = useTranslation('common');
 
 	/** APOLLO REQUESTS **/
 	/** LIFECYCLES **/
@@ -44,12 +46,17 @@ const Notice = () => {
 		return (
 			<Stack spacing={2} className="notice-content mobile">
 				<Typography variant="h6" fontWeight={800}>
-					Notices
+					{t('Notices', { defaultValue: 'Notices' })}
 				</Typography>
 				{data.map((item) => (
 					<Box key={item.no} className="notice-card">
 						<div className="notice-card__header">
-							<Chip label={item.tag || item.type} size="small" color="primary" variant="outlined" />
+							<Chip
+								label={t(item.tag || item.type, { defaultValue: item.tag || item.type })}
+								size="small"
+								color="primary"
+								variant="outlined"
+							/>
 							<span className="date">{item.date}</span>
 						</div>
 						<div className="title">{item.title}</div>
@@ -62,12 +69,16 @@ const Notice = () => {
 			<Stack className={'notice-content'}>
 				<div className="notice-head">
 					<div>
-						<p className="eyebrow">Platform updates</p>
-						<h3>Carento notices</h3>
-						<p className="muted">Texnik xizmat, aksiyalar va ijaraga oid muhim xabarlar.</p>
+						<p className="eyebrow">{t('Platform updates', { defaultValue: 'Platform updates' })}</p>
+						<h3>{t('Carento notices', { defaultValue: 'Carento notices' })}</h3>
+						<p className="muted">
+							{t('Technical service, promotions, and important rental notices.', {
+								defaultValue: 'Technical service, promotions, and important rental notices.',
+							})}
+						</p>
 					</div>
 					<Button variant="outlined" size="small">
-						View all
+						{t('View all', { defaultValue: 'View all' })}
 					</Button>
 				</div>
 
@@ -75,7 +86,12 @@ const Notice = () => {
 					{data.map((item) => (
 						<Box component={'div'} className={'notice-card'} key={item.no}>
 							<div className="notice-top">
-								<Chip label={item.tag || item.type} size="small" color="primary" variant="outlined" />
+								<Chip
+									label={t(item.tag || item.type, { defaultValue: item.tag || item.type })}
+									size="small"
+									color="primary"
+									variant="outlined"
+								/>
 								<span className="date">{item.date}</span>
 							</div>
 							<div className="notice-title">{item.title}</div>
