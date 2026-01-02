@@ -430,6 +430,7 @@ CarList.defaultProps = {
 		direction: Direction.DESC,
 		search: {},
 	},
+	
 };
 
 export default withLayoutBasic(CarList);
