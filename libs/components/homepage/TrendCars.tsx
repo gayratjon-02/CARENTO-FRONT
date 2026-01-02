@@ -8,6 +8,7 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_CARS } from '../../../apollo/user/query';
 import { T } from '../../types/common';
+import { useTranslation } from 'next-i18next';
 import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { Message } from '../../enums/common.enum';
 import { LIKE_TARGET_CAR } from '../../../apollo/user/mutation';
@@ -23,6 +24,7 @@ const TrendCars = (props: TrendCarsProps) => {
 	const { initialInput } = props;
 	const device = useDeviceDetect();
 	const [cars, setCars] = useState<Car[]>([]);
+	const { t } = useTranslation('common');
 
 	// GETCARS
 	/** APOLLO REQUESTS **/
@@ -111,8 +113,8 @@ const TrendCars = (props: TrendCarsProps) => {
 			<Stack className={'trend-properties'}>
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
-						<span>Most Searched Vehicles</span>
-						<p>The world&apos;s leading car brands</p>
+						<span>{t('Most Searched Vehicles', { defaultValue: 'Most Searched Vehicles' })}</span>
+						<p>{t("The world's leading car brands", { defaultValue: "The world's leading car brands" })}</p>
 					</Stack>
 					<Stack className={'card-box'}>
 						{!hasCars ? (
@@ -132,8 +134,8 @@ const TrendCars = (props: TrendCarsProps) => {
 				<Stack className={'container'}>
 					<Stack className={'info-box'}>
 						<Box component={'div'} className={'left'}>
-							<span>Most Searched Vehicles</span>
-							<p>The world&apos;s leading car brands</p>
+							<span>{t('Most Searched Vehicles', { defaultValue: 'Most Searched Vehicles' })}</span>
+							<p>{t("The world's leading car brands", { defaultValue: "The world's leading car brands" })}</p>
 						</Box>
 						<Box component={'div'} className={'right'}>
 							<div className={'pagination-box'}>

@@ -17,6 +17,7 @@ import { Stack, Button, ButtonBase } from '@mui/material';
 import { userVar } from 'apollo/store';
 import { useReactiveVar } from '@apollo/client';
 import { Car } from 'libs/types/car/cars';
+import { useTranslation } from 'next-i18next';
 
 interface TrendCarCardProps {
 	car: Car;
@@ -28,6 +29,7 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 
 	const hasImage = Array.isArray(car?.carImages) && car.carImages.length > 0;
 	const carImage = hasImage ? `${REACT_APP_API_URL}/${car.carImages[0]}` : undefined;
@@ -70,7 +72,7 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 	const reviewsCount = car?.carLikes ?? 0;
 
 	const locationLabel = useMemo(() => {
-		if (!car?.carLocation || typeof car.carLocation !== 'string') return 'South Korea';
+		if (!car?.carLocation || typeof car.carLocation !== 'string') return t('South Korea', { defaultValue: 'South Korea' });
 		return car.carLocation
 			.toLowerCase()
 			.split('_')
@@ -80,19 +82,23 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 
 	const formatEnumValue = (value?: string): string => {
 		if (!value) return '--';
-		return value
+		const formatted = value
 			.toLowerCase()
 			.split('_')
 			.map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
 			.join(' ');
+		return t(formatted, { defaultValue: formatted });
 	};
 
-	const formatNumber = (value?: number, suffix = ''): string => {
+	const formatNumber = (value?: number, suffixKey = ''): string => {
 		if (value === null || value === undefined) return '--';
+		const suffix = suffixKey ? ` ${t(suffixKey.trim(), { defaultValue: suffixKey.trim() })}` : '';
 		return `${value.toLocaleString()}${suffix}`;
 	};
 
-	const priceLabel = car?.pricePerDay ? `$${Number(car.pricePerDay).toLocaleString()}` : 'Request price';
+	const priceLabel = car?.pricePerDay
+		? `$${Number(car.pricePerDay).toLocaleString()}`
+		: t('Request price', { defaultValue: 'Request price' });
 
 	const brandYearLabel = useMemo(() => {
 		const brand = car?.brandType ? formatEnumValue(car.brandType) : '';
@@ -170,10 +176,12 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 				<Stack className="rating-pill">
 					<StarRoundedIcon fontSize="small" />
 					<span className="value">{ratingValue}</span>
-					<span className="reviews">({reviewsCount} reviews)</span>
+					<span className="reviews">
+						({reviewsCount} {t('reviews', { defaultValue: 'reviews' })})
+					</span>
 				</Stack>
 
-				<Stack className="car-title">{car?.carTitle || 'Premium Car'}</Stack>
+				<Stack className="car-title">{car?.carTitle || t('Premium Car', { defaultValue: 'Premium Car' })}</Stack>
 
 				{brandYearLabel && (
 					<Stack className="car-brand-year">
@@ -189,30 +197,30 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 				<Stack className="car-specs">
 					<Stack className="spec-item">
 						<SpeedOutlinedIcon fontSize="small" />
-						<span>{formatNumber(car?.mileage, ' miles')}</span>
+						<span>{formatNumber(car?.mileage, 'miles')}</span>
 					</Stack>
 					<Stack className="spec-item">
 						<SettingsOutlinedIcon fontSize="small" />
-						<span>{formatEnumValue(car?.transmission) || 'Automatic'}</span>
+						<span>{formatEnumValue(car?.transmission) || t('Automatic', { defaultValue: 'Automatic' })}</span>
 					</Stack>
 					<Stack className="spec-item">
 						<LocalGasStationOutlinedIcon fontSize="small" />
-						<span>{formatEnumValue(car?.fuelType) || 'Fuel'}</span>
+						<span>{formatEnumValue(car?.fuelType) || t('Fuel', { defaultValue: 'Fuel' })}</span>
 					</Stack>
 					<Stack className="spec-item">
 						<AirlineSeatReclineNormalOutlinedIcon fontSize="small" />
-						<span>{formatNumber(car?.seats, ' seats')}</span>
+						<span>{formatNumber(car?.seats, 'seats')}</span>
 					</Stack>
 				</Stack>
 
 				<Stack className="card-footer">
 					<Stack className="price-box">
-						<span>From</span>
+						<span>{t('From', { defaultValue: 'From' })}</span>
 						<strong>{priceLabel}</strong>
 					</Stack>
 
 					<Button className="book-btn" type="button" variant="contained" color="success" onClick={handleBookNow}>
-						Book Now
+						{t('Book Now', { defaultValue: 'Book Now' })}
 					</Button>
 				</Stack>
 			</Stack>
