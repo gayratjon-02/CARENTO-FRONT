@@ -3,6 +3,7 @@ import { Stack, Button, IconButton } from '@mui/material';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import { CarType } from '../../enum/car.enum';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 
 type CarTypeCard = {
 	type: CarType;
@@ -25,6 +26,7 @@ const CAR_TYPE_CARDS: CarTypeCard[] = [
 
 const ChooseByCarType = () => {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 
 	const handleTypeClick = (type: CarType) => {
 		const input = {
@@ -44,13 +46,15 @@ const ChooseByCarType = () => {
 		router.push('/car');
 	};
 
+	const vehiclesLabel = t('Vehicles', { defaultValue: 'Vehicles' });
+
 	return (
 		<Stack className="choose-by-type">
 			<Stack className="container">
 				<Stack className="info">
 					<div className="heading">
-						<h3>Browse by Type</h3>
-						<p>Find the perfect ride for any occasion</p>
+						<h3>{t('Browse by Type', { defaultValue: 'Browse by Type' })}</h3>
+						<p>{t('Find the perfect ride for any occasion', { defaultValue: 'Find the perfect ride for any occasion' })}</p>
 					</div>
 					<Button
 						className="view-more"
@@ -59,7 +63,7 @@ const ChooseByCarType = () => {
 						endIcon={<ArrowForwardIosRoundedIcon />}
 						onClick={handleViewMore}
 					>
-						View More
+						{t('View More', { defaultValue: 'View More' })}
 					</Button>
 				</Stack>
 
@@ -67,16 +71,21 @@ const ChooseByCarType = () => {
 					{CAR_TYPE_CARDS.map((item) => (
 						<div key={item.type} className="type-card" role="button" onClick={() => handleTypeClick(item.type)}>
 							<div className="thumb" style={{ backgroundImage: item.thumb ? `url(${item.thumb})` : item.gradient }}>
-								{!item.thumb && <span className="thumb-badge">{item.label}</span>}
+								{!item.thumb && <span className="thumb-badge">{t(item.label, { defaultValue: item.label })}</span>}
 							</div>
 							<div className="card-body">
-								<div className="title">{item.label}</div>
+								<div className="title">{t(item.label, { defaultValue: item.label })}</div>
 								<div className="card-footer">
-									<span className="count-pill">{item.count} Vehicles</span>
+									<span className="count-pill">
+										{item.count} {vehiclesLabel}
+									</span>
 									<IconButton
 										size="small"
 										className="arrow-btn"
-										aria-label={`View ${item.label}`}
+										aria-label={t('View {{label}}', {
+											label: t(item.label, { defaultValue: item.label }),
+											defaultValue: `View ${item.label}`,
+										})}
 										onClick={(e) => {
 											e.stopPropagation();
 											handleTypeClick(item.type);

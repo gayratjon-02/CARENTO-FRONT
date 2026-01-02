@@ -238,13 +238,16 @@
 			}
 			.info {
 				display: flex;
+				flex-direction: column;
 				align-items: center;
-				justify-content: space-between;
+				justify-content: center;
 				gap: 14px;
 				.heading {
 					display: flex;
 					flex-direction: column;
 					gap: 6px;
+					align-items: center;
+					text-align: center;
 					h3 {
 						margin: 0;
 						color: #181a20;
@@ -263,6 +266,7 @@
 					}
 				}
 				.view-more {
+					align-self: center;
 					padding: 12px 18px;
 					border-radius: 12px;
 					background: linear-gradient(135deg, #3cf083, #22c55e);
