@@ -1,6 +1,7 @@
 import React from 'react';
 import { Stack, Box } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
+import { useTranslation } from 'next-i18next';
 
 interface EventData {
 	eventTitle: string;
@@ -47,6 +48,7 @@ const eventsData: EventData[] = [
 
 const EventCard = ({ event }: { event: EventData }) => {
 	const device = useDeviceDetect();
+	const { t } = useTranslation('common');
 
 	return (
 		<Stack
@@ -59,16 +61,16 @@ const EventCard = ({ event }: { event: EventData }) => {
 			}}
 		>
 			<Box component={'div'} className={'card-top'}>
-				<span className={'pill'}>{event?.status}</span>
+				<span className={'pill'}>{t(event?.status, { defaultValue: event?.status })}</span>
 				<span className={'pill ghost'}>{event?.releaseWindow}</span>
 			</Box>
 			<Box component={'div'} className={'card-bottom'}>
-				<strong>{event?.eventTitle}</strong>
-				<p>{event?.tagline}</p>
+				<strong>{t(event?.eventTitle, { defaultValue: event?.eventTitle })}</strong>
+				<p>{t(event?.tagline, { defaultValue: event?.tagline })}</p>
 				<div className="meta">
-					<span className="chip">{event?.highlight}</span>
+					<span className="chip">{t(event?.highlight, { defaultValue: event?.highlight })}</span>
 					<div className="cta">
-						<span>View drop</span>
+						<span>{t('View drop', { defaultValue: 'View drop' })}</span>
 						<img src="/img/icons/rightup.svg" alt="" />
 					</div>
 				</div>
@@ -79,6 +81,7 @@ const EventCard = ({ event }: { event: EventData }) => {
 
 const Events = () => {
 	const device = useDeviceDetect();
+	const { t } = useTranslation('common');
 
 	return (
 		<Stack className={'events'}>
@@ -87,13 +90,17 @@ const Events = () => {
 			<Stack className={'container'}>
 				<Stack className={'info-box'}>
 					<Box component={'div'} className={'left'}>
-						<span className={'white'}>Upcoming Launches</span>
-						<p className={'white'}>Future rides we are watching closely—get in early.</p>
+						<span className={'white'}>{t('Upcoming Launches', { defaultValue: 'Upcoming Launches' })}</span>
+						<p className={'white'}>
+							{t('Future rides we are watching closely—get in early.', {
+								defaultValue: 'Future rides we are watching closely—get in early.',
+							})}
+						</p>
 					</Box>
 					{device !== 'mobile' && (
 						<Box component={'div'} className={'right'}>
 							<div className={'more-box'}>
-								<span>Notify me</span>
+								<span>{t('Notify me', { defaultValue: 'Notify me' })}</span>
 								<img src="/img/icons/rightup.svg" alt="" />
 							</div>
 						</Box>
