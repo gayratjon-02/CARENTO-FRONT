@@ -300,7 +300,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 											</Stack>
 											<span>
 												{t('Total {{count}} cars available', {
-													count: carTotal.toLocaleString(),
+													count: carTotal,
 													defaultValue: `Total ${carTotal.toLocaleString()} cars available`,
 												})}
 											</span>
@@ -452,7 +452,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 											<Typography className="panel-sub">
 												{carTotal
 													? t('{{count}} available', {
-															count: carTotal.toLocaleString(),
+															count: carTotal,
 															defaultValue: `${carTotal.toLocaleString()} available`,
 													  })
 													: t('No cars found', { defaultValue: 'No cars found' })}
@@ -479,7 +479,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 													</Stack>
 													<span>
 														{t('Total {{count}} cars available', {
-															count: carTotal.toLocaleString(),
+															count: carTotal,
 															defaultValue: `Total ${carTotal.toLocaleString()} cars available`,
 														})}
 													</span>
