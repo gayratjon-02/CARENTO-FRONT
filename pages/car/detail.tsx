@@ -37,6 +37,7 @@ import ReviewCard from '../../libs/components/agent/ReviewCard';
 import CarCard from '../../libs/components/car/CarCard';
 import { CarsInquiry } from 'libs/types/car/cars.input';
 import { Car } from 'libs/types/car/cars';
+import { useTranslation } from 'next-i18next';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -50,6 +51,7 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
+	const { t } = useTranslation('common');
 
 	const carId = useMemo(() => (router.query.id ? String(router.query.id) : ''), [router.query.id]);
 	const [activeImage, setActiveImage] = useState<string>('');
@@ -242,25 +244,34 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 	if (!car) {
 		return (
 			<Stack className={`car-detail-page ${device === 'mobile' ? 'mobile' : ''}`}>
-				<Stack className="container">
-					<Box className="car-detail__empty">
-						<Typography className="title">Car not found</Typography>
-						<Typography className="sub">Try going back to the list and open again.</Typography>
-						<Button startIcon={<ArrowBackRoundedIcon />} className="back" onClick={() => router.push('/car')}>
-							Back to Cars
-						</Button>
-					</Box>
+					<Stack className="container">
+						<Box className="car-detail__empty">
+							<Typography className="title">{t('Car not found', { defaultValue: 'Car not found' })}</Typography>
+							<Typography className="sub">
+								{t('Try going back to the list and open again.', {
+									defaultValue: 'Try going back to the list and open again.',
+								})}
+							</Typography>
+							<Button startIcon={<ArrowBackRoundedIcon />} className="back" onClick={() => router.push('/car')}>
+								{t('Back to Cars', { defaultValue: 'Back to Cars' })}
+							</Button>
+						</Box>
+					</Stack>
 				</Stack>
-			</Stack>
-		);
+			);
 	}
 
-	const title = car.carTitle ?? 'Car';
-	const brand = car.brandType ? formatEnumValue(String(car.brandType)) : '';
-	const fuel = car.fuelType ? formatEnumValue(String(car.fuelType)) : '';
-	const transmission = car.transmission ? formatEnumValue(String(car.transmission)) : '';
-	const type = car.carType ? formatEnumValue(String(car.carType)) : '';
-	const location = car.carLocation ? formatEnumValue(String(car.carLocation)) : '';
+	const title = car.carTitle ?? t('Car', { defaultValue: 'Car' });
+	const brandRaw = car.brandType ? formatEnumValue(String(car.brandType)) : '';
+	const fuelRaw = car.fuelType ? formatEnumValue(String(car.fuelType)) : '';
+	const transmissionRaw = car.transmission ? formatEnumValue(String(car.transmission)) : '';
+	const typeRaw = car.carType ? formatEnumValue(String(car.carType)) : '';
+	const locationRaw = car.carLocation ? formatEnumValue(String(car.carLocation)) : '';
+	const brand = brandRaw ? t(brandRaw, { defaultValue: brandRaw }) : '';
+	const fuel = fuelRaw ? t(fuelRaw, { defaultValue: fuelRaw }) : '';
+	const transmission = transmissionRaw ? t(transmissionRaw, { defaultValue: transmissionRaw }) : '';
+	const type = typeRaw ? t(typeRaw, { defaultValue: typeRaw }) : '';
+	const location = locationRaw ? t(locationRaw, { defaultValue: locationRaw }) : '';
 	const year = car.year ? String(car.year) : '';
 	const heroUrl = activeImage ? toImageUrl(activeImage) : images[0] ? toImageUrl(images[0]) : '';
 	const mileage = Number(car?.mileage ?? 0);
@@ -270,55 +281,65 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 	const facts = [
 		{
 			key: 'carType',
-			label: 'Car Type',
+			label: t('Car Type', { defaultValue: 'Car Type' }),
 			value: type || '—',
 			icon: <DirectionsCarFilledOutlinedIcon />,
 		},
 		{
 			key: 'mileage',
-			label: 'Mileage',
-			value: mileage ? `${mileage.toLocaleString()} km` : '—',
+			label: t('Mileage', { defaultValue: 'Mileage' }),
+			value: mileage ? t('{{value}} km', { value: mileage.toLocaleString(), defaultValue: `${mileage.toLocaleString()} km` }) : '—',
 			icon: <SpeedIcon />,
 		},
 		{
 			key: 'fuelType',
-			label: 'Fuel Type',
+			label: t('Fuel Type', { defaultValue: 'Fuel Type' }),
 			value: fuel || '—',
 			icon: <LocalGasStationIcon />,
 		},
 		{
 			key: 'engine',
-			label: 'Engine',
+			label: t('Engine', { defaultValue: 'Engine' }),
 			value: car?.engine ? String(car.engine) : '—',
 			icon: <SettingsOutlinedIcon />,
 		},
 		{
 			key: 'seats',
-			label: 'Seats',
-			value: car?.seats ? `${car.seats} seats` : '—',
+			label: t('Seats', { defaultValue: 'Seats' }),
+			value: car?.seats ? t('{{count}} seats', { count: car.seats, defaultValue: `${car.seats} seats` }) : '—',
 			icon: <EventSeatIcon />,
 		},
 		{
 			key: 'transmission',
-			label: 'Transmission',
+			label: t('Transmission', { defaultValue: 'Transmission' }),
 			value: transmission || '—',
 			icon: <SettingsOutlinedIcon />,
 		},
 	] as const;
 
 	const features = [
-		{ key: 'brand', label: 'Brand', value: brand || '—', icon: <BrandingWatermarkOutlinedIcon /> },
-		{ key: 'year', label: 'Year', value: year || '—', icon: <CalendarTodayOutlinedIcon /> },
-		{ key: 'location', label: 'Location', value: location || '—', icon: <LocationOnOutlinedIcon /> },
-		{ key: 'type', label: 'Type', value: type || '—', icon: <DirectionsCarFilledOutlinedIcon /> },
-		{ key: 'fuel', label: 'Fuel', value: fuel || '—', icon: <LocalGasStationIcon /> },
-		{ key: 'trans', label: 'Transmission', value: transmission || '—', icon: <SettingsOutlinedIcon /> },
-		{ key: 'seats', label: 'Seats', value: car?.seats ? String(car.seats) : '—', icon: <EventSeatIcon /> },
-		{ key: 'doors', label: 'Doors', value: car?.doors ? String(car.doors) : '—', icon: <MeetingRoomOutlinedIcon /> },
-		{ key: 'mileage2', label: 'Mileage', value: mileage ? `${mileage.toLocaleString()} km` : '—', icon: <SpeedIcon /> },
-		{ key: 'engine2', label: 'Engine', value: car?.engine ? String(car.engine) : '—', icon: <SettingsOutlinedIcon /> },
-		{ key: 'priceDay', label: 'Price/day', value: `$${formatterStr(priceDay)}`, icon: <AttachMoneyOutlinedIcon /> },
-		{ key: 'priceHour', label: 'Price/hour', value: `$${formatterStr(priceHour)}`, icon: <AttachMoneyOutlinedIcon /> },
+		{ key: 'brand', label: t('Brand', { defaultValue: 'Brand' }), value: brand || '—', icon: <BrandingWatermarkOutlinedIcon /> },
+		{ key: 'year', label: t('Year', { defaultValue: 'Year' }), value: year || '—', icon: <CalendarTodayOutlinedIcon /> },
+		{ key: 'location', label: t('Location', { defaultValue: 'Location' }), value: location || '—', icon: <LocationOnOutlinedIcon /> },
+		{ key: 'type', label: t('Type', { defaultValue: 'Type' }), value: type || '—', icon: <DirectionsCarFilledOutlinedIcon /> },
+		{ key: 'fuel', label: t('Fuel', { defaultValue: 'Fuel' }), value: fuel || '—', icon: <LocalGasStationIcon /> },
+		{ key: 'trans', label: t('Transmission', { defaultValue: 'Transmission' }), value: transmission || '—', icon: <SettingsOutlinedIcon /> },
+		{
+			key: 'seats',
+			label: t('Seats', { defaultValue: 'Seats' }),
+			value: car?.seats ? t('{{count}} seats', { count: car.seats, defaultValue: `${car.seats} seats` }) : '—',
+			icon: <EventSeatIcon />,
+		},
+		{ key: 'doors', label: t('Doors', { defaultValue: 'Doors' }), value: car?.doors ? String(car.doors) : '—', icon: <MeetingRoomOutlinedIcon /> },
+		{
+			key: 'mileage2',
+			label: t('Mileage', { defaultValue: 'Mileage' }),
+			value: mileage ? t('{{value}} km', { value: mileage.toLocaleString(), defaultValue: `${mileage.toLocaleString()} km` }) : '—',
+			icon: <SpeedIcon />,
+		},
+		{ key: 'engine2', label: t('Engine', { defaultValue: 'Engine' }), value: car?.engine ? String(car.engine) : '—', icon: <SettingsOutlinedIcon /> },
+		{ key: 'priceDay', label: t('Price/day', { defaultValue: 'Price/day' }), value: `$${formatterStr(priceDay)}`, icon: <AttachMoneyOutlinedIcon /> },
+		{ key: 'priceHour', label: t('Price/hour', { defaultValue: 'Price/hour' }), value: `$${formatterStr(priceHour)}`, icon: <AttachMoneyOutlinedIcon /> },
 	] as const;
 
 	return (
@@ -326,11 +347,11 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 			<Stack className="container">
 				<Box className="car-detail__crumbs">
 					<span className="link" onClick={() => router.push('/')}>
-						Home
+						{t('Home', { defaultValue: 'Home' })}
 					</span>
 					<span className="sep">/</span>
 					<span className="link" onClick={() => router.push('/car')}>
-						Cars
+						{t('Cars', { defaultValue: 'Cars' })}
 					</span>
 					<span className="sep">/</span>
 					<span className="current">{title}</span>
@@ -338,7 +359,7 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 
 				<Box className="car-detail__top">
 					<Button startIcon={<ArrowBackRoundedIcon />} className="back" onClick={() => router.push('/car')}>
-						Back
+						{t('Back', { defaultValue: 'Back' })}
 					</Button>
 					<Box className="meta">
 						<Box className="meta-item">
@@ -370,9 +391,9 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 									)}
 								</Box>
 								<Box className="hero-price">
-									<span>From</span>
+									<span>{t('From', { defaultValue: 'From' })}</span>
 									<strong>${formatterStr(car?.pricePerDay ?? 0)}</strong>
-									<small>/day</small>
+									<small>{t('/day', { defaultValue: '/day' })}</small>
 								</Box>
 							</Box>
 
@@ -445,8 +466,8 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 
 						<Box className="car-detail__section features">
 							<Box className="section-head">
-								<Typography className="section-title">Car Features</Typography>
-								<Typography className="section-sub">Quick overview</Typography>
+								<Typography className="section-title">{t('Car Features', { defaultValue: 'Car Features' })}</Typography>
+								<Typography className="section-sub">{t('Quick overview', { defaultValue: 'Quick overview' })}</Typography>
 							</Box>
 
 							<Box className="feature-grid">
@@ -462,8 +483,12 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 
 						<Box className="car-detail__section">
 							<Box className="section-head">
-								<Typography className="section-title">Reviews</Typography>
-								<Typography className="section-sub">{commentTotal ? `${commentTotal} total` : 'Be the first to review'}</Typography>
+								<Typography className="section-title">{t('Reviews', { defaultValue: 'Reviews' })}</Typography>
+								<Typography className="section-sub">
+									{commentTotal
+										? t('{{count}} total', { count: commentTotal, defaultValue: `${commentTotal} total` })
+										: t('Be the first to review', { defaultValue: 'Be the first to review' })}
+								</Typography>
 							</Box>
 
 							{commentTotal ? (
@@ -484,20 +509,24 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 									)}
 								</Stack>
 							) : (
-								<Box className="empty">No reviews yet.</Box>
+								<Box className="empty">{t('No reviews yet.', { defaultValue: 'No reviews yet.' })}</Box>
 							)}
 
 							<Box className="leave-review">
-								<Typography className="leave-title">Leave a review</Typography>
+								<Typography className="leave-title">{t('Leave a review', { defaultValue: 'Leave a review' })}</Typography>
 								<textarea
 									value={insertCommentData.commentContent}
-									placeholder={user?._id ? 'Share your experience…' : 'Login to write a review'}
+									placeholder={
+										user?._id
+											? t('Share your experience…', { defaultValue: 'Share your experience…' })
+											: t('Login to write a review', { defaultValue: 'Login to write a review' })
+									}
 									onChange={({ target: { value } }: any) => setInsertCommentData((prev) => ({ ...prev, commentContent: value }))}
 									disabled={!user?._id}
 								/>
 								<Box className="leave-actions">
 									<Button className="submit" onClick={createCommentHandler} disabled={!user?._id || !insertCommentData.commentContent.trim()}>
-										Submit
+										{t('Submit', { defaultValue: 'Submit' })}
 									</Button>
 								</Box>
 							</Box>
@@ -506,10 +535,10 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 						{similarCars.length > 0 && (
 							<Box className="car-detail__section">
 								<Box className="section-head">
-									<Typography className="section-title">Similar cars</Typography>
+									<Typography className="section-title">{t('Similar cars', { defaultValue: 'Similar cars' })}</Typography>
 									<Box className="section-chip">
 										<AutoAwesomeRoundedIcon />
-										<span>Handpicked suggestions</span>
+										<span>{t('Handpicked suggestions', { defaultValue: 'Handpicked suggestions' })}</span>
 									</Box>
 								</Box>
 								<Box className="similar-grid">
@@ -524,18 +553,18 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 					<Box className="car-detail__aside">
 						<Box className="aside-card">
 							<Box className="price">
-								<span>From</span>
+								<span>{t('From', { defaultValue: 'From' })}</span>
 								<strong>${formatterStr(car?.pricePerDay ?? 0)}</strong>
-								<small>/day</small>
+								<small>{t('/day', { defaultValue: '/day' })}</small>
 							</Box>
 							<Button className="cta" startIcon={<PhoneRoundedIcon />} href={car?.memberData?.memberPhone ? `tel:${car.memberData.memberPhone}` : undefined} disabled={!car?.memberData?.memberPhone}>
-								Call dealer
+								{t('Call dealer', { defaultValue: 'Call dealer' })}
 							</Button>
 							<Button className="cta ghost" onClick={handleBookOnline}>
-								Book online
+								{t('Book online', { defaultValue: 'Book online' })}
 							</Button>
 							<Button className="ghost" onClick={(e) => onLike(e as any)}>
-								{liked ? 'Liked' : 'Like'}
+								{liked ? t('Liked', { defaultValue: 'Liked' }) : t('Like', { defaultValue: 'Like' })}
 							</Button>
 						</Box>
 
@@ -550,8 +579,10 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 									alt=""
 								/>
 								<Box className="dealer-meta">
-									<strong>{car?.memberData?.memberFullName ?? car?.memberData?.memberNick ?? 'Dealer'}</strong>
-									<span className="sub">{car?.memberData?.memberAddress || 'Unknown location'}</span>
+									<strong>
+										{car?.memberData?.memberFullName ?? car?.memberData?.memberNick ?? t('Dealer', { defaultValue: 'Dealer' })}
+									</strong>
+									<span className="sub">{car?.memberData?.memberAddress || t('Unknown location', { defaultValue: 'Unknown location' })}</span>
 								</Box>
 							</Box>
 							<Box className="dealer-actions">
@@ -561,10 +592,10 @@ const CarDetail: NextPage = ({ initialComment }: any) => {
 									href={car?.memberData?.memberPhone ? `tel:${car.memberData.memberPhone}` : undefined}
 									disabled={!car?.memberData?.memberPhone}
 								>
-									Call
+									{t('Call', { defaultValue: 'Call' })}
 								</Button>
 								<Button className="primary" onClick={() => router.push(`/dealers/detail?agentId=${car?.memberData?._id}`)}>
-									View dealer
+									{t('View dealer', { defaultValue: 'View dealer' })}
 								</Button>
 							</Box>
 						</Box>
