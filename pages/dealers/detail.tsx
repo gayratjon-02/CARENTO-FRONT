@@ -4,6 +4,7 @@ import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
 import { Box, Button, Pagination, Stack, Tabs, Tab, Typography } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import StarIcon from '@mui/icons-material/Star';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { useRouter } from 'next/router';
@@ -30,6 +31,7 @@ export const getStaticProps = async ({ locale }: any) => ({
 const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any) => {
 	const device = useDeviceDetect();
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const user = useReactiveVar(userVar);
 	const [agentId, setAgentId] = useState<string | null>(null);
 	const [agent, setAgent] = useState<Member | null>(null);
@@ -217,7 +219,10 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 				return { ...prev, meFollowed: updated };
 			});
 
-			await sweetTopSmallSuccessAlert(nextFollow ? 'Followed' : 'Unfollowed', 700);
+			await sweetTopSmallSuccessAlert(
+				nextFollow ? t('Followed', { defaultValue: 'Followed' }) : t('Unfollowed', { defaultValue: 'Unfollowed' }),
+				700,
+			);
 		} catch (err: any) {
 			sweetMixinErrorAlert(err.message).then();
 		}
@@ -236,7 +241,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 						</Box>
 						<Box className="dealer-hero__meta">
 							<Typography className="dealer-hero__name">{agent?.memberFullName ?? agent?.memberNick}</Typography>
-							<Typography className="dealer-hero__role">Dealer</Typography>
+							<Typography className="dealer-hero__role">{t('Dealer', { defaultValue: 'Dealer' })}</Typography>
 							{agent?.memberPhone && (
 								<Typography className="dealer-hero__phone">
 									<img src="/img/icons/call.svg" alt="" />
@@ -247,15 +252,15 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 						<Box className="dealer-hero__stats">
 							<div className="stat">
 								<strong>{carsTotal.toLocaleString()}</strong>
-								<span>Cars</span>
+								<span>{t('Cars', { defaultValue: 'Cars' })}</span>
 							</div>
 							<div className="stat">
 								<strong>{Number(agent?.memberLikes ?? 0).toLocaleString()}</strong>
-								<span>Likes</span>
+								<span>{t('Likes', { defaultValue: 'Likes' })}</span>
 							</div>
 							<div className="stat">
 								<strong>{Number(agent?.memberViews ?? 0).toLocaleString()}</strong>
-								<span>Views</span>
+								<span>{t('Views', { defaultValue: 'Views' })}</span>
 							</div>
 						</Box>
 					</Stack>
@@ -269,8 +274,8 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 								textColor="primary"
 								indicatorColor="primary"
 							>
-								<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
-								<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
+								<Tab value="cars" label={`${t('Cars', { defaultValue: 'Cars' })} (${carTotal ?? 0})`} />
+								<Tab value="reviews" label={`${t('Reviews', { defaultValue: 'Reviews' })} (${commentTotal ?? 0})`} />
 							</Tabs>
 						</Box>
 
@@ -293,12 +298,17 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 													color="primary"
 												/>
 											</Stack>
-											<span>Total {carTotal.toLocaleString()} cars available</span>
+											<span>
+												{t('Total {{count}} cars available', {
+													count: carTotal.toLocaleString(),
+													defaultValue: `Total ${carTotal.toLocaleString()} cars available`,
+												})}
+											</span>
 										</>
 									) : (
 										<div className={'no-data'}>
 											<img src="/img/icons/icoAlert.svg" alt="" />
-											<p>No cars found!</p>
+											<p>{t('No cars found!', { defaultValue: 'No cars found!' })}</p>
 										</div>
 									)}
 								</Stack>
@@ -308,8 +318,8 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 						{activeTab === 'reviews' && (
 							<Stack className="dealer-panel">
 								<Stack className={'main-intro'}>
-									<span>Reviews</span>
-									<p>Share your experience with this dealer</p>
+									<span>{t('Reviews', { defaultValue: 'Reviews' })}</span>
+									<p>{t('Share your experience with this dealer', { defaultValue: 'Share your experience with this dealer' })}</p>
 								</Stack>
 
 								{commentTotal !== 0 && (
@@ -317,7 +327,10 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 										<Box component={'div'} className={'title-box'}>
 											<StarIcon />
 											<span>
-												{commentTotal} review{commentTotal > 1 ? 's' : ''}
+												{t('{{count}} reviews', {
+													count: commentTotal,
+													defaultValue: `${commentTotal} review${commentTotal > 1 ? 's' : ''}`,
+												})}
 											</span>
 										</Box>
 										{agentComments?.map((comment: Comment) => {
@@ -336,8 +349,8 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 								)}
 
 								<Stack className={'leave-review-config'}>
-									<Typography className={'main-title'}>Leave A Review</Typography>
-									<Typography className={'review-title'}>Review</Typography>
+									<Typography className={'main-title'}>{t('Leave a review', { defaultValue: 'Leave a review' })}</Typography>
+									<Typography className={'review-title'}>{t('Review', { defaultValue: 'Review' })}</Typography>
 									<textarea
 										onChange={({ target: { value } }: any) => {
 											setInsertCommentData({ ...insertCommentData, commentContent: value });
@@ -350,7 +363,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 											disabled={insertCommentData.commentContent === '' || user?._id === ''}
 											onClick={createCommentHandler}
 										>
-											<Typography className={'title'}>Submit Review</Typography>
+											<Typography className={'title'}>{t('Submit Review', { defaultValue: 'Submit Review' })}</Typography>
 										</Button>
 									</Box>
 								</Stack>
@@ -379,11 +392,11 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 									role="button"
 								>
 									<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
-									<span className="role">Dealer</span>
+									<span className="role">{t('Dealer', { defaultValue: 'Dealer' })}</span>
 									{agent?.memberAddress ? (
 										<span className="sub">{agent.memberAddress}</span>
 									) : (
-										<span className="sub muted">Unknown location</span>
+										<span className="sub muted">{t('Unknown location', { defaultValue: 'Unknown location' })}</span>
 									)}
 								</Box>
 							</Box>
@@ -391,10 +404,12 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 							{agent?.memberPhone && (
 								<Box className="profile-actions">
 									<Button className="primary" href={`tel:${agent.memberPhone}`}>
-										Call
+										{t('Call', { defaultValue: 'Call' })}
 									</Button>
 									<Button className="ghost" onClick={toggleFollowHandler}>
-										{displayFollowing ? 'Following' : 'Follow'}
+										{displayFollowing
+											? t('Following', { defaultValue: 'Following' })
+											: t('Follow', { defaultValue: 'Follow' })}
 									</Button>
 								</Box>
 							)}
@@ -402,15 +417,15 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 							<Box className="quick-stats">
 								<div className="stat">
 									<strong>{carsTotal.toLocaleString()}</strong>
-									<span>Cars</span>
+									<span>{t('Cars', { defaultValue: 'Cars' })}</span>
 								</div>
 								<div className="stat">
 									<strong>{Number(agent?.memberLikes ?? 0).toLocaleString()}</strong>
-									<span>Likes</span>
+									<span>{t('Likes', { defaultValue: 'Likes' })}</span>
 								</div>
 								<div className="stat">
 									<strong>{Number(agent?.memberViews ?? 0).toLocaleString()}</strong>
-									<span>Views</span>
+									<span>{t('Views', { defaultValue: 'Views' })}</span>
 								</div>
 							</Box>
 						</Stack>
@@ -425,17 +440,22 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 										textColor="primary"
 										indicatorColor="primary"
 									>
-										<Tab value="cars" label={`Cars (${carTotal ?? 0})`} />
-										<Tab value="reviews" label={`Reviews (${commentTotal ?? 0})`} />
+										<Tab value="cars" label={`${t('Cars', { defaultValue: 'Cars' })} (${carTotal ?? 0})`} />
+										<Tab value="reviews" label={`${t('Reviews', { defaultValue: 'Reviews' })} (${commentTotal ?? 0})`} />
 									</Tabs>
 								</Box>
 
 								{activeTab === 'cars' && (
 									<Stack className="dealer-panel">
 										<Box className="panel-head">
-											<Typography className="panel-title">Cars</Typography>
+											<Typography className="panel-title">{t('Cars', { defaultValue: 'Cars' })}</Typography>
 											<Typography className="panel-sub">
-												{carTotal ? `${carTotal.toLocaleString()} available` : 'No cars found'}
+												{carTotal
+													? t('{{count}} available', {
+															count: carTotal.toLocaleString(),
+															defaultValue: `${carTotal.toLocaleString()} available`,
+													  })
+													: t('No cars found', { defaultValue: 'No cars found' })}
 											</Typography>
 										</Box>
 
@@ -457,12 +477,17 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 															color="primary"
 														/>
 													</Stack>
-													<span>Total {carTotal.toLocaleString()} cars available</span>
+													<span>
+														{t('Total {{count}} cars available', {
+															count: carTotal.toLocaleString(),
+															defaultValue: `Total ${carTotal.toLocaleString()} cars available`,
+														})}
+													</span>
 												</>
 											) : (
 												<div className={'no-data'}>
 													<img src="/img/icons/icoAlert.svg" alt="" />
-													<p>No cars found!</p>
+													<p>{t('No cars found!', { defaultValue: 'No cars found!' })}</p>
 												</div>
 											)}
 										</Stack>
@@ -472,8 +497,12 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 								{activeTab === 'reviews' && (
 									<Stack className="dealer-panel">
 										<Stack className={'main-intro'}>
-											<span>Reviews</span>
-											<p>Share your experience with this dealer</p>
+											<span>{t('Reviews', { defaultValue: 'Reviews' })}</span>
+											<p>
+												{t('Share your experience with this dealer', {
+													defaultValue: 'Share your experience with this dealer',
+												})}
+											</p>
 										</Stack>
 
 										{commentTotal !== 0 && (
@@ -481,7 +510,10 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 												<Box component={'div'} className={'title-box'}>
 													<StarIcon />
 													<span>
-														{commentTotal} review{commentTotal > 1 ? 's' : ''}
+														{t('{{count}} reviews', {
+															count: commentTotal,
+															defaultValue: `${commentTotal} review${commentTotal > 1 ? 's' : ''}`,
+														})}
 													</span>
 												</Box>
 												{agentComments?.map((comment: Comment) => {
@@ -500,8 +532,8 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 										)}
 
 										<Stack className={'leave-review-config'}>
-											<Typography className={'main-title'}>Leave A Review</Typography>
-											<Typography className={'review-title'}>Review</Typography>
+											<Typography className={'main-title'}>{t('Leave a review', { defaultValue: 'Leave a review' })}</Typography>
+											<Typography className={'review-title'}>{t('Review', { defaultValue: 'Review' })}</Typography>
 											<textarea
 												onChange={({ target: { value } }: any) => {
 													setInsertCommentData({ ...insertCommentData, commentContent: value });
@@ -514,7 +546,7 @@ const DealerDetail: NextPage = ({ initialInput, initialComment, ...props }: any)
 													disabled={insertCommentData.commentContent === '' || user?._id === ''}
 													onClick={createCommentHandler}
 												>
-													<Typography className={'title'}>Submit Review</Typography>
+													<Typography className={'title'}>{t('Submit Review', { defaultValue: 'Submit Review' })}</Typography>
 												</Button>
 											</Box>
 										</Stack>
