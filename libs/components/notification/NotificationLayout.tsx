@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import { NotificationHeader } from './NotificationHeader';
-import { NotificationSidebar } from './NotificationSidebar';
+import { NotificationSidebar, NotificationFilter } from './NotificationSidebar';
 import { NotificationList } from './NotificationList';
-import { Notification, mockNotifications, NotificationType } from './notification.mock';
+import { Notification, mockNotifications } from './notification.mock';
 import styles from './notification.module.scss';
 
 const getTimeSince = (iso: string) => {
@@ -17,50 +17,57 @@ const getTimeSince = (iso: string) => {
 };
 
 export const NotificationLayout: React.FC = () => {
-  const [selectedType, setSelectedType] = useState<NotificationType | 'all'>('all');
-  const [items, setItems] = useState<Notification[]>(mockNotifications);
+	const [selectedType, setSelectedType] = useState<NotificationFilter>('all');
+	const [items, setItems] = useState<Notification[]>(mockNotifications);
 
-  const filtered = useMemo(() => {
-    if (selectedType === 'all') return items;
-    return items.filter((n) => n.type === selectedType);
-  }, [items, selectedType]);
+	const filtered = useMemo(() => {
+		if (selectedType === 'all') return items;
+		if (selectedType === 'booking') return items.filter((n) => n.type.startsWith('booking'));
+		if (selectedType === 'payment') return items.filter((n) => n.type.startsWith('payment'));
+		if (selectedType === 'system') return items.filter((n) => n.type === 'system_alert');
+		return items.filter((n) => n.type === 'promotion');
+	}, [items, selectedType]);
 
-  const counts = useMemo(() => {
-    const base: Record<string, number> = { all: items.length };
-    items.forEach((n) => {
-      base[n.type] = (base[n.type] || 0) + 1;
-    });
-    return base;
-  }, [items]);
+	const counts = useMemo<Record<NotificationFilter, number>>(() => {
+		const base: Record<NotificationFilter, number> = {
+			all: items.length,
+			booking: 0,
+			payment: 0,
+			system: 0,
+			promotion: 0,
+		};
+		items.forEach((n) => {
+			if (n.type.startsWith('booking')) base.booking += 1;
+			if (n.type.startsWith('payment')) base.payment += 1;
+			if (n.type === 'system_alert') base.system += 1;
+			if (n.type === 'promotion') base.promotion += 1;
+		});
+		return base;
+	}, [items]);
 
-  const handleSelectType = (type: NotificationType | 'all') => setSelectedType(type);
+	const handleSelectType = (type: NotificationFilter) => setSelectedType(type);
 
-  const handleMarkRead = useCallback(
-    (id: string) => {
-      setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
-    },
-    [setItems],
-  );
+	const handleMarkRead = useCallback((id: string) => {
+		setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+	}, []);
 
-  const handleMarkAllRead = () => {
-    setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
+	const handleMarkAllRead = () => {
+		setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+	};
 
-  const handleDeleteAll = () => {
-    setItems([]);
-  };
+	const handleDeleteAll = () => {
+		setItems([]);
+	};
 
-  return (
-    <Box className={styles.notificationPage}>
-      <Paper className={styles.container} elevation={0}>
-        <Box className={styles.sidebar}>
-          <NotificationSidebar counts={counts} selected={selectedType} onSelect={handleSelectType} />
-        </Box>
-        <Box className={styles.content}>
-          <NotificationHeader onMarkAllRead={handleMarkAllRead} onDeleteAll={handleDeleteAll} />
-          <NotificationList items={filtered} onMarkRead={handleMarkRead} getTimeSince={getTimeSince} />
-        </Box>
-      </Paper>
-    </Box>
-  );
+	return (
+		<Box className={styles.layout}>
+			<Box className={styles.container}>
+				<NotificationSidebar counts={counts} selected={selectedType} onSelect={handleSelectType} />
+				<Box className={styles.content}>
+					<NotificationHeader onMarkAllRead={handleMarkAllRead} onDeleteAll={handleDeleteAll} />
+					<NotificationList items={filtered} onMarkRead={handleMarkRead} getTimeSince={getTimeSince} />
+				</Box>
+			</Box>
+		</Box>
+	);
 };

@@ -1,42 +1,33 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { BackendNotification } from './notification.types';
+import { Notification } from './notification.mock';
 import { NotificationItem } from './NotificationItem';
 import styles from './notification.module.scss';
 
 interface NotificationListProps {
-	notifications: BackendNotification[];
-	onNotificationClick: (id: string) => void;
-	onDeleteNotification: (id: string) => void;
+	items: Notification[];
+	onMarkRead: (id: string) => void;
+	getTimeSince: (iso: string) => string;
 }
 
-export const NotificationList: React.FC<NotificationListProps> = ({
-	notifications = [],
-	onNotificationClick,
-	onDeleteNotification,
-}) => {
-	if (!notifications?.length) {
+export const NotificationList: React.FC<NotificationListProps> = ({ items, onMarkRead, getTimeSince }) => {
+	if (!items.length) {
 		return (
 			<Box className={styles.emptyState}>
 				<Typography variant="body1" color="text.secondary">
-					Xabarnomalar topilmadi
+					No notifications
 				</Typography>
 			</Box>
 		);
 	}
 
 	return (
-		<Stack className={styles.notificationList} spacing={0}>
-			{notifications.map((notification) => (
-				<NotificationItem
-					key={notification._id}
-					notification={notification}
-					onClick={onNotificationClick}
-					onDelete={onDeleteNotification}
-				/>
-			))}
-		</Stack>
+		<Box className={styles.listContainer}>
+			<Stack className={styles.notificationList} spacing={0}>
+				{items.map((item) => (
+					<NotificationItem key={item.id} item={item} onMarkRead={onMarkRead} timeLabel={getTimeSince(item.createdAt)} />
+				))}
+			</Stack>
+		</Box>
 	);
 };
-
-

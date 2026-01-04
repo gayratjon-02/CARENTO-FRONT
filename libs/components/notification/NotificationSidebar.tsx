@@ -1,43 +1,37 @@
 import React from 'react';
-import { Box, Stack, Typography, List, ListItemButton } from '@mui/material';
-import {
-	Notifications as AllIcon,
-	Favorite as LikeIcon,
-	Comment as CommentIcon,
-	PersonAdd as FollowIcon,
-	Message as MessageIcon,
-} from '@mui/icons-material';
-import { NotificationCategory } from './notification.types';
+import { Box, Typography, List, ListItemButton } from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import PaymentIcon from '@mui/icons-material/Payment';
+import SystemUpdateIcon from '@mui/icons-material/SystemUpdate';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import styles from './notification.module.scss';
 
-interface NotificationSidebarProps {
-	counts: Record<string, number>;
-	selected: NotificationCategory;
-	onSelect: (category: NotificationCategory) => void;
+export type NotificationFilter = 'all' | 'booking' | 'payment' | 'system' | 'promotion';
+
+export interface NotificationSidebarProps {
+	counts: Record<NotificationFilter, number>;
+	selected: NotificationFilter;
+	onSelect: (category: NotificationFilter) => void;
 }
 
-const categories: Array<{ key: NotificationCategory; label: string; icon: React.ReactNode }> = [
-	{ key: 'all', label: 'Barchasi', icon: <AllIcon /> },
-	{ key: 'like', label: 'Yoqtirishlar', icon: <LikeIcon /> },
-	{ key: 'comment', label: 'Izohlar', icon: <CommentIcon /> },
-	{ key: 'follow', label: 'Kuzatuvlar', icon: <FollowIcon /> },
-	{ key: 'message', label: 'Xabarlar', icon: <MessageIcon /> },
+const categories: Array<{ key: NotificationFilter; label: string; icon: React.ReactNode }> = [
+	{ key: 'all', label: 'All', icon: <NotificationsIcon /> },
+	{ key: 'booking', label: 'Booking', icon: <BookOnlineIcon /> },
+	{ key: 'payment', label: 'Payment', icon: <PaymentIcon /> },
+	{ key: 'system', label: 'System', icon: <SystemUpdateIcon /> },
+	{ key: 'promotion', label: 'Promotion', icon: <LocalOfferIcon /> },
 ];
 
-export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
-	counts = { all: 0, like: 0, comment: 0, follow: 0, message: 0 },
-	selected,
-	onSelect,
-}) => {
+export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({ counts, selected, onSelect }) => {
 	return (
 		<Box className={styles.sidebar}>
 			<Typography variant="h6" className={styles.sidebarTitle} fontWeight={700}>
-				Filters
+				Categories
 			</Typography>
-
 			<List className={styles.categoryList}>
 				{categories.map((category) => {
-					const count = counts[category.key];
+					const count = counts[category.key] ?? 0;
 					const isActive = selected === category.key;
 
 					return (
@@ -50,11 +44,7 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
 							<Typography variant="body1" className={styles.categoryLabel} fontWeight={isActive ? 600 : 400}>
 								{category.label}
 							</Typography>
-							{count > 0 && (
-								<Box className={styles.categoryBadge}>
-									{count > 99 ? '99+' : count}
-								</Box>
-							)}
+							{count > 0 && <Box className={styles.categoryBadge}>{count > 99 ? '99+' : count}</Box>}
 						</ListItemButton>
 					);
 				})}
@@ -62,4 +52,3 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
 		</Box>
 	);
 };
-
