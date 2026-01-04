@@ -11,9 +11,9 @@ import { NotificationCategory } from './notification.types';
 import styles from './notification.module.scss';
 
 interface NotificationSidebarProps {
-	activeCategory: NotificationCategory;
-	onCategoryChange: (category: NotificationCategory) => void;
-	categoryCounts: Record<NotificationCategory, number>;
+	counts: Record<string, number>;
+	selected: NotificationCategory;
+	onSelect: (category: NotificationCategory) => void;
 }
 
 const categories: Array<{ key: NotificationCategory; label: string; icon: React.ReactNode }> = [
@@ -25,9 +25,9 @@ const categories: Array<{ key: NotificationCategory; label: string; icon: React.
 ];
 
 export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
-	activeCategory,
-	onCategoryChange,
-	categoryCounts = { all: 0, like: 0, comment: 0, follow: 0, message: 0 },
+	counts = { all: 0, like: 0, comment: 0, follow: 0, message: 0 },
+	selected,
+	onSelect,
 }) => {
 	return (
 		<Box className={styles.sidebar}>
@@ -37,14 +37,14 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
 
 			<List className={styles.categoryList}>
 				{categories.map((category) => {
-					const count = categoryCounts[category.key];
-					const isActive = activeCategory === category.key;
+					const count = counts[category.key];
+					const isActive = selected === category.key;
 
 					return (
 						<ListItemButton
 							key={category.key}
 							className={`${styles.categoryItem} ${isActive ? styles.categoryActive : ''}`}
-							onClick={() => onCategoryChange(category.key)}
+							onClick={() => onSelect(category.key)}
 						>
 							<Box className={styles.categoryIcon}>{category.icon}</Box>
 							<Typography variant="body1" className={styles.categoryLabel} fontWeight={isActive ? 600 : 400}>
