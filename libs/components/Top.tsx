@@ -94,8 +94,9 @@ const Top: React.FC = () => {
 
 		setLang(currentLocale);
 
-		if (i18n.language !== currentLocale) {
-			i18n.changeLanguage(currentLocale);
+		// FIX: i18n.changeLanguage mavjud bo'lsa chaqiramiz (runtime error bartaraf)
+		if (i18n?.language !== currentLocale && typeof (i18n as any)?.changeLanguage === 'function') {
+			(i18n as any).changeLanguage(currentLocale);
 		}
 
 		if (typeof window !== 'undefined') {

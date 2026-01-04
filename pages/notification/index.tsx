@@ -7,4 +7,4 @@ const NotificationPage = () => {
 	return <NotificationLayout />;
 };
 
-export default NotificationPage;
+export default withLayoutBasic(NotificationPage);
