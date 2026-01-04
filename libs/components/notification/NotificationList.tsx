@@ -1,20 +1,21 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { Notification } from './notification.mock';
+import { BackendNotification } from './notification.types';
 import { NotificationItem } from './NotificationItem';
 import styles from './notification.module.scss';
 
 interface NotificationListProps {
-	notifications: Notification[];
+	notifications: BackendNotification[];
 	onNotificationClick: (id: string) => void;
+	onDeleteNotification: (id: string) => void;
 }
 
-export const NotificationList: React.FC<NotificationListProps> = ({ notifications, onNotificationClick }) => {
+export const NotificationList: React.FC<NotificationListProps> = ({ notifications, onNotificationClick, onDeleteNotification }) => {
 	if (notifications.length === 0) {
 		return (
 			<Box className={styles.emptyState}>
 				<Typography variant="body1" color="text.secondary">
-					No notifications found
+					Xabarnomalar topilmadi
 				</Typography>
 			</Box>
 		);
@@ -24,12 +25,14 @@ export const NotificationList: React.FC<NotificationListProps> = ({ notification
 		<Stack className={styles.notificationList} spacing={0}>
 			{notifications.map((notification) => (
 				<NotificationItem
-					key={notification.id}
+					key={notification._id}
 					notification={notification}
 					onClick={onNotificationClick}
+					onDelete={onDeleteNotification}
 				/>
 			))}
 		</Stack>
 	);
 };
+
 

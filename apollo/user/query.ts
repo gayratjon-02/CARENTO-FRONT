@@ -816,3 +816,48 @@ export const GET_ADMIN_BOOKINGS = gql`
 		}
 	}
 `;
+
+/**************************
+ *      NOTIFICATION      *
+ *************************/
+
+export const GET_NOTIFICATIONS = gql`
+	query GetNotifications {
+		getNotifications {
+			_id
+			notificationType
+			notificationStatus
+			notificationGroup
+			notificationTitle
+			notificationDesc
+			authorId
+			receiverId
+			carId
+			articleId
+			createdAt
+			updatedAt
+			authorData {
+				_id
+				memberNick
+				memberFullName
+				memberImage
+			}
+			receiverData {
+				_id
+				memberNick
+				memberFullName
+				memberImage
+			}
+			carData {
+				_id
+				carTitle
+				carImages
+			}
+			articleData {
+				_id
+				articleTitle
+				articleImage
+			}
+		}
+	}
+`;

@@ -2,12 +2,12 @@ import React from 'react';
 import { Box, Stack, Typography, List, ListItemButton } from '@mui/material';
 import {
 	Notifications as AllIcon,
-	Event as BookingIcon,
-	Payment as PaymentIcon,
-	Settings as SystemIcon,
-	LocalOffer as PromotionIcon,
+	Favorite as LikeIcon,
+	Comment as CommentIcon,
+	PersonAdd as FollowIcon,
+	Message as MessageIcon,
 } from '@mui/icons-material';
-import { NotificationCategory } from './notification.mock';
+import { NotificationCategory } from './notification.types';
 import styles from './notification.module.scss';
 
 interface NotificationSidebarProps {
@@ -17,11 +17,11 @@ interface NotificationSidebarProps {
 }
 
 const categories: Array<{ key: NotificationCategory; label: string; icon: React.ReactNode }> = [
-	{ key: 'all', label: 'All', icon: <AllIcon /> },
-	{ key: 'booking', label: 'Booking', icon: <BookingIcon /> },
-	{ key: 'payment', label: 'Payment', icon: <PaymentIcon /> },
-	{ key: 'system', label: 'System', icon: <SystemIcon /> },
-	{ key: 'promotion', label: 'Promotion', icon: <PromotionIcon /> },
+	{ key: 'all', label: 'Barchasi', icon: <AllIcon /> },
+	{ key: 'like', label: 'Yoqtirishlar', icon: <LikeIcon /> },
+	{ key: 'comment', label: 'Izohlar', icon: <CommentIcon /> },
+	{ key: 'follow', label: 'Kuzatuvlar', icon: <FollowIcon /> },
+	{ key: 'message', label: 'Xabarlar', icon: <MessageIcon /> },
 ];
 
 export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
