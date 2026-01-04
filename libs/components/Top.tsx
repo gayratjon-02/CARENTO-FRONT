@@ -12,7 +12,16 @@ import { alpha, styled } from '@mui/material/styles';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Logout } from '@mui/icons-material';
 
-import { CaretDown, BellRinging, HouseSimple, CarSimple, Buildings, ChatsCircle, Headset, UserCircle } from 'phosphor-react';
+import {
+	CaretDown,
+	BellRinging,
+	HouseSimple,
+	CarSimple,
+	Buildings,
+	ChatsCircle,
+	Headset,
+	UserCircle,
+} from 'phosphor-react';
 
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import { getJwtToken, logOut, updateUserInfo } from '../auth';
@@ -75,7 +84,7 @@ const Top: React.FC = () => {
 
 	const [colorChange, setColorChange] = useState(false);
 	const [bgColor, setBgColor] = useState(false);
-	const [notificationCount] = useState<number>(0);
+	const [notificationCount] = useState<number>(2);
 
 	// locale -> i18n sync
 	useEffect(() => {
@@ -230,7 +239,7 @@ const Top: React.FC = () => {
 					{/* RIGHT ACTIONS */}
 					<Box component="div" className="right-actions">
 						{/* NOTIFICATIONS */}
-						<Box component="div" className="action-pill notification-pill">
+						<Box component="div" className="action-pill notification-pill" onClick={() => router.push('/notification')}>
 							<Badge
 								badgeContent={notificationCount}
 								color="error"
