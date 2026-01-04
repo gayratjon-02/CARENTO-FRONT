@@ -27,7 +27,7 @@ const categories: Array<{ key: NotificationCategory; label: string; icon: React.
 export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
 	activeCategory,
 	onCategoryChange,
-	categoryCounts,
+	categoryCounts = { all: 0, like: 0, comment: 0, follow: 0, message: 0 },
 }) => {
 	return (
 		<Box className={styles.sidebar}>

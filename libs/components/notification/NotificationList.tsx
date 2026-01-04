@@ -10,8 +10,12 @@ interface NotificationListProps {
 	onDeleteNotification: (id: string) => void;
 }
 
-export const NotificationList: React.FC<NotificationListProps> = ({ notifications, onNotificationClick, onDeleteNotification }) => {
-	if (notifications.length === 0) {
+export const NotificationList: React.FC<NotificationListProps> = ({
+	notifications = [],
+	onNotificationClick,
+	onDeleteNotification,
+}) => {
+	if (!notifications?.length) {
 		return (
 			<Box className={styles.emptyState}>
 				<Typography variant="body1" color="text.secondary">
