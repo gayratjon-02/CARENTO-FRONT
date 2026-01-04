@@ -46,3 +46,4 @@ export const getCategoryFromType = (type: NotificationType, group: NotificationG
 	if (type === NotificationType.MESSAGE) return 'message';
 	return 'all';
 };
+
