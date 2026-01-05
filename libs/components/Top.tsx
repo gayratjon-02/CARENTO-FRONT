@@ -30,6 +30,7 @@ import { userVar } from '../../apollo/store';
 import { REACT_APP_API_URL } from '../config';
 import { GetNotifications } from '../../apollo/user/query';
 import { sweetLoginConfirmAlert } from '../sweetAlert';
+import { NotificationStatus } from '../enum/notification.enum';
 
 type Lang = 'en' | 'kr' | 'ru';
 type Currency = 'KRW' | 'USD';
@@ -215,10 +216,10 @@ const Top: React.FC = () => {
 		skip: !authToken,
 	});
 
-	const notificationCount = useMemo(
-		() => notificationsData?.getNotifications?.metaCounter?.[0]?.total ?? notificationsData?.getNotifications?.list?.length ?? 0,
-		[notificationsData],
-	);
+	const notificationCount = useMemo(() => {
+		const list = notificationsData?.getNotifications?.list ?? [];
+		return list.filter((n: any) => n.notificationStatus === NotificationStatus.WAIT).length;
+	}, [notificationsData]);
 
 	const handleNotificationClick = useCallback(async () => {
 		if (!user?._id) {
