@@ -36,18 +36,34 @@ export const NotificationLayout: React.FC = () => {
 
 	const getTimeSince = useCallback(
 		(iso: string) => {
-			const diff = Date.now() - new Date(iso).getTime();
+			if (!iso) return t('Just now', { defaultValue: 'Just now' });
+			const created = new Date(iso);
+			if (Number.isNaN(created.getTime())) return t('Just now', { defaultValue: 'Just now' });
+
+			const diff = Date.now() - created.getTime();
 			const mins = Math.floor(diff / 60000);
-			if (mins < 1) return t('Just now', { defaultValue: 'Just now' });
-			if (mins < 60) {
-				return t('{{count}} minutes ago', { count: mins, defaultValue: `${mins} minutes ago` });
-			}
 			const hrs = Math.floor(mins / 60);
-			if (hrs < 24) {
-				return t('{{count}} hours ago', { count: hrs, defaultValue: `${hrs} hours ago` });
-			}
 			const days = Math.floor(hrs / 24);
-			return t('{{count}} days ago', { count: days, defaultValue: `${days} days ago` });
+
+			let relative = t('Just now', { defaultValue: 'Just now' });
+			if (mins >= 1 && mins < 60) {
+				relative = t('{{count}} minutes ago', { count: mins, defaultValue: `${mins} minutes ago` });
+			} else if (hrs >= 1 && hrs < 24) {
+				relative = t('{{count}} hours ago', { count: hrs, defaultValue: `${hrs} hours ago` });
+			} else if (days >= 1) {
+				relative = t('{{count}} days ago', { count: days, defaultValue: `${days} days ago` });
+			}
+
+			const exact = new Intl.DateTimeFormat(undefined, {
+				year: 'numeric',
+				month: 'short',
+				day: '2-digit',
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false,
+			}).format(created);
+
+			return `${relative} • ${exact}`;
 		},
 		[t],
 	);
