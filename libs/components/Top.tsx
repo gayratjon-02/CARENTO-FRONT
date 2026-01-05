@@ -25,9 +25,10 @@ import {
 
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import { getJwtToken, logOut, updateUserInfo } from '../auth';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { userVar } from '../../apollo/store';
 import { REACT_APP_API_URL } from '../config';
+import { GetNotifications } from '../../apollo/user/query';
 
 type Lang = 'en' | 'kr' | 'ru';
 type Currency = 'KRW' | 'USD';
@@ -84,7 +85,7 @@ const Top: React.FC = () => {
 
 	const [colorChange, setColorChange] = useState(false);
 	const [bgColor, setBgColor] = useState(false);
-	const [notificationCount] = useState<number>(2);
+	const [authToken, setAuthToken] = useState<string | null>(null);
 
 	// locale -> i18n sync
 	useEffect(() => {
@@ -118,7 +119,10 @@ const Top: React.FC = () => {
 
 	useEffect(() => {
 		const jwt = getJwtToken();
-		if (jwt) updateUserInfo(jwt);
+		if (jwt) {
+			setAuthToken(jwt);
+			updateUserInfo(jwt);
+		}
 	}, []);
 
 	useEffect(() => {
@@ -132,22 +136,22 @@ const Top: React.FC = () => {
 		const links = [
 			{
 				href: '/',
-				label: t('nav.home', { defaultValue: t('Home') }),
+				label: t('Home', { defaultValue: 'Home' }),
 				icon: <HouseSimple size={18} weight="fill" />,
 			},
 			{
 				href: '/car',
-				label: t('nav.car', { defaultValue: t('Cars', { defaultValue: t('Car') || 'Car' }) }),
+				label: t('Cars', { defaultValue: 'Cars' }),
 				icon: <CarSimple size={18} weight="fill" />,
 			},
 			{
 				href: '/dealers',
-				label: t('nav.dealers', { defaultValue: t('Dealers') }),
+				label: t('Dealers', { defaultValue: 'Dealers' }),
 				icon: <Buildings size={18} weight="fill" />,
 			},
 			{
 				href: '/community?articleCategory=FREE',
-				label: t('nav.community', { defaultValue: t('Community') }),
+				label: t('Community', { defaultValue: 'Community' }),
 				icon: <ChatsCircle size={18} weight="fill" />,
 			},
 		];
@@ -155,14 +159,14 @@ const Top: React.FC = () => {
 		if (user?._id) {
 			links.push({
 				href: '/mypage',
-				label: t('nav.myAccount', { defaultValue: t('My Page') }),
+				label: t('My Page', { defaultValue: 'My Page' }),
 				icon: <UserCircle size={18} weight="fill" />,
 			});
 		}
 
 		links.push({
 			href: '/cs',
-			label: t('nav.support', { defaultValue: t('Support') }),
+			label: t('Support', { defaultValue: 'Support' }),
 			icon: <Headset size={18} weight="fill" />,
 		});
 
@@ -202,6 +206,18 @@ const Top: React.FC = () => {
 		}
 		setCurrencyAnchor(null);
 	}, []);
+
+	const { data: notificationsData } = useQuery(GetNotifications, {
+		fetchPolicy: 'network-only',
+		variables: { input: {} },
+		notifyOnNetworkStatusChange: true,
+		skip: !authToken,
+	});
+
+	const notificationCount = useMemo(
+		() => notificationsData?.getNotifications?.metaCounter?.[0]?.total ?? notificationsData?.getNotifications?.list?.length ?? 0,
+		[notificationsData],
+	);
 
 	if (device === 'mobile') {
 		return (
