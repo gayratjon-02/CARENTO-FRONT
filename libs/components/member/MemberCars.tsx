@@ -29,15 +29,17 @@ const MemberCars: NextPage = ({ initialInput, ...props }: any) => {
 		skip: !searchFilter?.search?.memberId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: any) => {
-			setAgentProperties(data?.getProperties?.list);
-			setTotal(data?.getProperties?.metaCounter[0]?.total ?? 0);
+			setAgentProperties(data?.getCars?.list ?? []);
+			setTotal(data?.getCars?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
 	/** LIFECYCLES **/
 	useEffect(() => {
-		getPropertiesRefetch().then();
-	}, [searchFilter]);
+		if (searchFilter?.search?.memberId) {
+			getPropertiesRefetch().then();
+		}
+	}, [searchFilter, getPropertiesRefetch]);
 
 	useEffect(() => {
 		if (memberId)
@@ -76,11 +78,11 @@ const MemberCars: NextPage = ({ initialInput, ...props }: any) => {
 							</div>
 						)}
 
-						{agentProperties.length !== 0 && (
+						{agentProperties?.length !== 0 && (
 							<Stack className="pagination-config">
 								<Stack className="pagination-box">
 									<Pagination
-										count={Math.ceil(total / searchFilter.limit)}
+										count={Math.ceil(total / (searchFilter.limit || 1))}
 										page={searchFilter.page}
 										shape="circular"
 										color="primary"

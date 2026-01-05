@@ -59,13 +59,15 @@ export const NotificationLayout: React.FC = () => {
 
 	const counts = useMemo<Record<NotificationCategory, number>>(() => {
 		const base: Record<NotificationCategory, number> = {
-			all: items.length,
+			all: 0,
 			like: 0,
 			comment: 0,
 			follow: 0,
 			message: 0,
 		};
 		items.forEach((n) => {
+			if (n.notificationStatus !== NotificationStatus.WAIT) return;
+			base.all += 1;
 			const category = getCategoryFromType(n.notificationType, n.notificationGroup);
 			if (category !== 'all') base[category] += 1;
 		});
