@@ -26,6 +26,8 @@ const withLayoutMain = (Component: any) => {
 
 		/** HANDLERS **/
 
+		const hideHero = (Component as any)?.disableHero === true;
+
 		if (device == 'mobile') {
 			return (
 				<>
@@ -60,13 +62,15 @@ const withLayoutMain = (Component: any) => {
 							<Top />
 						</Stack>
 
-						<Stack className={'header-main'}>
-							<Box className="header-image">
-								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src="/img/banner/banner1.jpg" alt="Carento" />
-							</Box>
-							<HeroSection />
-						</Stack>
+						{!hideHero && (
+							<Stack className={'header-main'}>
+								<Box className="header-image">
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img src="/img/banner/banner1.jpg" alt="Carento" />
+								</Box>
+								<HeroSection />
+							</Stack>
+						)}
 
 						<Stack id={'main'}>
 							<Component {...props} />

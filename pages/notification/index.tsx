@@ -19,4 +19,8 @@ const NotificationPage = () => {
 	);
 };
 
+// Disable hero banner for this page to keep the layout focused.
+// @ts-ignore
+NotificationPage.disableHero = true;
+
 export default withLayoutMain(NotificationPage);
