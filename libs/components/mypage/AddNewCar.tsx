@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import axios from 'axios';
+import imageCompression from 'browser-image-compression';
 import { getJwtToken } from '../../auth';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetMixinSuccessAlert } from '../../sweetAlert';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
@@ -32,6 +33,11 @@ type CarFormState = {
 	carImages: string[];
 	carStatus?: CarStatus;
 };
+
+const MAX_IMAGES = 5;
+const TARGET_IMAGE_SIZE_MB = 1.5;
+const MAX_IMAGE_DIMENSION = 1920;
+const MB_IN_BYTES = 1024 * 1024;
 
 const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 	const device = useDeviceDetect();
@@ -113,48 +119,73 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 
 			const files = Array.from(filesInput ?? []);
 			if (files.length === 0) return;
-			const maxImages = 5;
-			if (files.length > maxImages) throw new Error(`Cannot upload more than ${maxImages} images at once.`);
-			if ((form.carImages?.length ?? 0) + files.length > maxImages) {
-				throw new Error(`You can upload up to ${maxImages} images total.`);
+			if (files.length > MAX_IMAGES) throw new Error(`Cannot upload more than ${MAX_IMAGES} images at once.`);
+			if ((form.carImages?.length ?? 0) + files.length > MAX_IMAGES) {
+				throw new Error(`You can upload up to ${MAX_IMAGES} images total.`);
 			}
 
-			const formData = new FormData();
-			const variables = { files: new Array(files.length).fill(null), target: 'cars' };
-			formData.append(
-				'operations',
-				JSON.stringify({
-					query: `mutation ImagesUploader($files: [Upload!]!, $target: String!) { 
-						imagesUploader(files: $files, target: $target)
-				  }`,
-					variables,
+			// Compress on the client and send images one by one to keep requests small (avoid 413 errors).
+			const compressedFiles = await Promise.all(
+				files.map(async (file) => {
+					if (!file.type?.startsWith('image/')) {
+						throw new Error('Only JPG and PNG files are allowed.');
+					}
+
+					const shouldCompress = file.size / MB_IN_BYTES > TARGET_IMAGE_SIZE_MB;
+					if (!shouldCompress) return file;
+
+					const compressed = await imageCompression(file, {
+						maxSizeMB: TARGET_IMAGE_SIZE_MB,
+						maxWidthOrHeight: MAX_IMAGE_DIMENSION,
+						useWebWorker: true,
+					});
+
+					return compressed as File;
 				}),
 			);
 
-			const map: Record<string, string[]> = {};
-			files.forEach((_, idx) => {
-				map[String(idx)] = [`variables.files.${idx}`];
-			});
-			formData.append('map', JSON.stringify(map));
-			files.forEach((file, idx) => {
-				formData.append(String(idx), file);
-			});
+			const uploadedPaths: string[] = [];
+			for (const file of compressedFiles) {
+				const formData = new FormData();
+				const variables = { files: [null], target: 'cars' };
+				formData.append(
+					'operations',
+					JSON.stringify({
+						query: `mutation ImagesUploader($files: [Upload!]!, $target: String!) { 
+						imagesUploader(files: $files, target: $target)
+				  }`,
+						variables,
+					}),
+				);
 
-			const response = await axios.post(`${process.env.REACT_APP_API_GRAPHQL_URL}`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-					'apollo-require-preflight': true,
-					Authorization: `Bearer ${token}`,
-				},
-			});
+				formData.append(
+					'map',
+					JSON.stringify({
+						'0': ['variables.files.0'],
+					}),
+				);
+				formData.append('0', file);
 
-			const uploaded = response?.data?.data?.imagesUploader ?? [];
-			if (!Array.isArray(uploaded)) return;
+				const response = await axios.post(`${process.env.REACT_APP_API_GRAPHQL_URL}`, formData, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+						'apollo-require-preflight': true,
+						Authorization: `Bearer ${token}`,
+					},
+				});
 
-			setForm((prev) => ({ ...prev, carImages: [...(prev.carImages ?? []), ...uploaded] }));
+				const uploaded = response?.data?.data?.imagesUploader ?? [];
+				if (!Array.isArray(uploaded) || !uploaded[0]) {
+					throw new Error('Image upload failed. Please try again with a smaller photo.');
+				}
+
+				uploadedPaths.push(uploaded[0]);
+			}
+
+			setForm((prev) => ({ ...prev, carImages: [...(prev.carImages ?? []), ...uploadedPaths] }));
 		} catch (err: any) {
 			console.log('uploadFiles err:', err.message);
-			await sweetMixinErrorAlert(err.message);
+			await sweetMixinErrorAlert(err.message || 'Upload failed. Please try smaller images.');
 		}
 	};
 
@@ -252,7 +283,7 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 					<Typography sx={{ color: 'text.secondary', fontSize: 13 }}>Create your listing in a minute.</Typography>
 				</Stack>
 				<Button variant="outlined" onClick={onBrowseClick} sx={{ mb: 1.5 }}>
-					Upload photos ({form.carImages.length}/8)
+					Upload photos ({form.carImages.length}/{MAX_IMAGES})
 				</Button>
 				<input ref={inputRef} type="file" hidden multiple accept="image/jpg, image/jpeg, image/png" onChange={onFileChange} />
 				<Button variant="contained" fullWidth disabled={disabled} onClick={submitHandler}>
@@ -314,7 +345,7 @@ const AddCar = ({ initialValues }: { initialValues: CarFormState }) => {
 					>
 						<div className="dz-text">
 							<strong>Upload photos</strong>
-							<span>Drag & drop or browse (max 8)</span>
+							<span>Drag & drop or browse (max {MAX_IMAGES})</span>
 						</div>
 						<Button className="browse" onClick={onBrowseClick}>
 							Browse
