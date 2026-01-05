@@ -13,10 +13,6 @@ export interface NotificationSidebarProps {
 	counts: Record<NotificationCategory, number>;
 	selected: NotificationCategory;
 	onSelect: (category: NotificationCategory) => void;
-
-	// optional UX/i18n
-	headerImageSrc?: string;
-	headerImageAlt?: string;
 }
 
 const categories: Array<{ key: NotificationCategory; label: string; icon: React.ReactNode }> = [
@@ -31,21 +27,11 @@ export const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
 	counts,
 	selected,
 	onSelect,
-	headerImageSrc,
-	headerImageAlt,
 }) => {
 	const { t } = useTranslation('common');
-	const altText = headerImageAlt ?? t('Notifications', { defaultValue: 'Notifications' });
 
 	return (
 		<Box className={styles.sidebar}>
-			{headerImageSrc ? (
-				<Box className={styles.sidebarHeaderImageWrap}>
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img src={headerImageSrc} alt={altText} className={styles.sidebarHeaderImage} />
-				</Box>
-			) : null}
-
 			<Typography variant="h6" className={styles.sidebarTitle} fontWeight={700}>
 				{t('Categories', { defaultValue: 'Categories' })}
 			</Typography>

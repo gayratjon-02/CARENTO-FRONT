@@ -105,8 +105,6 @@ export const NotificationLayout: React.FC = () => {
 					counts={counts}
 					selected={selectedType}
 					onSelect={handleSelectType}
-					headerImageSrc="/img/banner/agents.webp"
-					headerImageAlt={t('Notifications', { defaultValue: 'Notifications' })}
 				/>
 				<Box className={styles.content}>
 					<NotificationHeader onMarkAllRead={handleMarkAllRead} onDeleteAll={handleDeleteAll} unreadCount={unreadCount} />
