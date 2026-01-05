@@ -3,7 +3,7 @@ import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
 import Top from '../Top';
 import Footer from '../Footer';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { userVar } from '../../../apollo/store';
 import { useReactiveVar } from '@apollo/client';
 import { getJwtToken, updateUserInfo } from '../../auth';
@@ -11,7 +11,6 @@ import Chat from '../Chat';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import VideoCarousel from '../common/VideoCarousel';
 import HeroSection from '../homepage/HeroSection';
 
 const withLayoutMain = (Component: any) => {
@@ -62,7 +61,10 @@ const withLayoutMain = (Component: any) => {
 						</Stack>
 
 						<Stack className={'header-main'}>
-							<VideoCarousel />
+							<Box className="header-image">
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src="/img/banner/banner1.jpg" alt="Carento" />
+							</Box>
 							<HeroSection />
 						</Stack>
 
