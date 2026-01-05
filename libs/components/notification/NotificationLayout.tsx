@@ -45,13 +45,15 @@ export const NotificationLayout: React.FC = () => {
 			const hrs = Math.floor(mins / 60);
 			const days = Math.floor(hrs / 24);
 
+			const pluralize = (value: number, unit: string) => `${value} ${unit}${value === 1 ? '' : 's'} ago`;
+
 			let relative = t('Just now', { defaultValue: 'Just now' });
 			if (mins >= 1 && mins < 60) {
-				relative = t('{{count}} minutes ago', { count: mins, defaultValue: `${mins} minutes ago` });
+				relative = pluralize(mins, 'minute');
 			} else if (hrs >= 1 && hrs < 24) {
-				relative = t('{{count}} hours ago', { count: hrs, defaultValue: `${hrs} hours ago` });
+				relative = pluralize(hrs, 'hour');
 			} else if (days >= 1) {
-				relative = t('{{count}} days ago', { count: days, defaultValue: `${days} days ago` });
+				relative = pluralize(days, 'day');
 			}
 
 			const exact = new Intl.DateTimeFormat(undefined, {
