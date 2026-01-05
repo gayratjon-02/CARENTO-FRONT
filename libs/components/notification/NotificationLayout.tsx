@@ -14,22 +14,25 @@ import styles from './notification.module.scss';
 export const NotificationLayout: React.FC = () => {
 	const { t } = useTranslation('common');
 	const [selectedType, setSelectedType] = useState<NotificationCategory>('all');
+	const notificationQueryVariables = useMemo(() => ({ input: {} }), []);
 
 	const { data, loading } = useQuery(GetNotifications, {
 		fetchPolicy: 'network-only',
+		variables: notificationQueryVariables,
+		notifyOnNetworkStatusChange: true,
 	});
 
 	const [readNotification] = useMutation(READ_NOTIFICATION, {
-		refetchQueries: [{ query: GetNotifications }],
+		refetchQueries: [{ query: GetNotifications, variables: notificationQueryVariables }],
 	});
 	const [readAllNotifications] = useMutation(READ_ALL_NOTIFICATIONS, {
-		refetchQueries: [{ query: GetNotifications }],
+		refetchQueries: [{ query: GetNotifications, variables: notificationQueryVariables }],
 	});
 	const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
-		refetchQueries: [{ query: GetNotifications }],
+		refetchQueries: [{ query: GetNotifications, variables: notificationQueryVariables }],
 	});
 
-	const items = useMemo<BackendNotification[]>(() => data?.getNotifications ?? [], [data]);
+	const items = useMemo<BackendNotification[]>(() => data?.getNotifications?.list ?? [], [data]);
 
 	const getTimeSince = useCallback(
 		(iso: string) => {

@@ -4,8 +4,6 @@ import { useTranslation } from 'next-i18next';
 import { BackendNotification } from './notification.types';
 import { NotificationItem } from './NotificationItem';
 import styles from './notification.module.scss';
-import { useQuery } from '@apollo/client';
-import { GetNotifications } from 'apollo/user/query';
 
 interface NotificationListProps {
 	items: BackendNotification[];
@@ -14,18 +12,6 @@ interface NotificationListProps {
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({ items, onMarkRead, getTimeSince }) => {
-
-	// Apolo request
-	const {} = useQuery(GetNotifications, {
-		fetchPolicy: 'network-only',
-		variables: {
-			notificationType: 
-		}
-
-	});
-
-
-
 	const { t } = useTranslation('common');
 	if (!items.length) {
 		return (
@@ -41,7 +27,12 @@ export const NotificationList: React.FC<NotificationListProps> = ({ items, onMar
 		<Box className={styles.listContainer}>
 			<Stack className={styles.notificationList} spacing={0}>
 				{items.map((item) => (
-					<NotificationItem key={item.id} item={item} onMarkRead={onMarkRead} timeLabel={getTimeSince(item.createdAt)} />
+					<NotificationItem
+						key={item._id}
+						item={item}
+						onMarkRead={onMarkRead}
+						timeLabel={getTimeSince(item.createdAt)}
+					/>
 				))}
 			</Stack>
 		</Box>
