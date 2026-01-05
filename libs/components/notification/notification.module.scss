@@ -25,6 +25,18 @@
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+.sidebarHeaderImageWrap {
+	padding: 0 20px 16px;
+}
+
+.sidebarHeaderImage {
+	width: 100%;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
 .sidebarTitle {
 	padding: 0 20px 16px;
 	color: #1f2937;
@@ -170,6 +182,14 @@
 	padding: 8px 0;
 }
 
+.loadingState {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 48px 0;
+}
+
 .notificationList {
 	display: flex;
 	flex-direction: column;
@@ -247,6 +267,21 @@
 	color: #9ca3af;
 	font-size: 12px;
 	margin-top: 4px;
+}
+
+.itemThumb {
+	width: 96px;
+	height: 64px;
+	border-radius: 10px;
+	overflow: hidden;
+	background: #e5e7eb;
+	flex-shrink: 0;
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
 }
 
 .unreadIndicator {

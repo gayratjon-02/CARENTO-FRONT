@@ -1,21 +1,37 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { Notification } from './notification.mock';
+import { useTranslation } from 'next-i18next';
+import { BackendNotification } from './notification.types';
 import { NotificationItem } from './NotificationItem';
 import styles from './notification.module.scss';
+import { useQuery } from '@apollo/client';
+import { GetNotifications } from 'apollo/user/query';
 
 interface NotificationListProps {
-	items: Notification[];
+	items: BackendNotification[];
 	onMarkRead: (id: string) => void;
 	getTimeSince: (iso: string) => string;
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({ items, onMarkRead, getTimeSince }) => {
+
+	// Apolo request
+	const {} = useQuery(GetNotifications, {
+		fetchPolicy: 'network-only',
+		variables: {
+			notificationType: 
+		}
+
+	});
+
+
+
+	const { t } = useTranslation('common');
 	if (!items.length) {
 		return (
 			<Box className={styles.emptyState}>
 				<Typography variant="body1" color="text.secondary">
-					No notifications
+					{t('No notifications', { defaultValue: 'No notifications' })}
 				</Typography>
 			</Box>
 		);

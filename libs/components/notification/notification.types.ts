@@ -44,6 +44,6 @@ export const getCategoryFromType = (type: NotificationType, group: NotificationG
 	if (type === NotificationType.COMMENT) return 'comment';
 	if (type === NotificationType.FOLLOW) return 'follow';
 	if (type === NotificationType.MESSAGE) return 'message';
+	if (type === NotificationType.SUBSCRIPTION) return 'follow';
 	return 'all';
 };
-

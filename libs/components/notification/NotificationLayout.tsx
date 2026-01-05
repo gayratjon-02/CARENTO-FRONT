@@ -1,71 +1,117 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
+import { useTranslation } from 'next-i18next';
+import { useMutation, useQuery } from '@apollo/client';
 import { NotificationHeader } from './NotificationHeader';
-import { NotificationSidebar, NotificationFilter } from './NotificationSidebar';
+import { NotificationSidebar } from './NotificationSidebar';
 import { NotificationList } from './NotificationList';
-import { Notification, mockNotifications } from './notification.mock';
+import { GetNotifications } from '../../../apollo/user/query';
+import { DELETE_NOTIFICATION, READ_ALL_NOTIFICATIONS, READ_NOTIFICATION } from '../../../apollo/user/mutation';
+import { BackendNotification, NotificationCategory, getCategoryFromType } from './notification.types';
+import { NotificationStatus } from '../../enum/notification.enum';
 import styles from './notification.module.scss';
 
-const getTimeSince = (iso: string) => {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins} min ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs} hours ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days} days ago`;
-};
-
 export const NotificationLayout: React.FC = () => {
-	const [selectedType, setSelectedType] = useState<NotificationFilter>('all');
-	const [items, setItems] = useState<Notification[]>(mockNotifications);
+	const { t } = useTranslation('common');
+	const [selectedType, setSelectedType] = useState<NotificationCategory>('all');
+
+	const { data, loading } = useQuery(GetNotifications, {
+		fetchPolicy: 'network-only',
+	});
+
+	const [readNotification] = useMutation(READ_NOTIFICATION, {
+		refetchQueries: [{ query: GetNotifications }],
+	});
+	const [readAllNotifications] = useMutation(READ_ALL_NOTIFICATIONS, {
+		refetchQueries: [{ query: GetNotifications }],
+	});
+	const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
+		refetchQueries: [{ query: GetNotifications }],
+	});
+
+	const items = useMemo<BackendNotification[]>(() => data?.getNotifications ?? [], [data]);
+
+	const getTimeSince = useCallback(
+		(iso: string) => {
+			const diff = Date.now() - new Date(iso).getTime();
+			const mins = Math.floor(diff / 60000);
+			if (mins < 1) return t('Just now', { defaultValue: 'Just now' });
+			if (mins < 60) {
+				return t('{{count}} minutes ago', { count: mins, defaultValue: `${mins} minutes ago` });
+			}
+			const hrs = Math.floor(mins / 60);
+			if (hrs < 24) {
+				return t('{{count}} hours ago', { count: hrs, defaultValue: `${hrs} hours ago` });
+			}
+			const days = Math.floor(hrs / 24);
+			return t('{{count}} days ago', { count: days, defaultValue: `${days} days ago` });
+		},
+		[t],
+	);
 
 	const filtered = useMemo(() => {
 		if (selectedType === 'all') return items;
-		if (selectedType === 'booking') return items.filter((n) => n.type.startsWith('booking'));
-		if (selectedType === 'payment') return items.filter((n) => n.type.startsWith('payment'));
-		if (selectedType === 'system') return items.filter((n) => n.type === 'system_alert');
-		return items.filter((n) => n.type === 'promotion');
+		return items.filter((n) => getCategoryFromType(n.notificationType, n.notificationGroup) === selectedType);
 	}, [items, selectedType]);
 
-	const counts = useMemo<Record<NotificationFilter, number>>(() => {
-		const base: Record<NotificationFilter, number> = {
+	const counts = useMemo<Record<NotificationCategory, number>>(() => {
+		const base: Record<NotificationCategory, number> = {
 			all: items.length,
-			booking: 0,
-			payment: 0,
-			system: 0,
-			promotion: 0,
+			like: 0,
+			comment: 0,
+			follow: 0,
+			message: 0,
 		};
 		items.forEach((n) => {
-			if (n.type.startsWith('booking')) base.booking += 1;
-			if (n.type.startsWith('payment')) base.payment += 1;
-			if (n.type === 'system_alert') base.system += 1;
-			if (n.type === 'promotion') base.promotion += 1;
+			const category = getCategoryFromType(n.notificationType, n.notificationGroup);
+			if (category !== 'all') base[category] += 1;
 		});
 		return base;
 	}, [items]);
 
-	const handleSelectType = (type: NotificationFilter) => setSelectedType(type);
+	const unreadCount = useMemo(
+		() => items.filter((n) => n.notificationStatus === NotificationStatus.WAIT).length,
+		[items],
+	);
 
-	const handleMarkRead = useCallback((id: string) => {
-		setItems((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
-	}, []);
+	const handleSelectType = (type: NotificationCategory) => setSelectedType(type);
 
-	const handleMarkAllRead = () => {
-		setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+	const handleMarkRead = useCallback(
+		async (id: string) => {
+			await readNotification({ variables: { id } });
+		},
+		[readNotification],
+	);
+
+	const handleMarkAllRead = async () => {
+		if (!unreadCount) return;
+		await readAllNotifications();
 	};
 
-	const handleDeleteAll = () => {
-		setItems([]);
+	const handleDeleteAll = async () => {
+		if (!items.length) return;
+		await Promise.all(items.map((n) => deleteNotification({ variables: { id: n._id } })));
 	};
 
 	return (
 		<Box className={styles.layout}>
 			<Box className={styles.container}>
-				<NotificationSidebar counts={counts} selected={selectedType} onSelect={handleSelectType} />
+				<NotificationSidebar
+					counts={counts}
+					selected={selectedType}
+					onSelect={handleSelectType}
+					headerImageSrc="/img/banner/agents.webp"
+					headerImageAlt={t('Notifications', { defaultValue: 'Notifications' })}
+				/>
 				<Box className={styles.content}>
-					<NotificationHeader onMarkAllRead={handleMarkAllRead} onDeleteAll={handleDeleteAll} />
-					<NotificationList items={filtered} onMarkRead={handleMarkRead} getTimeSince={getTimeSince} />
+					<NotificationHeader onMarkAllRead={handleMarkAllRead} onDeleteAll={handleDeleteAll} unreadCount={unreadCount} />
+					{loading ? (
+						<Box className={styles.loadingState}>
+							<CircularProgress />
+						</Box>
+					) : (
+						<NotificationList items={filtered} onMarkRead={handleMarkRead} getTimeSince={getTimeSince} />
+					)}
 				</Box>
 			</Box>
 		</Box>

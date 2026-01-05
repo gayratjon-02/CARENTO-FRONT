@@ -802,6 +802,123 @@ export const APPROVE_BOOKING_BY_AGENT = gql`
  *      NOTIFICATION      *
  *************************/
 
+export const CREATE_NOTIFICATION = gql`
+	mutation CreateNotification($input: NotificationInput!) {
+		createNotification(input: $input) {
+			_id
+			notificationType
+			notificationStatus
+			notificationGroup
+			notificationTitle
+			notificationDesc
+			authorId
+			receiverId
+			carId
+			articleId
+			createdAt
+			updatedAt
+			authorData {
+				_id
+				memberType
+				memberStatus
+				memberAuthType
+				memberPhone
+				memberNick
+				memberFullName
+				memberImage
+				memberAddress
+				memberDesc
+				memberCars
+				memberArticles
+				memberFollowers
+				memberFollowings
+				memberPoints
+				memberLikes
+				memberViews
+				memberComments
+				memberRank
+				memberWarnings
+				memberBlocks
+				drivingLicenseNumber
+				drivingLicensePhoto
+				deletedAt
+				createdAt
+				updatedAt
+				accessToken
+			}
+			receiverData {
+				_id
+				memberType
+				memberStatus
+				memberAuthType
+				memberPhone
+				memberNick
+				memberFullName
+				memberImage
+				memberAddress
+				memberDesc
+				memberCars
+				memberArticles
+				memberFollowers
+				memberFollowings
+				memberPoints
+				memberLikes
+				memberViews
+				memberComments
+				memberRank
+				memberWarnings
+				memberBlocks
+				drivingLicenseNumber
+				drivingLicensePhoto
+				deletedAt
+				createdAt
+				updatedAt
+				accessToken
+			}
+			carData {
+				_id
+				carTitle
+				carDescription
+				brandType
+				year
+				fuelType
+				transmission
+				seats
+				doors
+				mileage
+				engine
+				carType
+				carStatus
+				carLocation
+				carImages
+				pricePerDay
+				pricePerHour
+				carLikes
+				carViews
+				deletedAt
+				createdAt
+				updatedAt
+			}
+			articleData {
+				_id
+				articleCategory
+				articleStatus
+				articleTitle
+				articleContent
+				articleImage
+				articleViews
+				articleLikes
+				articleComments
+				memberId
+				createdAt
+				updatedAt
+			}
+		}
+	}
+`;
+
+
+
 export const READ_NOTIFICATION = gql`
 	mutation ReadNotification($id: String!) {
 		readNotification(id: $id) {

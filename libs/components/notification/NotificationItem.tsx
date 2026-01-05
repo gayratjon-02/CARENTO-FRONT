@@ -1,64 +1,118 @@
 import React from 'react';
 import { Avatar, Box, Stack, Typography } from '@mui/material';
-import BookOnlineIcon from '@mui/icons-material/BookOnline';
-import PaymentIcon from '@mui/icons-material/Payment';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import SystemUpdateIcon from '@mui/icons-material/SystemUpdate';
+import { useTranslation } from 'next-i18next';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import CommentIcon from '@mui/icons-material/Comment';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import MessageIcon from '@mui/icons-material/Message';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import { Notification } from './notification.mock';
+import { BackendNotification } from './notification.types';
+import { NotificationGroup, NotificationType, NotificationStatus } from '../../enum/notification.enum';
+import { REACT_APP_API_URL } from '../../config';
 import styles from './notification.module.scss';
 
 interface NotificationItemProps {
-	item: Notification;
+	item: BackendNotification;
 	onMarkRead: (id: string) => void;
 	timeLabel: string;
 }
 
-const iconMap: Record<Notification['type'], React.ReactNode> = {
-	booking_created: <BookOnlineIcon className={styles.icon} />,
-	booking_cancelled: <BookOnlineIcon className={styles.icon} />,
-	payment_success: <PaymentIcon className={styles.icon} />,
-	payment_failed: <ErrorOutlineIcon className={styles.icon} />,
-	system_alert: <SystemUpdateIcon className={styles.icon} />,
-	promotion: <LocalOfferIcon className={styles.icon} />,
+const iconMap: Record<NotificationType, React.ReactNode> = {
+	[NotificationType.LIKE]: <FavoriteIcon className={styles.icon} />,
+	[NotificationType.COMMENT]: <CommentIcon className={styles.icon} />,
+	[NotificationType.FOLLOW]: <PersonAddIcon className={styles.icon} />,
+	[NotificationType.MESSAGE]: <MessageIcon className={styles.icon} />,
+	[NotificationType.SUBSCRIPTION]: <LocalOfferIcon className={styles.icon} />,
 };
 
-const iconColor: Record<Notification['type'], string> = {
-	booking_created: '#4f46e5',
-	booking_cancelled: '#f59e0b',
-	payment_success: '#10b981',
-	payment_failed: '#ef4444',
-	system_alert: '#f97316',
-	promotion: '#8b5cf6',
+const iconColor: Record<NotificationType, string> = {
+	[NotificationType.LIKE]: '#ef4444',
+	[NotificationType.COMMENT]: '#3b82f6',
+	[NotificationType.FOLLOW]: '#10b981',
+	[NotificationType.MESSAGE]: '#f59e0b',
+	[NotificationType.SUBSCRIPTION]: '#8b5cf6',
 };
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ item, onMarkRead, timeLabel }) => {
+	const { t } = useTranslation('common');
+	const isUnread = item.notificationStatus === NotificationStatus.WAIT;
 	const handleClick = () => {
-		if (!item.isRead) onMarkRead(item.id);
+		if (isUnread) onMarkRead(item._id);
 	};
 
+	const authorName =
+		item.authorData?.memberFullName || item.authorData?.memberNick || t('Someone', { defaultValue: 'Someone' });
+
+	const actionLabel = (() => {
+		switch (item.notificationType) {
+			case NotificationType.LIKE:
+				return t('liked', { defaultValue: 'liked' });
+			case NotificationType.COMMENT:
+				return t('commented', { defaultValue: 'commented' });
+			case NotificationType.FOLLOW:
+				return t('started following you', { defaultValue: 'started following you' });
+			case NotificationType.MESSAGE:
+				return t('sent you a message', { defaultValue: 'sent you a message' });
+			case NotificationType.SUBSCRIPTION:
+				return t('subscribed', { defaultValue: 'subscribed' });
+			default:
+				return '';
+		}
+	})();
+
+	const relatedTitle =
+		item.notificationGroup === NotificationGroup.CAR
+			? item.carData?.carTitle
+			: item.notificationGroup === NotificationGroup.ARTICLE
+			? item.articleData?.articleTitle
+			: undefined;
+
+	const description =
+		item.notificationDesc || item.notificationTitle || (relatedTitle ? `${t('Related to', { defaultValue: 'Related to' })} ${relatedTitle}` : '');
+
+	const imageSrc = (() => {
+		if (item.notificationGroup === NotificationGroup.CAR && item.carData?.carImages?.[0]) {
+			return `${REACT_APP_API_URL}/${item.carData.carImages[0]}`;
+		}
+		if (item.notificationGroup === NotificationGroup.ARTICLE && item.articleData?.articleImage) {
+			return `${REACT_APP_API_URL}/${item.articleData.articleImage}`;
+		}
+		if (item.authorData?.memberImage) {
+			return item.authorData.memberImage.startsWith('http')
+				? item.authorData.memberImage
+				: `${REACT_APP_API_URL}/${item.authorData.memberImage}`;
+		}
+		return undefined;
+	})();
+
 	return (
-		<Box className={`${styles.notificationItem} ${item.isRead ? '' : styles.unread}`} onClick={handleClick}>
+		<Box className={`${styles.notificationItem} ${isUnread ? styles.unread : ''}`} onClick={handleClick}>
 			<Stack direction="row" spacing={2} className={styles.itemContent}>
-				<Avatar className={styles.iconAvatar} sx={{ bgcolor: iconColor[item.type] }}>
-					{iconMap[item.type]}
+				<Avatar className={styles.iconAvatar} sx={{ bgcolor: iconColor[item.notificationType] }}>
+					{iconMap[item.notificationType]}
 				</Avatar>
 				<Stack className={styles.itemText} spacing={0.5}>
 					<Typography
 						variant="subtitle1"
-						className={`${styles.itemTitle} ${item.isRead ? '' : styles.titleUnread}`}
-						fontWeight={item.isRead ? 600 : 700}
+						className={`${styles.itemTitle} ${isUnread ? styles.titleUnread : ''}`}
+						fontWeight={isUnread ? 700 : 600}
 					>
-						{item.title}
+						{authorName} {actionLabel}
 					</Typography>
 					<Typography variant="body2" className={styles.itemMessage}>
-						{item.message}
+						{description}
 					</Typography>
 					<Typography variant="caption" className={styles.itemTime}>
 						{timeLabel}
 					</Typography>
 				</Stack>
-				{!item.isRead && <Box className={styles.unreadIndicator} />}
+				{imageSrc && (
+					<Box className={styles.itemThumb}>
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img src={imageSrc} alt={authorName} />
+					</Box>
+				)}
+				{isUnread && <Box className={styles.unreadIndicator} />}
 			</Stack>
 		</Box>
 	);
