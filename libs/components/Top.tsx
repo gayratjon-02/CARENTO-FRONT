@@ -29,6 +29,7 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 import { userVar } from '../../apollo/store';
 import { REACT_APP_API_URL } from '../config';
 import { GetNotifications } from '../../apollo/user/query';
+import { sweetLoginConfirmAlert } from '../sweetAlert';
 
 type Lang = 'en' | 'kr' | 'ru';
 type Currency = 'KRW' | 'USD';
@@ -219,6 +220,17 @@ const Top: React.FC = () => {
 		[notificationsData],
 	);
 
+	const handleNotificationClick = useCallback(async () => {
+		if (!user?._id) {
+			const confirmed = await sweetLoginConfirmAlert('Please log in first.');
+			if (confirmed) {
+				router.push('/account/join');
+			}
+			return;
+		}
+		router.push('/notification');
+	}, [router, user?._id]);
+
 	if (device === 'mobile') {
 		return (
 			<Stack className="top">
@@ -256,7 +268,7 @@ const Top: React.FC = () => {
 					{/* RIGHT ACTIONS */}
 					<Box component="div" className="right-actions">
 						{/* NOTIFICATIONS */}
-						<Box component="div" className="action-pill notification-pill" onClick={() => router.push('/notification')}>
+						<Box component="div" className="action-pill notification-pill" onClick={handleNotificationClick}>
 							<Badge
 								badgeContent={notificationCount}
 								color="error"
