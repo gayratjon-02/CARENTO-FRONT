@@ -218,11 +218,14 @@
   /* SweetAlert mobile tweaks */
   .swal2-container {
     padding: 12px !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   .swal2-popup {
-    width: min(420px, 92vw) !important;
+    width: min(420px, 94vw) !important;
     border-radius: 18px !important;
     padding: 18px 16px !important;
+    margin: 0 auto !important;
   }
   .swal2-title {
     font-size: 18px !important;
@@ -730,7 +733,7 @@
             min-height: 260px;
             .rating-pill {
               position: absolute;
-              top: -14px;
+              top: -6px;
               right: 14px;
               display: inline-flex;
               align-items: center;
