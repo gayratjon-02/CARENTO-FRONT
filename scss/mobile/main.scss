@@ -429,7 +429,8 @@
           letter-spacing: -0.4px;
           .gradient-text {
             background: linear-gradient(120deg, #111827 0%, #0f9f6e 80%);
-            // -webkit-background-clip: text;
+            -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
           }
         }
@@ -500,13 +501,13 @@
       }
       .brand-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
         gap: 12px;
         width: 100%;
         padding-bottom: 2px;
       }
       .brand-card {
-        height: 114px;
+        height: 104px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -519,8 +520,8 @@
         position: relative;
         overflow: hidden;
         img {
-          max-width: 70%;
-          max-height: 50px;
+          max-width: 64%;
+          max-height: 42px;
           object-fit: contain;
         }
         .brand-name {
