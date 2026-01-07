@@ -8,9 +8,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import { alpha, styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
 
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Logout } from '@mui/icons-material';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 import {
 	CaretDown,
@@ -88,6 +91,7 @@ const Top: React.FC = () => {
 	const [colorChange, setColorChange] = useState(false);
 	const [bgColor, setBgColor] = useState(false);
 	const [authToken, setAuthToken] = useState<string | null>(null);
+	const [menuOpen, setMenuOpen] = useState(false);
 
 	// locale -> i18n sync
 	useEffect(() => {
@@ -133,6 +137,14 @@ const Top: React.FC = () => {
 		window.addEventListener('scroll', onScroll);
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
+
+	useEffect(() => {
+		const handleRouteChange = () => setMenuOpen(false);
+		router.events.on('routeChangeComplete', handleRouteChange);
+		return () => {
+			router.events.off('routeChangeComplete', handleRouteChange);
+		};
+	}, [router.events]);
 
 	const navLinks = useMemo(() => {
 		const links = [
@@ -232,14 +244,117 @@ const Top: React.FC = () => {
 		router.push('/notification');
 	}, [router, user?._id]);
 
+	const toggleMenu = useCallback(() => setMenuOpen((prev) => !prev), []);
+	const closeMenu = useCallback(() => setMenuOpen(false), []);
+
 	if (device === 'mobile') {
 		return (
-			<Stack className="top">
-				{navLinks.map((link) => (
-					<Link key={link.href} href={link.href}>
-						<div>{link.label}</div>
+			<Stack className={`top mobile-top ${menuOpen ? 'menu-open' : ''}`}>
+				<Box className="mobile-top-bar">
+					<Link href="/" className="brand">
+						<img src="/img/icons/main-logotip.svg" alt="Carento Logo" />
+						<span>Carento</span>
 					</Link>
-				))}
+					<Box className="mobile-actions">
+						<IconButton className="notification-btn" onClick={handleNotificationClick} aria-label="Notifications">
+							<Badge
+								badgeContent={notificationCount}
+								color="error"
+								max={99}
+								sx={{
+									'& .MuiBadge-badge': {
+										right: 0,
+										top: 2,
+									},
+								}}
+							>
+								<BellRinging size={22} weight="duotone" />
+							</Badge>
+						</IconButton>
+						<IconButton className="menu-btn" onClick={toggleMenu} aria-label="Toggle menu">
+							{menuOpen ? <CloseRoundedIcon /> : <MenuRoundedIcon />}
+						</IconButton>
+					</Box>
+				</Box>
+
+				<Box className={`mobile-drawer ${menuOpen ? 'open' : ''}`}>
+					<Box className="drawer-section">
+						<p className="drawer-title">{t('Menu', { defaultValue: 'Menu' })}</p>
+						<Stack className="drawer-nav">
+							{navLinks.map((link) => (
+								<Link
+									key={link.href}
+									href={link.href}
+									className={`drawer-nav-item ${isActiveRoute(link.href) ? 'active' : ''}`}
+									onClick={closeMenu}
+								>
+									<span className="icon">{link.icon}</span>
+									<span className="label">{link.label}</span>
+								</Link>
+							))}
+						</Stack>
+					</Box>
+
+					<Box className="drawer-section">
+						<p className="drawer-title">{t('Preferences', { defaultValue: 'Preferences' })}</p>
+						<Box className="pref-row">
+							<Button
+								variant="outlined"
+								className="pref-btn"
+								onClick={handleLangOpen}
+								endIcon={<CaretDown size={14} />}
+							>
+								<img src={`/img/flag/lang${lang}.png`} alt="flag" />
+								<span>{lang.toUpperCase()}</span>
+							</Button>
+							<Button
+								variant="outlined"
+								className="pref-btn"
+								onClick={handleCurrencyOpen}
+								endIcon={<CaretDown size={14} />}
+							>
+								<span className="currency-symbol">{currency === 'USD' ? '$' : '₩'}</span>
+								<span>{currency}</span>
+							</Button>
+						</Box>
+					</Box>
+
+					<Box className="drawer-section">
+						<p className="drawer-title">{t('Account', { defaultValue: 'Account' })}</p>
+						{user?._id ? (
+							<Box className="user-quick">
+								<Box className="avatar">
+									<img
+										src={user?.memberImage ? `${REACT_APP_API_URL}/${user.memberImage}` : '/img/profile/defaultUser.svg'}
+										alt="user avatar"
+									/>
+								</Box>
+								<Box className="user-meta">
+									<strong>{user?.memberNick || t('User', { defaultValue: 'User' })}</strong>
+									<span>{user?.memberEmail || t('Logged in', { defaultValue: 'Logged in' })}</span>
+								</Box>
+								<Button
+									variant="contained"
+									color="primary"
+									className="logout-btn"
+									onClick={() => {
+										closeMenu();
+										logOut();
+									}}
+								>
+									{t('Logout', { defaultValue: 'Logout' })}
+								</Button>
+							</Box>
+						) : (
+							<Link href="/account/join" className="auth-btn" onClick={closeMenu}>
+								<span>{t('Login / Sign up', { defaultValue: 'Login / Sign up' })}</span>
+								<AccountCircleOutlinedIcon fontSize="small" />
+							</Link>
+						)}
+					</Box>
+				</Box>
+
+				{menuOpen && <div className="mobile-drawer-backdrop" onClick={closeMenu} />}
 			</Stack>
 		);
 	}
