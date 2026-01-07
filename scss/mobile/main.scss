@@ -291,15 +291,18 @@
       }
     }
     .grid {
-      display: grid;
-      grid-auto-flow: column;
-      grid-auto-columns: 82%;
+      display: flex;
+      flex-direction: row;
       gap: 12px;
       overflow-x: auto;
       padding-bottom: 4px;
       -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      padding-right: 4px;
     }
     .type-card {
+      min-width: 82%;
+      scroll-snap-align: start;
       border-radius: 16px;
       border: 1px solid #e6e7eb;
       background: #fff;
