@@ -583,6 +583,9 @@
         display: flex;
         flex-direction: row;
         width: 100%;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        padding: 4px 0 10px;
+        border-radius: 18px;
         .empty-list {
           width: 100%;
           height: 240px;
@@ -598,9 +601,9 @@
           height: auto;
           display: flex;
           flex-direction: row;
-          padding-bottom: 8px;
+          padding: 6px 2px 14px;
           .trend-property-slide {
-            width: 92%;
+            width: 94%;
             height: auto;
             display: flex;
             padding: 4px;
@@ -610,35 +613,46 @@
           width: 100%;
           display: flex;
           flex-direction: column;
-          border-radius: 16px;
-          background: #fff;
+          border-radius: 18px;
+          background: linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
           border: 1px solid #e6e7eb;
-          box-shadow: 0 12px 28px rgba(19, 25, 38, 0.08);
+          box-shadow: 0 14px 30px rgba(19, 25, 38, 0.08);
           overflow: hidden;
           .trend-car-image {
             position: relative;
             width: 100%;
-            height: 190px;
-            border-radius: 16px 16px 0 0;
+            height: 210px;
+            border-radius: 18px 18px 0 0;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+            background-color: #eceff3;
+            overflow: hidden;
+            &::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background: linear-gradient(180deg, rgba(15, 23, 42, 0) 35%, rgba(15, 23, 42, 0.25) 100%);
+              pointer-events: none;
+            }
             .trend-stats-bar {
               position: absolute;
               left: 14px;
               right: 14px;
               bottom: 12px;
-              height: 36px;
+              height: 42px;
               display: flex;
               flex-direction: row;
               align-items: center;
               justify-content: space-between;
               z-index: 3;
-              background: transparent;
-              box-shadow: none;
-              backdrop-filter: none;
-              color: rgba(255, 255, 255, 0.92);
-              text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+              padding: 8px 10px;
+              border-radius: 12px;
+              background: rgba(15, 23, 42, 0.38);
+              box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+              backdrop-filter: blur(6px);
+              color: rgba(255, 255, 255, 0.95);
+              text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
             }
             .trend-stats-left {
               display: inline-flex;
@@ -663,13 +677,13 @@
               }
             }
             .trend-stats-icon {
-              font-size: 22px;
+              font-size: 20px;
               color: inherit;
               filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
             }
             .trend-stats-count {
-              font-size: 16px;
-              font-weight: 500;
+              font-size: 14px;
+              font-weight: 600;
               color: inherit;
             }
             &.no-image {
@@ -690,13 +704,13 @@
           }
           .trend-car-body {
             position: relative;
-            padding: 16px 16px 14px;
+            padding: 18px 16px 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             .rating-pill {
               position: absolute;
-              top: -16px;
+              top: -18px;
               left: 14px;
               display: inline-flex;
               align-items: center;
@@ -704,7 +718,7 @@
               padding: 8px 12px;
               border-radius: 999px;
               background: #fff;
-              box-shadow: 0 10px 26px rgba(16, 185, 129, 0.18);
+              box-shadow: 0 12px 28px rgba(16, 185, 129, 0.2);
               color: #0f9f6e;
               font-family: $font;
               font-size: 12px;
@@ -722,15 +736,15 @@
             .car-title {
               color: #1f2937;
               font-family: $font;
-              font-size: 16px;
-              font-weight: 700;
-              line-height: 1.4;
+              font-size: 17px;
+              font-weight: 800;
+              line-height: 1.35;
             }
             .car-brand-year {
               color: #6b7280;
               font-family: $font;
-              font-size: 13px;
-              font-weight: 500;
+              font-size: 12px;
+              font-weight: 600;
             }
             .car-location {
               display: inline-flex;
@@ -745,10 +759,10 @@
               }
             }
             .car-specs {
-              margin-top: 4px;
+              margin-top: 6px;
               display: grid;
               grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 10px 12px;
+              gap: 12px 10px;
               .spec-item {
                 display: inline-flex;
                 align-items: center;
@@ -756,14 +770,14 @@
                 color: #4b5563;
                 font-family: $font;
                 font-size: 13px;
-                font-weight: 600;
+                font-weight: 700;
                 svg {
                   color: #a0a0aa;
                 }
               }
             }
             .card-footer {
-              margin-top: 10px;
+              margin-top: 14px;
               display: flex;
               align-items: center;
               justify-content: space-between;
@@ -774,22 +788,22 @@
                 span {
                   color: #6b7280;
                   font-family: $font;
-                  font-size: 13px;
+                  font-size: 12px;
                   font-weight: 500;
                 }
                 strong {
                   margin-top: 2px;
                   color: #111827;
                   font-family: $font;
-                  font-size: 17px;
+                  font-size: 18px;
                   font-weight: 800;
                 }
               }
               .book-btn {
-                padding: 10px 16px;
+                padding: 11px 16px;
                 border-radius: 30px;
                 background: linear-gradient(135deg, #22c55e, #16a34a);
-                box-shadow: 0 10px 24px rgba(34, 197, 94, 0.28);
+                box-shadow: 0 12px 26px rgba(34, 197, 94, 0.26);
                 color: #fff;
                 border: none;
                 min-width: 0;
