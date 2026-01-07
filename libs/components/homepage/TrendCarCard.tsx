@@ -1,4 +1,4 @@
-import React, { CSSProperties, MouseEvent, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { REACT_APP_API_URL } from '../../config';
 
@@ -18,6 +18,7 @@ import { userVar } from 'apollo/store';
 import { useReactiveVar } from '@apollo/client';
 import { Car } from 'libs/types/car/cars';
 import { useTranslation } from 'next-i18next';
+import useDeviceDetect from '../../hooks/useDeviceDetect';
 
 interface TrendCarCardProps {
 	car: Car;
@@ -30,9 +31,27 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 	const { t } = useTranslation('common');
+	const device = useDeviceDetect();
 
-	const hasImage = Array.isArray(car?.carImages) && car.carImages.length > 0;
-	const carImage = hasImage ? `${REACT_APP_API_URL}/${car.carImages[0]}` : undefined;
+	const buildImageUrl = useCallback((src?: string): string | undefined => {
+		if (!src) return undefined;
+		if (src.startsWith('http://') || src.startsWith('https://')) return src;
+		const normalized = src.startsWith('/') ? src.slice(1) : src;
+		return `${REACT_APP_API_URL}/${normalized}`;
+	}, []);
+
+	const rawImageCandidate =
+		(car?.carImages && car.carImages[0]) ||
+		((car as any)?.mainImage as string | undefined) ||
+		((car as any)?.coverImage as string | undefined);
+
+	const rawImage =
+		typeof rawImageCandidate === 'string'
+			? rawImageCandidate
+			: (rawImageCandidate as any)?.url || (rawImageCandidate as any)?.path || undefined;
+
+	const carImage = buildImageUrl(rawImage as any);
+	const hasImage = Boolean(carImage);
 	const imageStyle: CSSProperties | undefined = carImage ? { backgroundImage: `url(${carImage})` } : undefined;
 
 	const carId = car?._id ? String(car._id) : '';
@@ -46,6 +65,8 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 	}, [car]);
 
 	const [liked, setLiked] = useState<boolean>(isLikedFromApi);
+	const [likeToast, setLikeToast] = useState<string | null>(null);
+	const likeToastTimer = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		setLiked(isLikedFromApi);
@@ -139,13 +160,27 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 		const prev = liked;
 		const next = !prev;
 		setLiked(next);
+		const toastMsg = next
+			? t('Added to likes', { defaultValue: 'Added to likes' })
+			: t('Removed from likes', { defaultValue: 'Removed from likes' });
+		if (likeToastTimer.current) clearTimeout(likeToastTimer.current);
+		setLikeToast(toastMsg);
+		likeToastTimer.current = setTimeout(() => setLikeToast(null), 1600);
 
 		try {
 			await likeCarHandler(user, carId);
 		} catch (err) {
 			setLiked(prev);
+			if (likeToastTimer.current) clearTimeout(likeToastTimer.current);
+			setLikeToast(null);
 		}
 	};
+
+	useEffect(() => {
+		return () => {
+			if (likeToastTimer.current) clearTimeout(likeToastTimer.current);
+		};
+	}, []);
 
 	return (
 		<Stack className="trend-car-card" onClick={openDetailPage}>
@@ -223,6 +258,12 @@ const TrendCarCard = (props: TrendCarCardProps) => {
 						{t('Book Now', { defaultValue: 'Book Now' })}
 					</Button>
 				</Stack>
+
+				{likeToast && (
+					<div className={`like-toast ${device === 'mobile' ? 'mobile' : ''}`}>
+						<span>{likeToast}</span>
+					</div>
+				)}
 			</Stack>
 		</Stack>
 	);

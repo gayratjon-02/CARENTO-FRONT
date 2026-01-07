@@ -611,6 +611,7 @@
         }
         .trend-car-card {
           width: 100%;
+          position: relative;
           display: flex;
           flex-direction: column;
           border-radius: 18px;
@@ -621,7 +622,7 @@
           .trend-car-image {
             position: relative;
             width: 100%;
-            height: 210px;
+            height: 220px;
             border-radius: 18px 18px 0 0;
             background-size: cover;
             background-repeat: no-repeat;
@@ -632,7 +633,7 @@
               content: '';
               position: absolute;
               inset: 0;
-              background: linear-gradient(180deg, rgba(15, 23, 42, 0) 35%, rgba(15, 23, 42, 0.25) 100%);
+              background: linear-gradient(180deg, rgba(15, 23, 42, 0) 35%, rgba(15, 23, 42, 0.32) 100%);
               pointer-events: none;
             }
             .trend-stats-bar {
@@ -710,7 +711,7 @@
             gap: 10px;
             .rating-pill {
               position: absolute;
-              top: -18px;
+              top: -14px;
               left: 14px;
               display: inline-flex;
               align-items: center;
@@ -723,6 +724,7 @@
               font-family: $font;
               font-size: 12px;
               font-weight: 600;
+              min-width: 92px;
               .reviews {
                 color: #6b7280;
                 font-weight: 500;
@@ -812,6 +814,25 @@
                 font-weight: 700;
                 text-transform: none;
               }
+            }
+          }
+          .like-toast {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 14px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            font-family: $font;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.25);
+            pointer-events: none;
+            &.mobile {
+              width: calc(100% - 32px);
+              text-align: center;
             }
           }
         }
