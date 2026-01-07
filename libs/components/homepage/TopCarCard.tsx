@@ -30,19 +30,25 @@ const TopCarCard = (props: TopCarCardProps) => {
 		await router.push({ pathname: '/car/detail', query: { id: carId } });
 	};
 
+	const buildImageUrl = (src?: string): string | undefined => {
+		if (!src) return undefined;
+		if (src.startsWith('http://') || src.startsWith('https://')) return src;
+		const normalized = src.startsWith('/') ? src.slice(1) : src;
+		return `${REACT_APP_API_URL}/${normalized}`;
+	};
+
+	const imageSrc = buildImageUrl(car?.carImages?.[0]);
+	const imageStyle = imageSrc ? { backgroundImage: `url(${imageSrc})` } : undefined;
+	const imageClass = imageSrc ? 'card-img' : 'card-img no-image';
+
 	if (device === 'mobile') {
 		return (
 			<Stack className="top-card-box">
-				<Box
-					component={'div'}
-					className={'card-img'}
-					style={{ backgroundImage: `url(${REACT_APP_API_URL}/${car?.carImages[0]})` }}
-					onClick={() => pushDetailHandler(car?._id)}
-				>
-					<div>${car?.pricePerDay}</div>
+				<Box component={'div'} className={imageClass} style={imageStyle} onClick={() => pushDetailHandler(car?._id)}>
+					<div className="price-pill">{car?.pricePerDay ? `$${car?.pricePerDay}` : t('Price on request')}</div>
 				</Box>
 				<Box component={'div'} className={'info'}>
-						<strong className={'title'} onClick={() => pushDetailHandler(car?._id)}>
+					<strong className={'title'} onClick={() => pushDetailHandler(car?._id)}>
 						{car?.carTitle}
 					</strong>
 					<p className={'desc'}>{car?.carDescription}</p>
@@ -98,13 +104,8 @@ const TopCarCard = (props: TopCarCardProps) => {
 	} else {
 		return (
 			<Stack className="top-card-box">
-				<Box
-					component={'div'}
-					className={'card-img'}
-					style={{ backgroundImage: `url(${REACT_APP_API_URL}/${car?.carImages[0]})` }}
-					onClick={() => pushDetailHandler(car?._id)}
-				>
-					<div>${car?.pricePerDay}</div>
+				<Box component={'div'} className={imageClass} style={imageStyle} onClick={() => pushDetailHandler(car?._id)}>
+					<div className="price-pill">{car?.pricePerDay ? `$${car?.pricePerDay}` : t('Price on request')}</div>
 				</Box>
 				<Box component={'div'} className={'info'}>
 					<strong className={'title'} onClick={() => pushDetailHandler(car?._id)}>
