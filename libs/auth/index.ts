@@ -135,6 +135,7 @@ export const updateUserInfo = (jwtToken: any) => {
 		memberAuthType: claims.memberAuthType,
 		memberPhone: claims.memberPhone ?? '',
 		memberNick: claims.memberNick ?? '',
+		memberEmail: claims.memberEmail ?? '',
 		memberFullName: claims.memberFullName ?? '',
 		memberImage:
 			claims.memberImage === null || claims.memberImage === undefined
@@ -173,6 +174,7 @@ const deleteUserInfo = () => {
 		memberAuthType: '',
 		memberPhone: '',
 		memberNick: '',
+		memberEmail: '',
 		memberFullName: '',
 		memberImage: '',
 		memberAddress: '',
