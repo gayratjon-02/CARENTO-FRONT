@@ -1917,8 +1917,13 @@
       align-items: center;
       .info-box {
         width: 100%;
-        align-items: flex-start;
-        gap: 6px;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+        padding: 0 8px;
+        .eyebrow {
+          margin-bottom: 2px;
+        }
         .eyebrow {
           display: inline-flex;
           align-items: center;
@@ -1933,13 +1938,18 @@
           letter-spacing: 0.12em;
         }
         span {
-          font-size: 26px;
+          font-size: 24px;
+          line-height: 1.25;
+          letter-spacing: -0.3px;
+          word-break: keep-all;
+          max-width: 100%;
         }
         p {
           color: #4b5563;
-          font-size: 14px;
-          max-width: 320px;
-          line-height: 24px;
+          font-size: 13px;
+          max-width: 94%;
+          line-height: 20px;
+          word-break: keep-all;
         }
       }
       .wrapper {
