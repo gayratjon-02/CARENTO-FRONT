@@ -4,9 +4,9 @@ services:
     restart: always
     image: node:20.10.0
     ports:
-      - 4010:3010
+      - 4021:4020
     environment:
-      - PORT=3010
+      - PORT=4020
     volumes:
       - ./:/usr/src/carento-front
     working_dir: /usr/src/carento-front

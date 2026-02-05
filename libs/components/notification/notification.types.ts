@@ -47,3 +47,4 @@ export const getCategoryFromType = (type: NotificationType, group: NotificationG
 	if (type === NotificationType.SUBSCRIPTION) return 'follow';
 	return 'all';
 };
+
