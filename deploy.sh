@@ -6,5 +6,8 @@ git reset --hard
 git checkout master
 git pull origin master
 
+docker stop  carento-front
+docker remove carento-front
+
 
 docker compose up -d
