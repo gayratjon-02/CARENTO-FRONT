@@ -11,9 +11,10 @@ const nextConfig = {
 	},
 	images: {
 		remotePatterns: [
+			{ protocol: 'https', hostname: 'carento.tech', pathname: '/**' },
+			{ protocol: 'https', hostname: 'api.carento.tech', pathname: '/**' },
 			{ protocol: 'http', hostname: '167.172.90.235', port: '4027', pathname: '/uploads/**' },
 			{ protocol: 'http', hostname: '167.172.90.235', port: '4001', pathname: '/uploads/**' },
-			{ protocol: 'https', hostname: '167.172.90.235', port: '', pathname: '/uploads/**' },
 		],
 	},
 };

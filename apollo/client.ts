@@ -18,6 +18,16 @@ function getHeaders() {
 	return headers;
 }
 
+/** HTTPS sahifadan faqat wss:// ishlaydi; ws:// brauzer tomonidan bloklanadi */
+function getWebSocketUri(): string {
+	const raw = process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007';
+	if (typeof window === 'undefined') return raw;
+	if (window.location?.protocol === 'https:' && raw.startsWith('ws://')) {
+		return raw.replace(/^ws:\/\//i, 'wss://');
+	}
+	return raw;
+}
+
 const tokenRefreshLink = new TokenRefreshLink({
 	accessTokenField: 'accessToken',
 	isTokenValidOrUndefined: () => {
@@ -82,9 +92,9 @@ function createIsomorphicLink() {
 			uri: process.env.REACT_APP_API_GRAPHQL_URL,
 		});
 
-		/* WEBSOCKET SUBSCRIPTION LINK */
+		/* WEBSOCKET SUBSCRIPTION LINK (HTTPS da wss:// ishlatiladi) */
 		const wsLink = new WebSocketLink({
-			uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
+			uri: getWebSocketUri(),
 			options: {
 				reconnect: false,
 				timeout: 30000,
